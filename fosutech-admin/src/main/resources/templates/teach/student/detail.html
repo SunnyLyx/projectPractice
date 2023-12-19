@@ -1,0 +1,961 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/layui/layui.css}" rel="stylesheet"/>
+<body class="white-bg">
+<style>
+    .name{
+        height: 100px;
+        line-height: 100px;
+        font-size: 22px;
+    }
+    .rowTop{
+        margin-top: 20px;
+    }
+    .col-sm-4{
+        padding: 0px;
+    }
+    .col-sm-8{
+        padding: 0px;
+        padding-left: 10px;
+    }
+    .col-sm-8>span{
+        color: #000000;
+    }
+    .layui-tab-title .layui-this{
+        color: #ffffff;
+        background-color: #0e9aef;
+    }
+</style>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content" th:object="${student}">
+    <input name="studentId" type="hidden" th:value="*{studentId}" id="studentId"/>
+    <div class="row">
+        <div class="col-md-1" style="padding-right: 0px;width: 12.333333%;text-align: center;">
+            <span class="name text-center" th:text="*{studentName}"></span>
+        </div>
+        <div class="col-md-4">
+            <div class="row rowTop">
+                <div class="col-sm-4 text-right">
+                    <span>专业</span>
+                </div>
+                <div class="col-sm-8 text-left">
+                    <span th:text="*{majors.majorName}"></span>
+                </div>
+            </div>
+            <div class="row rowTop">
+                <div class="col-sm-4 text-right">
+                    <span>班级</span>
+                </div>
+                <div class="col-sm-8">
+                    <span th:text="*{classes.className}"></span>
+                </div>
+            </div>
+            <div class="row rowTop">
+                <div class="col-sm-4 text-right">
+                    <span>进班时间</span>
+                </div>
+                <div class="col-sm-8">
+                    <span th:text="*{startTime}"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="row rowTop">
+                <div class="col-sm-4 text-right">
+                    <span>状态</span>
+                </div>
+                <div class="col-sm-8">
+                    <span th:text="*{params.state}"></span>
+                </div>
+            </div>
+            <div class="row rowTop">
+                <div class="col-sm-4 text-right">
+                    <span>电 话</span>
+                </div>
+                <div class="col-sm-8 text-left">
+                    <span th:text="*{phone}"></span>
+                </div>
+            </div>
+            <div class="row rowTop">
+                <div class="col-sm-4 text-right">
+                    <span>性 别</span>
+                </div>
+                <div class="col-sm-8 text-left">
+                    <span th:text="*{params.gender}"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2" style="height: 100px; line-height: 100px;">
+            <!--<input class="btn btn-primary" type="button" value="更改学生状态">-->
+        </div>
+    </div>
+    <div class="layui-tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this">个人档案</li>
+            <li>考勤</li>
+            <li>项目</li>
+            <li>作业</li>
+            <li>考试</li>
+            <li>就业</li>
+            <li>状态记录</li>
+        </ul>
+        <div class="layui-tab-content">
+            <div class="layui-tab-item layui-show">
+                <div class="row">
+                    <!--<input  class="btn btn-success" type="button" value="编辑个人档案">-->
+                </div>
+                <hr/>
+                <div class="row rowTop">
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>邮 箱</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{mail}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>证件号码</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{idCardNo}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>学历性质</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{params.nature}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>就业意向</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{params.jobCity}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row rowTop">
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>通讯地址</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{address}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>最高学历</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{params.edu}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>毕业/在读学校</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{graduateInstitutions}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>专业/年级</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{major}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row rowTop">
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>籍贯</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{nativePlace}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>英语水平</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{params.englishLevel}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>是否有基础</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{params.basic}"></span>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+                <div class="row rowTop">
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>预计毕业时间</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{graduateDate}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>缴费金额</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{workExperience}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>线下学号</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{kgcUid}"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="row rowTop">
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>紧急联系人</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{emergencyContact}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>紧急联系人电话</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{emergencyContactPhone}"></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="col-sm-4 text-center">
+                            <span>备注</span>
+                        </div>
+                        <div class="col-sm-8 text-left">
+                            <span th:text="*{extend2}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="container-div ui-layout-center">
+                    <div class="row">
+                        <div class="col-sm-12 search-collapse">
+                            <form id="form">
+                                <div class="select-list">
+                                    <ul>
+                                        <li class="select-time">
+                                            <label>创建时间： </label>
+                                            <input type="text" id="startTime" placeholder="开始时间"/>
+                                            <span>-</span>
+                                            <input type="text" id="endTime" placeholder="结束时间"/>
+                                            <a style="margin-left: 20px" class="btn btn-primary btn-rounded btn-sm" id="selectTime"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-sm-12 select-table">
+                            <div class="col-sm-2 text-center">
+                                <span>出勤率：</span>
+                                <span id="span1"></span>
+                            </div>
+                            <div class="col-sm-2 text-center">
+                                <span>迟到：</span>
+                                <span id="span2"></span>
+                            </div>
+                            <div class="col-sm-2 text-center">
+                                <span>请假：</span>
+                                <span id="span3"></span>
+                            </div>
+                            <div class="col-sm-2 text-center">
+                                <span>旷课：</span>
+                                <span id="span4"></span>
+                            </div>
+                            <div class="col-sm-2 text-center">
+                                <span>早退：</span>
+                                <span id="span5"></span>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 select-table table-striped">
+                            <table id="bootstrap-table" data-mobile-responsive="false"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="container-div ui-layout-center">
+                    <div class="row">
+                        <div class="col-sm-12 select-table table-striped">
+                            <table id="bootstrap-table1" data-mobile-responsive="true"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="container-div ui-layout-center">
+                    <div class="row">
+                        <div class="col-sm-12 search-collapse">
+                            <form id="form2">
+                                <div class="select-list">
+                                    <ul>
+                                        <li class="select-time">
+                                            <label>创建时间： </label>
+                                            <input type="text" id="startTime2" placeholder="开始时间"/>
+                                            <span>-</span>
+                                            <input type="text" id="endTime2" placeholder="结束时间"/>
+                                            <a style="margin-left: 20px" class="btn btn-primary btn-rounded btn-sm" id="selectTime2"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-sm-12 select-table table-striped">
+                            <table id="bootstrap-table2" data-mobile-responsive="true"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="container-div ui-layout-center">
+                    <div class="row">
+                        <div class="col-sm-12 search-collapse">
+                            <form id="form3">
+                                <div class="select-list">
+                                    <ul>
+                                        <li class="select-time">
+                                            <label>创建时间： </label>
+                                            <input type="text" id="startTime3" placeholder="开始时间"/>
+                                            <span>-</span>
+                                            <input type="text" id="endTime3" placeholder="结束时间"/>
+                                            <a style="margin-left: 20px" class="btn btn-primary btn-rounded btn-sm" id="selectTime3"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-sm-12 select-table table-striped">
+                            <table id="bootstrap-table3" data-mobile-responsive="true"></table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="container-div ui-layout-center">
+                    <div class="row" th:object="${employment}">
+                        <!--<div class="col-sm-12 select-table table-striped">
+                            <table id="bootstrap-table4" data-mobile-responsive="true"></table>
+                        </div>-->
+                        <!--<div class="col-md-2" style="height: 100px; line-height: 100px;">
+                            <input class="btn btn-primary" name="editEmployment" id="editEmployment"  type="button" value="编辑">
+                        </div>-->
+                        <div class="row rowTop" style="line-height: 30px">
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>更新时间</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{edittime}"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>就业方式</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{employmentWay}"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>入职时间</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{hiredate}"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>就业城市</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{urbanEmployment}"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>单位</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{einheit}"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>所属行业</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{industry}"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>试用薪资</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{probationSalary}"></span>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="col-sm-4 text-center">
+                                    <span>转正薪资</span>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <span th:if="${not #strings.isEmpty(employment)}" th:text="*{obtainmentSalary}"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-tab-item">
+                <div class="container-div ui-layout-center">
+                    <ul class="layui-timeline" id="time">
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript" th:src="@{/ajax/libs/layer/layer.min.js}"></script>
+<script type="text/javascript" th:src="@{/ajax/libs/layui/layui.js}"></script>
+
+<script type="text/javascript">
+    //注意：选项卡 依赖 element 模块，否则无法进行功能性操作
+    layui.use('element', function(){
+        var element = layui.element;
+
+        //…
+    });
+
+    $(function() {
+        var studentId = $("#studentId").val();
+        $('#bootstrap-table').bootstrapTable({
+            url: ctx + "teach/teachStudentAttendance/attendanceList",
+            contentType: "application/x-www-form-urlencoded",
+            method: 'post',
+            cache: false,
+            sortable: true,
+            sortStable: true,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50],
+            escape: false ,
+            showFooter: false,
+            iconSize: 'outline',
+            toolbar: '#toolbar',
+            sidePagination: "server",
+            search: false,
+            showSearch: true,
+            showRefresh: true,
+            showColumns: true,
+            showToggle: true,
+            showExport: true,
+            queryParams: {"studentId":studentId},
+            columns: [
+                {
+                    field : 'attendanceId',
+                    title : 'ID',
+                    visible: false
+                },
+                {
+                    field : 'teachAttendance.attendanceDatetime',
+                    title : '日期',
+                    visible: true
+                },
+                {
+                    field : 'classes.className',
+                    title : '所在班级',
+                    visible: true
+                },
+                {
+                    field : 'sysUser.userName',
+                    title : '上课老师',
+                    visible: true
+                },
+                {
+                    field : 'teachAttendance.lesson',
+                    title : '课程',
+                    visible: true,
+                    formatter: function (value, row, index) {
+                        if(value == 1){
+                            return '专业课';
+                        }else{
+                            return '实践课';
+                        }
+                    }
+                },
+                {
+                    field : 'attendance',
+                    title : '出勤',
+                    visible: true,
+                    formatter: function (value, row, index) {
+                        if(value == 1){
+                            return '出勤';
+                        }
+                        if(value == 2){
+                            return '请假';
+                        }
+                        if(value == 3){
+                            return '旷课';
+                        }
+                        if(value == 4){
+                            return '迟到';
+                        }
+                        if(value == 5){
+                            return '早退';
+                        }
+                    }
+                }],
+            responseHandler: function(res) {
+                if (res.code == 0) {
+                    var data = [];
+                    for(var i = 0;i<res.rows.length;i++){
+                        if(res.rows[i].studentId == -1){
+                            $("#span1").html(res.rows[i].params.acceptability);
+                            $("#span2").html(res.rows[i].params.latenum);
+                            $("#span3").html(res.rows[i].params.leavenum);
+                            $("#span4").html(res.rows[i].params.truancynum);
+                            $("#span5").html(res.rows[i].params.leaveearlynum);
+                        }else {
+                            data.push(res.rows[i])
+                        }
+                    }
+                    return { rows: data, total: res.total-1 };
+                } else {
+                    $.modal.alertWarning(res.msg);
+                    return { rows: [], total: 0 };
+                }
+            }
+        });
+
+        var selectTime = document.getElementById('selectTime');
+        selectTime.onclick = function (ev) {
+            var startTime = $("#startTime").val();
+            var endTime = $("#endTime").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachStudentAttendance/attendanceList",
+                data : {"studentId":studentId,"startTime":startTime,"endTime":endTime},
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    var rows = [];
+                    for(var i = 0;i<data.rows.length;i++){
+                        if(data.rows[i].studentId == -1){
+                            $("#span1").html(data.rows[i].params.acceptability);
+                            $("#span2").html(data.rows[i].params.latenum);
+                            $("#span3").html(data.rows[i].params.leavenum);
+                            $("#span4").html(data.rows[i].params.truancynum);
+                            $("#span5").html(data.rows[i].params.leaveearlynum);
+                        }else {
+                            rows.push(data.rows[i]);
+                        }
+                    }
+                    var datas = {total:data.total-1,rows:rows,code:data.code};
+                    $("#bootstrap-table").bootstrapTable('load', datas);
+                }
+            });
+        };
+
+        $('#bootstrap-table1').bootstrapTable({
+            url: ctx + "teach/teachStudentSubject/listByStudentId",
+            contentType: "application/x-www-form-urlencoded",
+            method: 'post',
+            cache: false,
+            sortable: true,
+            sortStable: true,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50],
+            escape: false ,
+            showFooter: false,
+            iconSize: 'outline',
+            toolbar: '#toolbar',
+            sidePagination: "server",
+            search: false,
+            showSearch: true,
+            showRefresh: true,
+            showColumns: true,
+            showToggle: true,
+            showExport: true,
+            queryParams: {"studentId":studentId},
+            columns: [
+                {
+                    field : 'id',
+                    title : 'ID',
+                    visible: false
+                },
+                {
+                    field : 'classes.className',
+                    title : '班级',
+                    visible: true
+                },
+                {
+                    field : 'subject.subjectName',
+                    title : '项目',
+                    visible: true
+                },
+                {
+                    field : 'subject.starttime',
+                    title : '开始时间',
+                    visible: true
+                },
+                {
+                    field : 'subject.endtime',
+                    title : '结束时间',
+                    visible: true
+                },
+                {
+                    field : 'submit',
+                    title : '提交情况',
+                    visible: true,
+                    formatter: function (value, row, index) {
+                        if(value == 1){
+                            return '优';
+                        }
+                        if(value == 2){
+                            return '良好';
+                        }
+                        if(value == 3){
+                            return '差';
+                        }
+                        if(value == 4){
+                            return '未交';
+                        }
+                    }
+                },
+                /*{
+                    field : 'subjectUrl',
+                    title : '作品链接',
+                    visible: true
+                },*/
+                {
+                    field : 'evaluate',
+                    title : '评价',
+                    visible: true
+                }],
+            responseHandler: $.table.responseHandler
+        });
+
+        $('#bootstrap-table2').bootstrapTable({
+            url: ctx + "teach/teachStudentJob/listByStudentId",
+            contentType: "application/x-www-form-urlencoded",
+            method: 'post',
+            cache: false,
+            sortable: true,
+            sortStable: true,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50],
+            escape: false ,
+            showFooter: false,
+            iconSize: 'outline',
+            toolbar: '#toolbar',
+            sidePagination: "server",
+            search: false,
+            showSearch: true,
+            showRefresh: true,
+            showColumns: true,
+            showToggle: true,
+            showExport: true,
+            queryParams: {"studentId":studentId},
+            columns: [
+                {
+                    field : 'id',
+                    title : 'ID',
+                    visible: false
+                },
+                {
+                    field : 'teachJob.datetime',
+                    title : '日期',
+                    visible: true
+                },
+                {
+                    field : 'classes.className',
+                    title : '班级',
+                    visible: true
+                },
+                {
+                    field : 'jobResult',
+                    title : '作业提交',
+                    visible: true,
+                    formatter: function (value, row, index) {
+                        if(value == 1){
+                            return '优';
+                        }
+                        if(value == 2){
+                            return '良好';
+                        }
+                        if(value == 3){
+                            return '差';
+                        }
+                        if(value == 4){
+                            return '未交';
+                        }
+                    }
+                }],
+            responseHandler: $.table.responseHandler
+        });
+
+        var selectTime2 = document.getElementById('selectTime2');
+        selectTime2.onclick = function (ev) {
+            var startTime = $("#startTime2").val();
+            var endTime = $("#endTime2").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachStudentJob/listByStudentId",
+                data : {"studentId":studentId,"startTime":startTime,"endTime":endTime},
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $("#bootstrap-table2").bootstrapTable('load', data);
+                }
+            });
+        };
+
+        $('#bootstrap-table3').bootstrapTable({
+            url: ctx + "teach/teachStudentExam/listByStudentId",
+            contentType: "application/x-www-form-urlencoded",
+            method: 'post',
+            cache: false,
+            sortable: true,
+            sortStable: true,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50],
+            escape: false ,
+            showFooter: false,
+            iconSize: 'outline',
+            toolbar: '#toolbar',
+            sidePagination: "server",
+            search: false,
+            showSearch: true,
+            showRefresh: true,
+            showColumns: true,
+            showToggle: true,
+            showExport: true,
+            queryParams: {"studentId":studentId},
+            columns: [
+                {
+                    field : 'id',
+                    title : 'ID',
+                    visible: false
+                },
+                {
+                    field : 'teachExam.datetime',
+                    title : '日期',
+                    visible: true
+                },
+                {
+                    field : 'classes.className',
+                    title : '班级',
+                    visible: true
+                },
+                {
+                    field : 'majorStage.stageName',
+                    title : '阶段',
+                    visible: true
+                },
+                {
+                    field : 'score',
+                    title : '成绩',
+                    visible: true
+                }],
+            responseHandler: $.table.responseHandler
+        });
+
+        var selectTime3 = document.getElementById('selectTime3');
+        selectTime3.onclick = function (ev) {
+            var startTime = $("#startTime3").val();
+            var endTime = $("#endTime3").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachStudentExam/listByStudentId",
+                data : {"studentId":studentId,"startTime":startTime,"endTime":endTime},
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $("#bootstrap-table3").bootstrapTable('load', data);
+                }
+            });
+        };
+
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "teach/teachStatusRecord/list",
+            data : {"studentId":studentId},
+            async : false,
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                var dataRow = data.rows;
+                for(var i = 0;i<dataRow.length;i++){
+                    if(dataRow[i].upTime == null){
+                        dataRow[i].upTime = "";
+                    }
+                    var trs="<li class=\"layui-timeline-item\">\n" +
+                        "<i class=\"layui-icon layui-timeline-axis\">&#xe63f;</i>\n" +
+                        "<div class=\"layui-timeline-content layui-text\">\n" +
+                        "<h3 class=\"layui-timeline-title\">"+dataRow[i].changeTime+"</h3>\n" +
+                        "<ul>\n" +
+                        "<li>更改人<span style='display: inline-block;margin-left: 10px'>"+dataRow[i].sysUser.userName+"</span></li>\n" +
+                        "<li>更改类型<span style='display: inline-block;margin-left: 10px'>"+dataRow[i].changeType+"</span></li>\n" +
+                        "<li>更改内容<span style='display: inline-block;margin-left: 10px'>"+dataRow[i].changeContent+"</span></li>\n" +
+                        "<li>更改时间<span style='display: inline-block;margin-left: 10px'>"+dataRow[i].upTime+"</span></li>\n" +
+                        "</ul>\n" +
+                        "</div>\n" +
+                        "</li>";
+                    $("#time").append(trs);
+                }
+            }
+        });
+
+    });
+
+    $(window).load(function(){
+        //初始化时间控件
+        /*考勤的时间控件*/
+        var cartimeDate = laydate.render({
+            elem: '#startTime' //用车时间
+            ,done:function(value, date){
+                returntimeDate.config.min=getDateArray(date);//重点
+            }
+        });
+
+        var returntimeDate = laydate.render({
+            elem: '#endTime' //预计回车时间
+            ,done:function(value, date){
+                cartimeDate.config.max=getDateArray(date);//重点
+            }
+        });
+
+        function getDateArray(date){//获取时间数组
+            var darray={};
+            darray.year=date.year;
+            darray.month=date.month - 1;
+            var day=date.date;
+            if(date.hours == 23 && date.minutes == 59 && date.seconds == 59){
+                day = day + 1;
+            }else{
+                darray.hours = date.hours;
+                darray.minutes = date.minutes;
+                darray.seconds = date.seconds;
+            }
+            darray.date=day;
+            return darray;
+        }
+
+        /*作业的时间控件*/
+        var cartimeDate2 = laydate.render({
+            elem: '#startTime2',trigger: 'click' //用车时间
+            ,done:function(value, date){
+                returntimeDate2.config.min=getDateArray2(date);//重点
+            }
+        });
+
+        var returntimeDate2 = laydate.render({
+            elem: '#endTime2',trigger: 'click' //预计回车时间
+            ,done:function(value, date){
+                cartimeDate2.config.max=getDateArray2(date);//重点
+            }
+        });
+
+        function getDateArray2(date){//获取时间数组
+            var darray={};
+            darray.year=date.year;
+            darray.month=date.month - 1;
+            var day=date.date;
+            if(date.hours == 23 && date.minutes == 59 && date.seconds == 59){
+                day = day + 1;
+            }else{
+                darray.hours = date.hours;
+                darray.minutes = date.minutes;
+                darray.seconds = date.seconds;
+            }
+            darray.date=day;
+            return darray;
+        }
+
+        /*考试的时间控件*/
+        var cartimeDate3 = laydate.render({
+            elem: '#startTime3',trigger: 'click' //用车时间
+            ,done:function(value, date){
+                returntimeDate3.config.min=getDateArray3(date);//重点
+            }
+        });
+
+        var returntimeDate3 = laydate.render({
+            elem: '#endTime3',trigger: 'click' //预计回车时间
+            ,done:function(value, date){
+                cartimeDate3.config.max=getDateArray3(date);//重点
+            }
+        });
+
+        function getDateArray3(date){//获取时间数组
+            var darray={};
+            darray.year=date.year;
+            darray.month=date.month - 1;
+            var day=date.date;
+            if(date.hours == 23 && date.minutes == 59 && date.seconds == 59){
+                day = day + 1;
+            }else{
+                darray.hours = date.hours;
+                darray.minutes = date.minutes;
+                darray.seconds = date.seconds;
+            }
+            darray.date=day;
+            return darray;
+        }
+
+    });
+
+</script>
+
+</body>
+</html>

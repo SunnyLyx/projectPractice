@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<!--<link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>-->
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachAssessmentCriterion-add">
+			<input id="assessId" name="assessId" th:value="${assessId}" type="hidden">
+			<input name="schoolId"  type="hidden" id="treeId"/>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">分部：</label>
+					<div class="col-sm-8">
+						<!--<input id="schoolId" name="schoolId" class="form-control" type="text">-->
+						<input class="form-control" type="text" name="schoolName" onclick="selectDeptTree()" readonly="true" id="treeName">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">角色：</label>
+					<div class="col-sm-8">
+						<!--<input id="characterNo" name="characterNo" class="form-control" type="text">-->
+						<select id="characterNo" name="characterNo" class="form-control" type="text">
+							<option th:each="obj,eStat:${role}" th:value="${obj.roleId}"
+									th:text="${obj.roleName}"></option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考核项：</label>
+					<div class="col-sm-8">
+						<div class="input-group" style="margin-bottom: 10px">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="专业课出勤率">专业课出勤率：
+							</span>
+							<input id="courses" name="itemsNo" class="form-control" type="number" />
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="实践课出勤率">实践课出勤率：
+							</span>
+							<input id="practiceCourse" name="itemsNo" class="form-control" type="number" />
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="项目合格率">项目合格率：
+							</span>
+							<input id="preparation" name="itemsNo" class="form-control" type="number" />
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="作业完成率">作业完成率：
+							</span>
+							<input id="task" name="itemsNo" class="form-control" type="number"/>
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="满意度">满意度：
+							</span>
+							<input id="satisfaction" name="itemsNo" class="form-control" type="number"/>
+						</div>
+						<div class="input-group">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="考试合格率">考试合格率：
+							</span>
+							<input id="test" name="itemsNo" class="form-control" type="number" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考核占分比：</label>
+					<div class="col-sm-8">
+						<input id="assessProportion" name="assessProportion" class="form-control" type="number" placeholder="输入百分比"/>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachAssessmentCriterion";
+		$("#form-teachAssessmentCriterion-add").validate({
+			rules:{
+				xxxx:{
+					required:true
+				}
+			}
+		});
+
+        //初始化分部控件
+        function selectDeptTree() {
+            var treeId = $("#treeId").val();
+            var deptId = $.common.isEmpty(treeId) ? "100" : $("#treeId").val();
+            var options = {
+                title: '选择分部',
+                width: "500",
+                url: ctx + "system/dept/selectDeptTree/" + deptId,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+                add();
+	        }
+	    }
+
+	    function add() {
+            var assessId = $("#assessId").val();
+            var options=$("#characterNo option:selected");  //获取选中的项
+			var characterNo = options.val();
+			var schoolId = $("input[name='schoolId']").val();
+			var assessProportion = $("#assessProportion").val();
+			var data = [];
+
+            $("input[type='checkbox']").each(function () {
+                if ($(this).is(":checked")) {
+                    var items = $(this).val();
+                    var itemsNo = $(this).parent().next().val();
+                    if(itemsNo != null && itemsNo != "" && itemsNo.length != 0){
+                        data.push({"itemsNo":itemsNo,"items":items});
+                    }
+                }
+            });
+			// console.log(data);
+            var assess = JSON.stringify(data);
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : {
+                    "assessId": assessId,
+                    "characterNo": characterNo,
+                    "schoolId": schoolId,
+                    "assessProportion": assessProportion,
+					"assess":assess
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+	</script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachClassAttendanceMapper">
+    
+    <resultMap type="TeachClassAttendance" id="TeachClassAttendanceResult">
+        <result property="id"    column="id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="teacherId"    column="teacher_id"    />
+        <result property="attendanceDatetime"    column="attendance_datetime"    />
+        <result property="classroom"    column="classroom"    />
+        <result property="lesson"    column="lesson"    />
+        <result property="attendancenum"    column="attendancenum"    />
+        <result property="leavenum"    column="leavenum"    />
+        <result property="truancynum"    column="truancynum"    />
+        <result property="latenum"    column="latenum"    />
+        <result property="leaveearlynum"    column="leaveearlynum"    />
+        <result property="studentnum"    column="studentnum"    />
+        <result property="classAttendance"    column="class_attendance"    />
+        <result property="className"    column="class_name"    />
+        <result property="teacherName"    column="teacher_name"    />
+    </resultMap>
+	
+	<sql id="selectTeachClassAttendanceVo">
+        select id, class_id, teacher_id, attendance_datetime, classroom, lesson, attendancenum, leavenum, truancynum, latenum, leaveearlynum, studentnum, class_attendance from teach_class_attendance
+    </sql>
+	
+    <select id="selectTeachClassAttendanceList" parameterType="TeachClassAttendance" resultMap="TeachClassAttendanceResult">
+        select ts.id,tc.class_name as class_name,
+        su.user_name as teacher_name, attendance_datetime, classroom, lesson, attendancenum, leavenum, truancynum, latenum, leaveearlynum, studentnum, class_attendance from teach_class_attendance ts
+        join teach_classes tc on tc.class_id = ts.class_id
+        join sys_user su on su.user_id = ts.teacher_id
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+            <if test="className != null and className != ''"> and tc.class_name = #{className}</if>
+            <if test="teacherName != null and teacherName != ''"> and su.user_name = #{teacherName}</if>
+             <if test="lesson != null  and lesson != '' "> and lesson = #{lesson}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachClassAttendanceById" parameterType="Integer" resultMap="TeachClassAttendanceResult">
+        <include refid="selectTeachClassAttendanceVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachClassAttendanceTask"  resultMap="TeachClassAttendanceResult">
+        SELECT class_id,teacher_id,attendance_datetime,classroom,lesson,sum(attendancenum) as attendancenum ,sum(studentnum)  as studentnum ,sum(leavenum) as leavenum ,sum(truancynum) as truancynum ,sum(latenum) as latenum ,sum(leaveearlynum) as leaveearlynum from
+        (
+        SELECT class_id,teacher_id,attendance_datetime,classroom,lesson,count(0) as studentnum,0 as attendancenum,0 as leavenum ,0 as truancynum ,0 as latenum ,0 as leaveearlynum from teach_attendance ta
+        join teach_student_attendance tsa on
+        ta.attendance_id = tsa.attendance_id
+        WHERE DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ta.class_id,ta.lesson,ta.teacher_id
+        UNION
+        select class_id,teacher_id,attendance_datetime,classroom,lesson, 0 as studentnum, count(attendance) as attendancenum,0 as leavenum, 0 as truancynum, 0 as latenum , 0 as leaveearlynum  from teach_attendance ta
+        join teach_student_attendance tsa on
+        ta.attendance_id = tsa.attendance_id
+        where tsa.attendance = '1'
+        and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ta.class_id,ta.lesson,ta.teacher_id
+        UNION
+        select class_id,teacher_id,attendance_datetime,classroom,lesson,0 as studentnum,0 as attendancenum,count(attendance) as leavenum ,0 as truancynum ,0 as latenum ,0 as leaveearlynum  from teach_attendance ta
+        join teach_student_attendance tsa on
+        ta.attendance_id = tsa.attendance_id
+        where tsa.attendance = '2'
+        and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ta.class_id,ta.lesson,ta.teacher_id
+        UNION
+        select class_id,teacher_id,attendance_datetime,classroom,lesson,0 as studentnum,0 as attendancenum,0 as leavenum ,count(attendance) as truancynum ,0 as latenum ,0 as leaveearlynum  from teach_attendance ta
+        join teach_student_attendance tsa on
+        ta.attendance_id = tsa.attendance_id
+        where tsa.attendance = '3'
+        and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ta.class_id,ta.lesson,ta.teacher_id
+        UNION
+        select class_id,teacher_id,attendance_datetime,classroom,lesson,0 as studentnum,0 as attendancenum,0 as leavenum ,0 as truancynum ,count(attendance) as latenum ,0 as leaveearlynum  from teach_attendance ta
+        join teach_student_attendance tsa on
+        ta.attendance_id = tsa.attendance_id
+        where tsa.attendance = '4'
+        and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ta.class_id,ta.lesson,ta.teacher_id
+        UNION
+        select class_id,teacher_id,attendance_datetime,classroom,lesson,0 as studentnum,0 as attendancenum,0 as leavenum ,0 as truancynum ,0 as latenum ,count(attendance) as leaveearlynum  from teach_attendance ta
+        join teach_student_attendance tsa on
+        ta.attendance_id = tsa.attendance_id
+        where tsa.attendance = '5'
+        and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ta.class_id,ta.lesson,ta.teacher_id
+        ) a
+        GROUP BY  a.class_id,a.teacher_id,a.attendance_datetime,a.classroom,a.lesson
+    </select>
+
+    <insert id="insertTeachClassAttendance" parameterType="TeachClassAttendance">
+        insert into teach_class_attendance
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="classId != null  and classId != ''  ">class_id,</if>
+			<if test="teacherId != null  and teacherId != ''  ">teacher_id,</if>
+			<if test="attendanceDatetime != null  ">attendance_datetime,</if>
+			<if test="classroom != null  and classroom != ''  ">classroom,</if>
+			<if test="lesson != null  and lesson != ''  ">lesson,</if>
+			<if test="attendancenum != null  ">attendancenum,</if>
+			<if test="leavenum != null  ">leavenum,</if>
+			<if test="truancynum != null  ">truancynum,</if>
+			<if test="latenum != null  ">latenum,</if>
+			<if test="leaveearlynum != null  ">leaveearlynum,</if>
+			<if test="studentnum != null  ">studentnum,</if>
+			<if test="classAttendance != null  and classAttendance != ''  ">class_attendance,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="classId != null  and classId != ''  ">#{classId},</if>
+			<if test="teacherId != null  and teacherId != ''  ">#{teacherId},</if>
+			<if test="attendanceDatetime != null  ">#{attendanceDatetime},</if>
+			<if test="classroom != null  and classroom != ''  ">#{classroom},</if>
+			<if test="lesson != null  and lesson != ''  ">#{lesson},</if>
+			<if test="attendancenum != null  ">#{attendancenum},</if>
+			<if test="leavenum != null  ">#{leavenum},</if>
+			<if test="truancynum != null  ">#{truancynum},</if>
+			<if test="latenum != null  ">#{latenum},</if>
+			<if test="leaveearlynum != null  ">#{leaveearlynum},</if>
+			<if test="studentnum != null  ">#{studentnum},</if>
+			<if test="classAttendance != null  and classAttendance != '' ">#{classAttendance},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachClassAttendance" parameterType="TeachClassAttendance">
+        update teach_class_attendance
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  and classId != ''  ">class_id = #{classId},</if>
+            <if test="teacherId != null  and teacherId != ''  ">teacher_id = #{teacherId},</if>
+            <if test="attendanceDatetime != null  ">attendance_datetime = #{attendanceDatetime},</if>
+            <if test="classroom != null  and classroom != ''  ">classroom = #{classroom},</if>
+            <if test="lesson != null  and lesson != ''  ">lesson = #{lesson},</if>
+            <if test="attendancenum != null  ">attendancenum = #{attendancenum},</if>
+            <if test="leavenum != null  ">leavenum = #{leavenum},</if>
+            <if test="truancynum != null  ">truancynum = #{truancynum},</if>
+            <if test="latenum != null  ">latenum = #{latenum},</if>
+            <if test="leaveearlynum != null  ">leaveearlynum = #{leaveearlynum},</if>
+            <if test="studentnum != null  ">studentnum = #{studentnum},</if>
+            <if test="classAttendance != null  and classAttendance != ''  ">class_attendance = #{classAttendance},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachClassAttendanceById" parameterType="Integer">
+        delete from teach_class_attendance where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachClassAttendanceByIds" parameterType="String">
+        delete from teach_class_attendance where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

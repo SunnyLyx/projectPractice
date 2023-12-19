@@ -1,0 +1,107 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachSubjectAttendance-edit" th:object="${teachSubjectAttendance}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级ID：</label>
+				<div class="col-sm-8">
+					<input id="classId" name="classId" th:field="*{classId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目ID：</label>
+				<div class="col-sm-8">
+					<input id="subjectId" name="subjectId" th:field="*{subjectId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目开始时间：</label>
+				<div class="col-sm-8">
+					<input id="attendanceStarttime" name="attendanceStarttime" th:field="*{attendanceStarttime}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目结束时间：</label>
+				<div class="col-sm-8">
+					<input id="attendanceEndtime" name="attendanceEndtime" th:field="*{attendanceEndtime}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目名称：</label>
+				<div class="col-sm-8">
+					<input id="subjectname" name="subjectname" th:field="*{subjectname}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业优人数：</label>
+				<div class="col-sm-8">
+					<input id="bestnum" name="bestnum" th:field="*{bestnum}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业良人数：</label>
+				<div class="col-sm-8">
+					<input id="goodnum" name="goodnum" th:field="*{goodnum}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业差人数：</label>
+				<div class="col-sm-8">
+					<input id="poornum" name="poornum" th:field="*{poornum}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业未完成人数：</label>
+				<div class="col-sm-8">
+					<input id="unfinishednum" name="unfinishednum" th:field="*{unfinishednum}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级总人数：</label>
+				<div class="col-sm-8">
+					<input id="studentnum" name="studentnum" th:field="*{studentnum}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业优占比：</label>
+				<div class="col-sm-8">
+					<input id="bestAttendance" name="bestAttendance" th:field="*{bestAttendance}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业良占比：</label>
+				<div class="col-sm-8">
+					<input id="goodAttendance" name="goodAttendance" th:field="*{goodAttendance}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业差占比：</label>
+				<div class="col-sm-8">
+					<input id="poorAttendance" name="poorAttendance" th:field="*{poorAttendance}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachSubjectAttendance";
+		$("#form-teachSubjectAttendance-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-teachSubjectAttendance-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

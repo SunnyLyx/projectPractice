@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>edu.fosu</groupId>
+    <artifactId>fosutech</artifactId>
+    <version>1.0</version>
+
+    <description>fosuTech教学管理系统</description>
+    
+    <properties>
+	    <fosutech.version>1.0</fosutech.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<java.version>1.8</java.version>
+		<shiro.version>1.4.0</shiro.version>
+		<thymeleaf.extras.shiro.version>2.0.0</thymeleaf.extras.shiro.version>
+		<mybatis.boot.version>1.3.2</mybatis.boot.version>
+		<druid.version>1.1.10</druid.version>
+		<bitwalker.version>1.19</bitwalker.version>
+		<kaptcha.version>2.3.2</kaptcha.version>
+		<swagger.version>2.7.0</swagger.version>
+		<pagehelper.boot.version>1.2.5</pagehelper.boot.version>
+		<oshi.version>3.9.1</oshi.version>
+		<qiniu.version>[7.2.0, 7.2.99]</qiniu.version>
+		<aliyun.oss.version>2.5.0</aliyun.oss.version>
+		<qcloud.cos.version>4.4</qcloud.cos.version>
+		<fastjson.version>1.2.49</fastjson.version>
+		<oshi.version>3.9.1</oshi.version>
+	</properties>
+	
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.1.1.RELEASE</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+		<module>fosutech-admin</module>
+		<module>fosutech-framework</module>
+		<module>fosutech-system</module>
+		<module>fosutech-knowledge</module>
+		<module>fosutech-teach</module>
+		<module>fosutech-quartz</module>
+		<module>fosutech-generator</module>
+		<module>fosutech-common</module>
+    </modules>
+
+    <packaging>pom</packaging>
+
+
+	<dependencies>
+
+		<!-- 多模块排除内置tomcat -->
+		<!--<dependency>-->
+			<!--<groupId>org.springframework.boot</groupId>-->
+			<!--<artifactId>spring-boot-starter-web</artifactId>-->
+			<!--<exclusions>-->
+				<!--<exclusion>-->
+					<!--<groupId>org.springframework.boot</groupId>-->
+					<!--<artifactId>spring-boot-starter-tomcat</artifactId>-->
+				<!--</exclusion>-->
+			<!--</exclusions>-->
+		<!--</dependency>-->
+
+		<!--Spring框架基本的核心工具-->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context-support</artifactId>
+		</dependency>
+
+        <!-- SpringBoot集成mybatis框架 -->
+        <dependency>
+            <groupId>org.mybatis.spring.boot</groupId>
+            <artifactId>mybatis-spring-boot-starter</artifactId>
+            <version>${mybatis.boot.version}</version>
+        </dependency>
+
+        <!-- Mysql驱动包 -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+
+       <dependency>
+		    <groupId>javax.servlet</groupId>
+		    <artifactId>javax.servlet-api</artifactId>
+		</dependency>
+
+		<!-- 日志工具类 -->
+		<dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+		<!--redis-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+
+
+
+
+	</dependencies>
+
+	<build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

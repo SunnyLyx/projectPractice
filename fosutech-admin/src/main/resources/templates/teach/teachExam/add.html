@@ -1,0 +1,394 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachExam-add">
+			<input id="classId" name="classId" type="hidden">
+			<input name="accessId"  type="hidden" id="accessId" th:value="${quanxian}"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text"  onclick="selectList()"  readonly="true" id="className"   >
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">考试阶段：</label>
+				<div class="col-sm-8">
+					<select id="stageId" name="stageId" class="form-control" type="text"></select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考试时间：</label>
+				<div class="col-sm-8">
+					<input id="datetime" name="datetime" class="form-control" type="text" readonly="true">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">及格线：</label>
+				<div class="col-sm-8">
+					<input id="cutOffscores" name="cutOffscores" class="form-control" type="text" onkeyup="value=value.replace(/[^\d]/g,'')">
+				</div>
+			</div>
+			<input id="invigilator" name="invigilator" type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">主考老师：</label>
+				<div class="col-sm-8">
+					<input id="TeacherName" class="form-control" type="text" onclick="selectTeacherList()" readonly="true">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考试地点：</label>
+				<div class="col-sm-8">
+					<input id="address" name="address" class="form-control" type="text">
+				</div>
+			</div>
+			<div id="BadstudenUser">
+				<h4 style="display: inline-block">非在读学生：</h4>
+			</div>
+			<hr/>
+			<h3>在读学生考试</h3>
+			<hr/>
+			<table class="table " id="Professional">
+				<tr id="biaoti">
+					<th style="display: none">学生id</th>
+					<th>学生</th>
+					<th>成绩</th>
+					<th>备注</th>
+				</tr>
+			</table>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachExam"
+		$("#form-teachExam-add").validate({
+			rules:{
+                className:{
+					required:true,
+				},
+                stageId:{
+                    required:true,
+                },
+                datetime:{
+                    required:true,
+                },
+                cutOffscores:{
+                    required:true,
+                },
+			}
+		});
+		console.log($("#accessId").val())
+        if($("#accessId").val()==0){
+            //时间选择器
+            $(function(){
+                laydate.render({
+                    elem: '#datetime',
+                    trigger: 'click',
+                    format: 'yyyy-MM-dd',
+                    done: function(value, date, endDate){
+
+                        var myDate = new Date()
+                        var Y=myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+                        var M=myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+                        var D=myDate.getDate();        //获取当前日(1-31)
+                        myDate.setTime(myDate.getTime()-24*60*60*1000);
+                        if(M<10){
+                            M="0"+M
+                        }
+                        if(D<10){
+                            D="0"+D
+                        }
+                        var curDay =Y+"-"+M+"-"+D;
+                        //当前时间
+                        var Ncurdy = curDay.split("-");
+                        //昨天时间
+                        var Ndatatime = value.split("-");
+                        var PresentTimes =Ncurdy[0]+Ncurdy[1]+Ncurdy[2];
+                        var UserTime =Ndatatime[0]+Ndatatime[1]+Ndatatime[2];
+                        if(parseInt(PresentTimes)>=parseInt(UserTime)){
+
+                        }else{
+                            layer.alert("选择时间不可以大于当前时间")
+                            $("#datetime").val("")
+                        }
+                    }
+                });
+            });
+        }else{
+            //时间选择器
+            $(function(){
+                laydate.render({
+                    elem: '#datetime',
+                    trigger: 'click',
+                    done: function(value, date, endDate){
+
+                        var myDate = new Date()
+                        var Y=myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+                        var M=myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+                        var D=myDate.getDate();        //获取当前日(1-31)
+                        myDate.setTime(myDate.getTime()-24*60*60*1000);
+                        if(M<10){
+                            M="0"+M
+                        }
+                        if(D<10){
+                            D="0"+D
+                        }
+                        var s1 = myDate.getFullYear()+"-" + M+ "-" + myDate.getDate();
+                        var curDay =Y+"-"+M+"-"+D;
+                        //当前时间
+                        var Ncurdy = curDay.split("-");
+                        //昨天时间
+                        var yesterday = s1.split("-");
+                        var Ndatatime = value.split("-");
+                        var PresentTimes =Ncurdy[0]+Ncurdy[1]+Ncurdy[2];
+                        var UserTime =Ndatatime[0]+Ndatatime[1]+Ndatatime[2];
+                        var yesterday1=yesterday[0]+yesterday[1]+yesterday[2];
+                        if(parseInt(PresentTimes)>=parseInt(UserTime)){
+                            if(parseInt(UserTime)<parseInt(yesterday1)){
+                                layer.alert("结束时间只能是昨天或者今天")
+                                $("#datetime").val("")
+                            }
+                        }else{
+                            layer.alert("选择时间不可以大于当前时间")
+                            $("#datetime").val("")
+                        }
+                    }
+
+                });
+            });
+        }
+
+
+        /*学生管理-新增-选择班级*/
+        function selectList() {
+            var classId = $.common.isEmpty($("#classId").val()) ? 1 : $("#classId").val();
+            var url = ctx + "teach/teachClasses/selectList";
+            var options = {
+                title: '选择班级',
+                width: "800",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            var className = body.find('.selected')[0].children[2].innerHTML;
+            var classId = body.find('.selected')[0].children[1].innerHTML;
+            if(data != "undefined" && data != "" && data != null){
+                $("#className").val(className);
+                $("#classId").val(classId);
+                stuMsg(classId)
+                stuId(classId)
+                stuOtherMsg(classId)
+                //判断是否为空
+                /*if (classId != undefined && classId != null) {
+                    checkInput();
+                }*/
+
+            }else{
+                layer.msg("请选择一个班级");
+            }
+            layer.close(index);
+        }
+
+        function selectTeacherList() {
+            var url = ctx + "system/user/selectList";
+            var options = {
+                title: '选择老师',
+                width: "800",
+                url: url,
+                callBack: TeacherOpen
+            };
+            $.modal.openOptions(options);
+        }
+
+        function stuMsg(classId){
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/student/classStudents",
+                data : {"classNo" : classId},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $("#biaoti").siblings().remove();
+                    var dataStu =data.rows;
+                    for(var i=0;i<dataStu.length;i++){
+                        var stu="<tr>\n" +
+                            "\t\t\t\t\t<td style=\"display: none\"><input class=\"stuChildren\" type=\"hidden\" value='"+dataStu[i].studentId+"' /></td>\n" +
+                            "\t\t\t\t\t<td><span style='width: 55%;display: inline-block'>"+dataStu[i].studentName+"</span></td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input class='score' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" placeholder=\"请输入考试成绩,如缺考则不填\" onkeyup=\"value=value.replace(/[^\\d]/g,'')\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input class='remark' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" placeholder=\"请输入备注\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t</tr>";
+                        $("#Professional").append(stu);
+                    }
+                }
+            })
+        }
+		function stuId(classId) {
+            //根据选择的专业级联查询阶段存入当前阶段下拉框
+                console.log(classId)
+                // var classId = $("#classId").val();
+                $.ajax({
+                    cache : true,
+                    type : "POST",
+                    url : ctx + "teach/teachClasses/majorStage",
+                    data : {"classId" : classId},
+                    error : function(request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success : function(data) {
+                        if (data && data.rows.length > 0) {
+                            project = data.rows;
+                            addOptions(project);
+                        }
+                    }
+                })
+
+            function addOptions(project) {
+
+                var pro = $('select[name="stageId"]');
+                pro.children().remove();
+
+                var options = "";
+                $(project).each(function() {
+                    options += '<option value="' + this.id + '" >' + this.stageName + '</option>';
+                });
+
+                pro.append(options);
+            }
+        }
+
+        function TeacherOpen(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            if(data != "undefined" && data != "" && data != null){
+                $("#TeacherName").val(body.find('.selected')[0].children[2].innerHTML);
+                $("#invigilator").val(body.find('.selected')[0].children[1].innerHTML);
+            }else{
+                layer.msg("请选择一个老师");
+            }
+            layer.close(index);
+        }
+
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            //$.operate.save(prefix + "/add", $('#form-teachExam-add').serialize());
+				add();
+	        }
+	    }
+        //判断日期
+        function add() {
+            var classId = $("#classId").val();
+            var invigilator = $("#invigilator").val();
+            var datetime = $("#datetime").val();
+            var cutOffscores = $("#cutOffscores").val();
+            var address = $("#address").val();
+            var stageId = $("#stageId").val();
+            var children =[];
+            var stuNunber = document.getElementsByClassName("stuChildren");
+            var score = document.getElementsByClassName("score");
+            var remark = document.getElementsByClassName("remark");
+            for(var i=0;i<stuNunber.length;i++){
+                var NameId = stuNunber[i].value;
+                var score1 = score[i].value;
+                var remark1 = remark[i].value;
+                if(score1 != null && score1 != "" && score1 != "undefined"){
+                    if(remark1 != null && remark1 != "" && remark1 != "undefined"){
+                        children.push({studentId:NameId,score:score1,remark:remark1});
+                    }else{
+                        children.push({studentId:NameId,score:score1});
+                    }
+                } else if(remark1 != null && remark1 != "" && remark1 != "undefined"){
+                    children.push({studentId:NameId,remark:remark1});
+                }else {
+                    children.push({studentId:NameId});
+                }
+            }
+            var aaaa = JSON.stringify(children)
+            var data = {
+                classId: classId,
+                invigilator: invigilator,
+                datetime: datetime,
+                cutOffscores: cutOffscores,
+                address: address,
+                stageId: stageId,
+                aaaa: aaaa
+            }
+
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : data,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            })
+        }
+
+        function stuOtherMsg(classId){
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: ctx + "teach/student/classOtherStudents",
+                data: {"classNo": classId},
+                error: function (request) {
+                    $.modal.alertError("系统错误");
+                },
+                success: function (data) {
+                    var dataRow = data.rows;
+                    $("#BadstudenUser>span").remove();
+                    for(var i=0;i<dataRow.length;i++){
+                        var datas="<span style='width: 80px;display: inline-block;text-align: center;height:30px;line-height:30px;margin-left: 15px;border-radius: 20px;font-size: 14px;color: #ffffff;background-color: #0d8ddb'>"+dataRow[i].studentName+"</span>";
+                        $("#BadstudenUser").append(datas)
+                    }
+                    if(dataRow.length==0){
+                        $("#BadstudenUser").append("<span>无</span>");
+                    }
+                }
+            })
+        }
+//        $(document).ready(function(){
+//
+//            var datetime = $("#datetime").val();
+//            $("#datetime").on("blur",function () {
+//                var myDate = new Date()
+//                var Y=myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+//                var M=myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+//                var D=myDate.getDate();        //获取当前日(1-31)
+//                if(M<10){
+//                    M="0"+M
+//                }
+//                var curDay =Y+"-"+M+"-"+D;
+//                var Ncurdy = curDay.split("-");
+//                var Ndatatime = datetime.split("-");
+//                var PresentTime =Ncurdy[0]+Ncurdy[1]+Ncurdy[2];
+//                var UserTime =Ndatatime[0]+Ndatatime[1]+Ndatatime[2];
+//                console.log(parseInt(PresentTime))
+//                console.log(parseInt(UserTime))
+//
+//                if(parseInt(PresentTime)<parseInt(UserTime)){
+//
+//                }else{
+//                    layer.msg("填选时间不能小于当前时间")
+//                    $("#datetime").val(curDay)
+//                }
+//            })
+//        })
+
+	</script>
+</body>
+</html>

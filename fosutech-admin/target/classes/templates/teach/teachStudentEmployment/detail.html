@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+	<form class="form-horizontal m" id="form-teachStudentEmployment-detail" th:object="${teachStudentEmployment}">
+		<input id="id" name="id" th:field="*{id}"  type="hidden">
+		<input name="studentId"  type="hidden" id="studentId" th:field="*{studentId}"/>
+
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">学生：</label>
+				<div class="col-sm-8">
+					<!--<input id="studentId" name="studentId" th:field="*{studentId}" class="form-control" type="text">-->
+					<input class="form-control" type="text" name="studentName" readonly="true" id="studentName" th:field="*{studentName}">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">就业方式：</label>
+				<div class="col-sm-8">
+					<input id="employmentWay" name="employmentWay" th:field="*{employmentWay}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">入职时间：</label>
+				<div class="col-sm-8">
+					<input id="hiredate" name="hiredate" th:field="*{hiredate}" class="form-control" type="text" placeholder="yyyy-MM-dd" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">就业城市：</label>
+				<div class="col-sm-8">
+					<input id="urbanEmployment" name="urbanEmployment" th:field="*{urbanEmployment}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">就业单位：</label>
+				<div class="col-sm-8">
+					<input id="einheit" name="einheit" th:field="*{einheit}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">所属行业：</label>
+				<div class="col-sm-8">
+					<input id="industry" name="industry" th:field="*{industry}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">试用薪资：</label>
+				<div class="col-sm-8">
+					<input id="probationSalary" name="probationSalary" th:field="*{probationSalary}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">转正薪资：</label>
+				<div class="col-sm-8">
+					<input id="obtainmentSalary" name="obtainmentSalary" th:field="*{obtainmentSalary}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">就业老师：</label>
+				<div class="col-sm-8">
+					<input id="teacherEmployment" name="teacherEmployment" th:field="*{employment}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">就业备注：</label>
+				<div class="col-sm-8">
+					<input id="employmentNote" name="employmentNote" th:field="*{employmentNote}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">是否属实：</label>
+				<div class="col-sm-8">
+					<input id="employmentIsTrue" name="employmentIsTrue" th:value="*{params.employmentIsTrue}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">回访老师：</label>
+				<div class="col-sm-8">
+					<input id="visitTeacher" name="visitTeacher" th:field="*{visit}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">回访时间：</label>
+				<div class="col-sm-8">
+					<input id="visitTime" name="visitTime" th:field="*{visitTime}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">更新时间：</label>
+				<div class="col-sm-8">
+					<input id="edittime" name="edittime" th:field="*{edittime}" class="form-control" type="text" readonly="readonly">
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+
+</script>
+</body>
+</html>

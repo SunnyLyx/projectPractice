@@ -1,0 +1,161 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								班级ID：<input type="text" name="classId"/>
+							</li>
+
+							<li>
+								项目ID：<input type="text" name="subjectId"/>
+							</li>
+
+							<li>
+								项目开始时间：<input type="text" name="attendanceStarttime"/>
+							</li>
+
+							<li>
+								项目结束时间：<input type="text" name="attendanceEndtime"/>
+							</li>
+
+							<li style="width: 100%;text-align: center">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<!--<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="teach:teachSubjectAttendance:add">-->
+					<!--<i class="fa fa-fw fa-plus"></i> 添加-->
+				<!--</a>-->
+				<!--<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="teach:teachSubjectAttendance:edit">-->
+					<!--<i class="fa fa-fw fa-edit"></i> 修改-->
+				<!--</a>-->
+				<!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="teach:teachSubjectAttendance:remove">-->
+					<!--<i class="fa fa-fw fa-remove"></i> 删除-->
+				<!--</a>-->
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="teach:teachSubjectAttendance:export">
+						<i class="fa fa-fw fa-download"></i> 导出
+				 </a>-->
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('teach:teachSubjectAttendance:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('teach:teachSubjectAttendance:remove')}]];
+        var prefix = ctx + "teach/teachSubjectAttendance";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "作业统计",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'id', 
+					title : '主键',
+					visible: false
+				},
+				{
+					field : 'classId', 
+					title : '班级ID',
+					sortable: true
+				},
+				{
+					field : 'subjectId', 
+					title : '项目ID',
+					sortable: true
+				},
+				{
+					field : 'attendanceStarttime', 
+					title : '项目开始时间',
+					sortable: true
+				},
+				{
+					field : 'attendanceEndtime', 
+					title : '项目结束时间',
+					sortable: true
+				},
+				{
+					field : 'subjectname', 
+					title : '项目名称',
+					sortable: true
+				},
+				{
+					field : 'bestnum', 
+					title : '项目优人数',
+					sortable: true
+				},
+				{
+					field : 'goodnum', 
+					title : '项目良人数',
+					sortable: true
+				},
+				{
+					field : 'poornum', 
+					title : '项目差人数',
+					sortable: true
+				},
+				{
+					field : 'unfinishednum', 
+					title : '项目未完成人数',
+					sortable: true
+				},
+				{
+					field : 'studentnum', 
+					title : '班级总人数',
+					sortable: true
+				},
+				{
+					field : 'bestAttendance', 
+					title : '项目优占比',
+					sortable: true
+				},
+				{
+					field : 'goodAttendance', 
+					title : '项目良占比',
+					sortable: true
+				},
+				{
+					field : 'poorAttendance', 
+					title : '项目差占比',
+					sortable: true
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-fw fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-fw fa-remove"></i>删除</a>');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

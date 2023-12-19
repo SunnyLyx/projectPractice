@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachTeacherStatisticsChildrenMapper">
+    
+    <resultMap type="TeachTeacherStatisticsChildren" id="TeachTeacherStatisticsChildrenResult">
+        <result property="id"    column="id"    />
+        <result property="teacherStatisticsId"    column="teacher_statistics_id"    />
+        <result property="inspectionItemsNo"    column="inspection_items_no"    />
+        <result property="percentageComplete"    column="percentage_complete"    />
+        <result property="grade"    column="grade"    />
+    </resultMap>
+	
+	<sql id="selectTeachTeacherStatisticsChildrenVo">
+        select id, teacher_statistics_id, inspection_items_no, percentage_complete, grade from teach_teacher_statistics_children
+    </sql>
+	
+    <select id="selectTeachTeacherStatisticsChildrenList" parameterType="TeachTeacherStatisticsChildren" resultMap="TeachTeacherStatisticsChildrenResult">
+        <include refid="selectTeachTeacherStatisticsChildrenVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="teacherStatisticsId != null "> and teacher_statistics_id = #{teacherStatisticsId}</if>
+             <if test="inspectionItemsNo != null "> and inspection_items_no = #{inspectionItemsNo}</if>
+             <if test="percentageComplete != null "> and percentage_complete = #{percentageComplete}</if>
+             <if test="grade != null "> and grade = #{grade}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachTeacherStatisticsChildrenById" parameterType="Integer" resultMap="TeachTeacherStatisticsChildrenResult">
+        <include refid="selectTeachTeacherStatisticsChildrenVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTeachTeacherStatisticsChildren" parameterType="TeachTeacherStatisticsChildren">
+        insert into teach_teacher_statistics_children
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="teacherStatisticsId != null  ">teacher_statistics_id,</if>
+			<if test="inspectionItemsNo != null  ">inspection_items_no,</if>
+			<if test="percentageComplete != null  ">percentage_complete,</if>
+			<if test="grade != null  ">grade,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="teacherStatisticsId != null  ">#{teacherStatisticsId},</if>
+			<if test="inspectionItemsNo != null  ">#{inspectionItemsNo},</if>
+			<if test="percentageComplete != null  ">#{percentageComplete},</if>
+			<if test="grade != null  ">#{grade},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachTeacherStatisticsChildren" parameterType="TeachTeacherStatisticsChildren">
+        update teach_teacher_statistics_children
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="teacherStatisticsId != null  ">teacher_statistics_id = #{teacherStatisticsId},</if>
+            <if test="inspectionItemsNo != null  ">inspection_items_no = #{inspectionItemsNo},</if>
+            <if test="percentageComplete != null  ">percentage_complete = #{percentageComplete},</if>
+            <if test="grade != null  ">grade = #{grade},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachTeacherStatisticsChildrenById" parameterType="Integer">
+        delete from teach_teacher_statistics_children where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachTeacherStatisticsChildrenByIds" parameterType="String">
+        delete from teach_teacher_statistics_children where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,193 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								班级：<input type="text" name="className"/>
+							</li>
+
+							<li>
+								项目名称：<input type="text" name="subjectName"/>
+							</li>
+
+							<li>
+								项目时间：<input type="text" name="starttime" id="starttime"/>
+							</li>
+
+							<li style="width:290px">
+								专业：<!--<input type="text" name="majorId"/>-->
+								<select id="majorId" name="majorId" class="form-control" type="text" style="padding: 0px;display: inline-block">
+									<option value="0" id="aaa">全部</option>
+									<option th:each="obj,eStat:${major}" th:value="${obj.majorId}"
+											th:text="${obj.majorName}"></option>
+								</select>
+							</li>
+
+							<li style="width: 100%;text-align: center">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="teach:teachSubject:add">
+					<i class="fa fa-fw fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="teach:teachSubject:edit">
+					<i class="fa fa-fw fa-edit"></i> 修改
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="teach:teachSubject:remove">
+					<i class="fa fa-fw fa-remove"></i> 删除
+				</a>
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="teach:teachSubject:export">
+						<i class="fa fa-fw fa-download"></i> 导出
+				 </a>-->
+				<br/>
+				<span style="color: #cb4042">项目合格率：(优+良)/班级基数</span>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('teach:teachSubject:edit')}]];
+        var detailFlag = [[${@permission.hasPermi('teach:teachSubject:detail')}]];
+        var removeFlag = [[${@permission.hasPermi('teach:teachSubject:remove')}]];
+        var prefix = ctx + "teach/teachSubject";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                detailUrl: prefix + "/detail/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "班级项目",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'subjectId', 
+					title : '项目id',
+					visible: false
+				},
+                    {
+                        field : 'schoolName',
+                        title : '分部',
+                        sortable: false,
+                        formatter:paramsMatter
+
+                    },
+                    {
+                        field : 'majorName',
+                        title : '专业',
+                        sortable: false,
+                        formatter:paramsMatter
+
+                    },
+                    {
+                        field : 'className',
+                        title : '班级',
+                        sortable: false
+                    },
+				{
+					field : 'subjectName', 
+					title : '项目名称',
+					sortable: false,
+                    formatter:paramsMatter
+
+                },
+				{
+					field : 'starttime', 
+					title : '项目开始时间',
+					sortable: false
+				},
+				{
+					field : 'endtime', 
+					title : '结束时间',
+					sortable: false,
+                    formatter:paramsMatter
+
+                },
+                    {
+                        field : 'bestnum',
+                        title : '项目提交优人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'goodnum',
+                        title : '项目提交良好人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'poornum',
+                        title : '项目提交差人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'unfinishednum',
+                        title : '项目未完成人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'studentnum',
+                        title : '班级在读人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'bestAttendance',
+                        title : '项目优占比',
+                        sortable: false
+                    },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: #0e9aef;" class="' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.subjectId + '\')">编辑</a> ');
+                        actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: rgb(242,178,89)" class="' + detailFlag + '" href="#" onclick="$.operate.detail(\'' + row.subjectId + '\')">详情</a> ');
+		            	actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: red;" class="' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.subjectId + '\')">删除</a>');
+                        return $.table.dropdownToggle(actions.join(''));
+                    }
+		        }]
+            };
+            function paramsMatter(value,row,index) {
+                var span=document.createElement('span');
+                span.setAttribute('title',value);
+                span.innerHTML = value;
+                span.style.width="80px";
+                span.style.display="inline-block";
+                span.style.overflow="hidden";
+                span.style.textOverflow="ellipsis";
+                span.style.whiteSpace="nowrap";
+                return span.outerHTML;
+            }
+            $.table.init(options);
+        });
+
+        //时间选择器
+        $(function(){
+            laydate.render({
+                elem: '#starttime',
+                range: '~',trigger: 'click'
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachSatisfaction-edit" th:object="${teachSatisfaction}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<!--隐藏班级编号-->
+			<input name="classId" type="hidden" id="classId" th:field="*{classId}"/>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="classNo" onclick="selectList()" readonly="true"
+						   id="className" th:field="*{className}">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">教师名称：</label>
+				<div class="col-sm-8">
+					<!--<input id="teacherId" name="teacherId" th:field="*{teacherId}" class="form-control" type="text">-->
+					<!--<select name="teacherId" id="teacherId" class="form-control">
+						<option th:each="obj,eStat:${teacherList}" th:value="${obj.teacher_id}"
+								th:text="${obj.teachName}" th:selected="${#strings.contains(teachSatisfaction.teacherId,obj.teacher_id)}"></option>
+					</select>-->
+					<input id="teacherId" name="teacherId" th:field="*{teacherId}" class="form-control" type="hidden">
+					<select id="teacher" name="teacher" class="form-control" type="text"></select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">满意度：</label>
+				<div class="col-sm-8">
+					<input id="satisfaction" name="satisfaction" th:field="*{satisfaction}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachSatisfaction";
+		$("#form-teachSatisfaction-edit").validate({
+			rules: {
+				classNo: {
+					required: true
+				},
+				teacherId: {
+					required: true
+				},
+				satisfaction: {
+					required: true
+				}
+			}
+		});
+
+        //默认老师下拉框
+        var classId = $("#classId").val();
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "teach/teachSatisfaction/classId",
+			data:{"classId":classId},
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                if (data && data.rows.length > 0) {
+                    var teacher = data.rows;
+                    //console.log(teacher);
+                    addOptions1(teacher);
+                }
+            }
+        });
+
+        function addOptions1(teacher) {
+            var pro = $('select[name="teacher"]');
+            pro.children().remove();
+
+            var options = "";
+            $(teacher).each(function() {
+                options += '<option class="teachers" value="' + this.teacher_id + '" >' + this.teacher_name + '</option>';
+            });
+
+            pro.append(options);
+
+            var teachers = document.getElementsByClassName("teachers");
+            for (var i=0;i<teachers.length;i++){
+                //console.log($("#teacherId").val())
+                if(teachers[i].value==$("#teacherId").val()){
+                    teachers[i].selected=true;
+                }
+            }
+        }
+
+
+		/*选择班级*/
+		function selectList() {
+			var url = ctx + "teach/teachClasses/selectList";
+			var options = {
+				title: '选择班级',
+				width: "900",
+				url: url,
+				callBack: doSubmit
+			};
+			$.modal.openOptions(options);
+		}
+
+		function doSubmit(index, layero) {
+			var body = layer.getChildFrame('body', index);
+			var data = body.find('.selected')[0];
+			if (data != "undefined" && data != "" && data != null) {
+				$("#className").val(body.find('.selected')[0].children[2].innerHTML);
+				$("#classId").val(body.find('.selected')[0].children[1].innerHTML);
+				//判断是否为空
+				if (classId != undefined && classId != null) {
+					checkInput();
+				}
+			} else {
+				layer.msg("请选择一个班级");
+			}
+			layer.close(index);
+		};
+
+		//当班级发生改变的时候  清空下拉框  重新赋值
+		function checkInput(){
+			var classId = $("#classId").val();
+			var codeurl = ctx + "teach/teachSatisfaction/classId";
+			//清空之后再赋值
+			$("#teacher").children().remove();
+			//判断是否为空
+			if (classId != undefined && classId != null) {
+				$.post(codeurl, {classId: classId}, function (data) {
+					$.each(data.rows, function (i, d) {
+						$("select[name='teacher']").append("<option value='" + d.teacher_id + "'>" + d.teacher_name + "</option>");
+					});
+				}, 'json');
+			}
+		}
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                edit();
+                //$.operate.save(prefix + "/edit", $('#form-teachSatisfaction-edit').serialize());
+            }
+        }
+
+        function edit(){
+            var id = $("#id").val();
+            var classId = $("input[name='classId']").val();
+            var options=$("#teacher option:selected"); //获取选中的项
+            var teacherId = options.val();
+            var satisfaction = $("#satisfaction").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/edit",
+                data : {
+                    "id":id,
+                    "classId": classId,
+                    "teacherId": teacherId,
+                    "satisfaction": satisfaction
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+		}
+	</script>
+</body>
+</html>

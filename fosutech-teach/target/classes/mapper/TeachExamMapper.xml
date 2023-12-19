@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachExamMapper">
+    
+    <resultMap type="TeachExam" id="TeachExamResult">
+        <result property="examId"    column="exam_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="datetime"    column="datetime"    />
+        <result property="cutOffscores"    column="cut_offscores"    />
+        <result property="invigilator"    column="invigilator"    />
+        <result property="teacherName"    column="teacher_name"    />
+        <result property="address"    column="address"    />
+        <result property="stageId"    column="stage_id"    />
+        <result property="stageName"    column="stage_name"    />
+        <result property="schoolName"    column="school_name"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="pass"    column="pass"    />
+        <result property="fail"    column="fail"    />
+        <result property="studentNum"    column="student_num"    />
+        <result property="acceptability"    column="acceptability"    />
+        <result property="starttime"    column="starttime"    />
+        <result property="endtime"    column="endtime"    />
+
+        <!--<association property="majorStage"  column="id" javaType="TeachMajorStage" resultMap="TeachMajorStageResult" />-->
+    </resultMap>
+
+    <!--<resultMap type="TeachMajorStage" id="TeachMajorStageResult">
+        <result property="id"    column="id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageName"    column="stage_name"    />
+        <result property="sort"    column="sort"    />
+    </resultMap>-->
+	
+	<sql id="selectTeachExamVo">
+        select exam_id, class_id, datetime, cut_offscores, invigilator, address from teach_exam
+    </sql>
+	
+    <select id="selectTeachExamList" parameterType="TeachExam" resultMap="TeachExamResult">
+        select a.acceptability, a.student_num, a.fail, a.pass, a.exam_id, a.datetime, a.cut_offscores, a.invigilator, a.address,
+        b.dept_name school_name, c.major_name,d.stage_name, tc.class_name,su.user_name teacher_name from teach_exam a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        JOIN sys_user su ON su.user_id = a.invigilator
+        JOIN teach_major_stage d ON d.id = a.stage_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        <where>
+            <if test="examId != null "> and a.exam_id = #{examId}</if>
+             <if test="datetime != null "> and a.datetime = #{datetime}</if>
+             <if test="cutOffscores != null  and cutOffscores != '' "> and a.cut_offscores = #{cutOffscores}</if>
+             <if test="invigilator != null  and invigilator != '' "> and a.invigilator = #{invigilator}</if>
+             <if test="address != null  and address != '' "> and a.address = #{address}</if>
+            <if test="className != null and className != ''"> and tc.class_name LIKE concat('%', #{className}, '%')</if>
+            <if test="majorId != null"> and tc.major_id = #{majorId}</if>
+            <if test="classes != null and classes != ''"> and a.class_id in
+                <foreach item="classes" collection="classes" open="(" separator="," close=")">
+                    #{classes}
+                </foreach>
+            </if>
+         </where>
+        order by a.datetime desc
+    </select>
+
+    <select id="selectTeachExamListCount" resultType="int">
+        SELECT COUNT(0) FROM teach_exam WHERE class_id = #{classId} and datetime between #{starttime} and #{endtime}
+    </select>
+
+    <select id="selectTeachExamList1" parameterType="TeachExam" resultMap="TeachExamResult">
+        select a.acceptability, a.student_num, a.fail, a.pass, a.exam_id, a.datetime, a.cut_offscores, a.invigilator, a.address,
+        b.dept_name school_name, c.major_name,d.stage_name, tc.class_name,su.user_name teacher_name from teach_exam a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        JOIN sys_user su ON su.user_id = a.invigilator
+        JOIN teach_major_stage d ON d.id = a.stage_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        WHERE a.class_id = #{classId} and a.datetime between #{starttime} and #{endtime}
+        order by a.datetime desc
+    </select>
+    
+    <select id="selectTeachExamById" parameterType="Integer" resultMap="TeachExamResult">
+        select a.exam_id, a.class_id, a.datetime, a.cut_offscores, a.invigilator, a.address, a.stage_id, tc.class_name, su.user_name as teacher_name from teach_exam a
+        join teach_classes tc on tc.class_id = a.class_id
+        join sys_user su on su.user_id = a.invigilator
+        where exam_id = #{examId}
+    </select>
+
+    <select id="selectTeachExamListById" parameterType="Integer" resultMap="TeachExamResult">
+        select a.exam_id, a.datetime, a.cut_offscores, a.invigilator, a.address, b.dept_name school_name, c.major_name,d.stage_name, tc.class_name,su.user_name teacher_name from teach_exam a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        JOIN sys_user su ON su.user_id = a.invigilator
+        JOIN teach_major_stage d ON d.id = a.stage_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        <where>
+            tc.school_id = #{schoolId}
+        </where>
+    </select>
+
+    <select id="selectSum" resultType="int">
+        SELECT COUNT(0) FROM teach_exam
+    </select>
+
+    <select id="selectCountByaa" resultType="int">
+        SELECT COUNT(0) FROM teach_exam WHERE class_id = #{classId} and stage_id = #{stageId} and datetime between #{starttime} and #{endtime}
+    </select>
+
+    <select id="selectMaxId" resultType="int">
+        SELECT MAX(exam_id) FROM teach_exam
+    </select>
+
+    <select id="selectTeachExamByClassId" parameterType="TeachExam" resultMap="TeachExamResult">
+        select e.exam_id,ms.stage_name from teach_exam e
+        left join teach_major_stage ms on e.stage_id = ms.id
+        <where>
+            <if test="classId != null and classId != 0 ">
+                e.class_id = #{classId}
+            </if>
+        </where>
+    </select>
+
+        
+    <insert id="insertTeachExam" parameterType="TeachExam">
+        insert into teach_exam
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="examId != null  ">exam_id,</if>
+			<if test="classId != null  ">class_id,</if>
+			<if test="datetime != null  ">datetime,</if>
+			<if test="cutOffscores != null  and cutOffscores != ''  ">cut_offscores,</if>
+			<if test="invigilator != null  and invigilator != ''  ">invigilator,</if>
+			<if test="address != null  and address != ''  ">address,</if>
+            <if test="stageId != null  and stageId != ''">stage_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="examId != null  ">#{examId},</if>
+			<if test="classId != null  ">#{classId},</if>
+			<if test="datetime != null  ">#{datetime},</if>
+			<if test="cutOffscores != null  and cutOffscores != ''  ">#{cutOffscores},</if>
+			<if test="invigilator != null  and invigilator != ''  ">#{invigilator},</if>
+			<if test="address != null  and address != ''  ">#{address},</if>
+            <if test="stageId != null  and stageId != ''">#{stage_id},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachExam" parameterType="TeachExam">
+        update teach_exam
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  ">class_id = #{classId},</if>
+            <if test="datetime != null  ">datetime = #{datetime},</if>
+            <if test="cutOffscores != null  and cutOffscores != ''  ">cut_offscores = #{cutOffscores},</if>
+            <if test="invigilator != null  and invigilator != ''  ">invigilator = #{invigilator},</if>
+            <if test="address != null  and address != ''  ">address = #{address},</if>
+            <if test="stageId != null  and stageId != ''">stage_id = #{stageId},</if>
+        </trim>
+        where exam_id = #{examId}
+    </update>
+
+	<delete id="deleteTeachExamById" parameterType="Integer">
+        delete from teach_exam where exam_id = #{examId}
+    </delete>
+	
+    <delete id="deleteTeachExamByIds" parameterType="String">
+        delete from teach_exam where exam_id in 
+        <foreach item="examId" collection="array" open="(" separator="," close=")">
+            #{examId}
+        </foreach>
+    </delete>
+    
+</mapper>

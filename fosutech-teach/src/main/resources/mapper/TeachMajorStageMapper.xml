@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachMajorStageMapper">
+    
+    <resultMap type="TeachMajorStage" id="TeachMajorStageResult">
+        <result property="id"    column="id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageName"    column="stage_name"    />
+        <result property="sort"    column="sort"    />
+    </resultMap>
+	
+	<sql id="selectTeachMajorStageVo">
+        select id, major_id, stage_name, sort from teach_major_stage
+    </sql>
+	
+    <select id="selectTeachMajorStageList" parameterType="TeachMajorStage" resultMap="TeachMajorStageResult">
+        <include refid="selectTeachMajorStageVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="majorId != null "> and major_id = #{majorId}</if>
+             <if test="stageName != null  and stageName != '' "> and stage_name = #{stageName}</if>
+             <if test="sort != null "> and sort = #{sort}</if>
+         </where>
+        order by sort asc
+    </select>
+    
+    <select id="selectTeachMajorStageById" parameterType="String" resultMap="TeachMajorStageResult">
+        <include refid="selectTeachMajorStageVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTeachMajorStage" parameterType="TeachMajorStage">
+        insert into teach_major_stage
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="majorId != null  ">major_id,</if>
+			<if test="stageName != null  and stageName != ''  ">stage_name,</if>
+			<if test="sort != null  ">sort,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="majorId != null  ">#{majorId},</if>
+			<if test="stageName != null  and stageName != ''  ">#{stageName},</if>
+			<if test="sort != null  ">#{sort},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachMajorStage" parameterType="TeachMajorStage">
+        update teach_major_stage
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="majorId != null  ">major_id = #{majorId},</if>
+            <if test="stageName != null  and stageName != ''  ">stage_name = #{stageName},</if>
+            <if test="sort != null  ">sort = #{sort},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachMajorStageById" parameterType="String">
+        delete from teach_major_stage where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachMajorStageByIds" parameterType="String">
+        delete from teach_major_stage where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTeachMajorStageByMajorId" parameterType="Integer">
+        delete from teach_major_stage where major_id = #{majorId}
+    </delete>
+    
+</mapper>

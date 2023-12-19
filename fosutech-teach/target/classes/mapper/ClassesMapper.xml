@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.ClassesMapper">
+    
+    <resultMap type="Classes" id="ClassesResult">
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageNew"    column="stage_new"    />
+        <result property="stageStarttime"    column="stage_starttime"    />
+        <result property="stageEndtime"    column="stage_endtime"    />
+        <result property="headTeacher"    column="head_teacher"    />
+        <result property="teacherOne"    column="teacher_one"    />
+        <result property="teacherTwo"    column="teacher_two"    />
+        <result property="teacherThree"    column="teacher_three"    />
+        <result property="teacherFour"    column="teacher_four"    />
+        <result property="teachingAssistant"    column="teaching_assistant"    />
+        <association property="sysDept"  column="dept_id" javaType="SysDept" resultMap="SysDeptResult" />
+        <association property="majors"  column="major_id" javaType="Major" resultMap="MajorResult" />
+    </resultMap>
+
+    <resultMap type="SysDept" id="SysDeptResult">
+        <id     property="deptId"     column="dept_id"     />
+        <result property="parentId"   column="parent_id"   />
+        <result property="ancestors"  column="ancestors"   />
+        <result property="deptName"   column="dept_name"   />
+        <result property="orderNum"   column="order_num"   />
+        <result property="leader"     column="leader"      />
+        <result property="phone"      column="phone"       />
+        <result property="email"      column="email"       />
+        <result property="status"     column="status"      />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="parentName" column="parent_name" />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <resultMap type="Major" id="MajorResult">
+        <result property="majorId"    column="major_id"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="stageOne"    column="stage_one"    />
+        <result property="stageTwo"    column="stage_two"    />
+        <result property="stageThree"    column="stage_three"    />
+        <result property="stageFour"    column="stage_four"    />
+    </resultMap>
+	
+	<sql id="selectClassesVo">
+        select class_id, class_name, school_id, major_id, stage_new, stage_starttime, stage_endtime, head_teacher, teacher_one, teacher_two, teacher_three, teacher_four, teaching_assistant from teach_classes
+    </sql>
+	
+    <select id="selectClassesList" parameterType="Classes" resultMap="ClassesResult">
+        SELECT a.*,b.dept_name,c.major_name FROM teach_classes a
+        LEFT JOIN sys_dept b ON b.dept_id = a.school_id LEFT JOIN teach_major c ON a.major_id = c.major_id
+        <where>
+            <if test="classId != null "> and class_id = #{classId}</if>
+             <if test="className != null  and className != '' "> and class_name = #{className}</if>
+             <if test="schoolId != null "> and school_id = #{schoolId}</if>
+             <if test="majorId != null "> and major_id = #{majorId}</if>
+             <if test="stageNew != null  and stageNew != '' "> and stage_new = #{stageNew}</if>
+             <if test="stageStarttime != null "> and stage_starttime = #{stageStarttime}</if>
+             <if test="stageEndtime != null "> and stage_endtime = #{stageEndtime}</if>
+             <if test="headTeacher != null "> and head_teacher = #{headTeacher}</if>
+             <if test="teacherOne != null "> and teacher_one = #{teacherOne}</if>
+             <if test="teacherTwo != null "> and teacher_two = #{teacherTwo}</if>
+             <if test="teacherThree != null "> and teacher_three = #{teacherThree}</if>
+             <if test="teacherFour != null "> and teacher_four = #{teacherFour}</if>
+             <if test="teachingAssistant != null "> and teaching_assistant = #{teachingAssistant}</if>
+         </where>
+    </select>
+    
+    <select id="selectClassesById" parameterType="Integer" resultMap="ClassesResult">
+        <include refid="selectClassesVo"/>
+        where class_id = #{classId}
+    </select>
+        
+    <insert id="insertClasses" parameterType="Classes">
+        insert into teach_classes
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="classId != null  ">class_id,</if>
+			<if test="className != null  and className != ''  ">class_name,</if>
+			<if test="schoolId != null  ">school_id,</if>
+			<if test="majorId != null  ">major_id,</if>
+			<if test="stageNew != null  and stageNew != ''  ">stage_new,</if>
+			<if test="stageStarttime != null  ">stage_starttime,</if>
+			<if test="stageEndtime != null  ">stage_endtime,</if>
+			<if test="headTeacher != null  ">head_teacher,</if>
+			<if test="teacherOne != null  ">teacher_one,</if>
+			<if test="teacherTwo != null  ">teacher_two,</if>
+			<if test="teacherThree != null  ">teacher_three,</if>
+			<if test="teacherFour != null  ">teacher_four,</if>
+			<if test="teachingAssistant != null  ">teaching_assistant,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="classId != null  ">#{classId},</if>
+			<if test="className != null  and className != ''  ">#{className},</if>
+			<if test="schoolId != null  ">#{schoolId},</if>
+			<if test="majorId != null  ">#{majorId},</if>
+			<if test="stageNew != null  and stageNew != ''  ">#{stageNew},</if>
+			<if test="stageStarttime != null  ">#{stageStarttime},</if>
+			<if test="stageEndtime != null  ">#{stageEndtime},</if>
+			<if test="headTeacher != null  ">#{headTeacher},</if>
+			<if test="teacherOne != null  ">#{teacherOne},</if>
+			<if test="teacherTwo != null  ">#{teacherTwo},</if>
+			<if test="teacherThree != null  ">#{teacherThree},</if>
+			<if test="teacherFour != null  ">#{teacherFour},</if>
+			<if test="teachingAssistant != null  ">#{teachingAssistant},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateClasses" parameterType="Classes">
+        update teach_classes
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="className != null  and className != ''  ">class_name = #{className},</if>
+            <if test="schoolId != null  ">school_id = #{schoolId},</if>
+            <if test="majorId != null  ">major_id = #{majorId},</if>
+            <if test="stageNew != null  and stageNew != ''  ">stage_new = #{stageNew},</if>
+            <if test="stageStarttime != null  ">stage_starttime = #{stageStarttime},</if>
+            <if test="stageEndtime != null  ">stage_endtime = #{stageEndtime},</if>
+            <if test="headTeacher != null  ">head_teacher = #{headTeacher},</if>
+            <if test="teacherOne != null  ">teacher_one = #{teacherOne},</if>
+            <if test="teacherTwo != null  ">teacher_two = #{teacherTwo},</if>
+            <if test="teacherThree != null  ">teacher_three = #{teacherThree},</if>
+            <if test="teacherFour != null  ">teacher_four = #{teacherFour},</if>
+            <if test="teachingAssistant != null  ">teaching_assistant = #{teachingAssistant},</if>
+        </trim>
+        where class_id = #{classId}
+    </update>
+
+	<delete id="deleteClassesById" parameterType="Integer">
+        delete from teach_classes where class_id = #{classId}
+    </delete>
+	
+    <delete id="deleteClassesByIds" parameterType="String">
+        delete from teach_classes where class_id in 
+        <foreach item="classId" collection="array" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachMajorMapper">
+    
+    <resultMap type="TeachMajor" id="TeachMajorResult">
+        <result property="majorId"    column="major_id"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="majorType"     column="major_type"   />
+        <association property="stages"  column="id" javaType="TeachMajorStage" resultMap="TeachMajorStageResult" />
+    </resultMap>
+
+    <resultMap type="TeachMajorStage" id="TeachMajorStageResult">
+        <result property="id"    column="id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageName"    column="stage_name"    />
+        <result property="sort"    column="sort"    />
+    </resultMap>
+	
+	<sql id="selectTeachMajorVo">
+        select major_id, major_name, major_type from teach_major
+    </sql>
+	
+    <select id="selectTeachMajorList" parameterType="TeachMajor" resultMap="TeachMajorResult">
+        <include refid="selectTeachMajorVo"/>
+        <where>  
+            <if test="majorId != null "> and major_id = #{majorId}</if>
+             <if test="majorName != null  and majorName != '' "> and major_name like concat('%',#{majorName},'%')</if>
+            <if test="majorType != null">and major_type = #{majorType}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachMajorById" parameterType="Integer" resultMap="TeachMajorResult">
+        <include refid="selectTeachMajorVo"/>
+        where major_id = #{majorId}
+    </select>
+        
+    <insert id="insertTeachMajor" parameterType="TeachMajor">
+        insert into teach_major
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="majorId != null  ">major_id,</if>
+			<if test="majorName != null  and majorName != ''  ">major_name,</if>
+            <if test="majorType != null">major_type,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="majorId != null  ">#{majorId},</if>
+			<if test="majorName != null  and majorName != ''  ">#{majorName},</if>
+            <if test="majorType != null">#{majorType},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachMajor" parameterType="TeachMajor">
+        update teach_major
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="majorName != null  and majorName != ''  ">major_name = #{majorName},</if>
+            <if test="majorType != null">major_type = #{majorType},</if>
+        </trim>
+        where major_id = #{majorId}
+    </update>
+
+	<delete id="deleteTeachMajorById" parameterType="Integer">
+        delete from teach_major where major_id = #{majorId}
+    </delete>
+	
+    <delete id="deleteTeachMajorByIds" parameterType="String">
+        delete from teach_major where major_id in 
+        <foreach item="majorId" collection="array" open="(" separator="," close=")">
+            #{majorId}
+        </foreach>
+    </delete>
+
+    <select id="selectId" resultType="Integer">
+        select major_id from teach_major
+        order by major_id desc limit 1
+    </select>
+
+    <select id="selectCountNum" resultType="Integer">
+        select count(1) from teach_major
+    </select>
+
+    <select id="checkMajorNameUnique" parameterType="String" resultMap="TeachMajorResult">
+        <include refid="selectTeachMajorVo"/>
+        where major_name=#{majorName}
+    </select>
+    
+</mapper>

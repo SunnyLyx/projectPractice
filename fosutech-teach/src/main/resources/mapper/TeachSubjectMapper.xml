@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachSubjectMapper">
+    
+    <resultMap type="TeachSubject" id="TeachSubjectResult">
+        <result property="subjectId"    column="subject_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="subjectName"    column="subject_name"    />
+        <result property="starttime"    column="starttime"    />
+        <result property="endtime"    column="endtime"    />
+        <result property="schoolName"    column="school_name"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="bestnum"    column="bestnum"    />
+        <result property="goodnum"    column="goodnum"    />
+        <result property="poornum"    column="poornum"    />
+        <result property="unfinishednum"    column="unfinishednum"    />
+        <result property="studentnum"    column="studentnum"    />
+        <result property="bestAttendance"    column="best_attendance"    />
+        <result property="majorId"    column="major_id"    />
+    </resultMap>
+	
+	<sql id="selectTeachSubjectVo">
+        select subject_id, class_id, subject_name, starttime, endtime from teach_subject
+    </sql>
+	
+    <select id="selectTeachSubjectList" parameterType="TeachSubject" resultMap="TeachSubjectResult">
+        select a.bestnum, a.goodnum, a.poornum, a.unfinishednum, a.studentnum, a.best_attendance, a.subject_id, a.subject_name, a.starttime, a.endtime,
+        b.dept_name school_name, c.major_name, tc.class_name from teach_subject a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        <where>  
+            <if test="className != null and className != '' "> and tc.class_name LIKE concat('%', #{className}, '%')</if>
+             <if test="subjectName != null  and subjectName != '' "> and a.subject_name LIKE concat('%', #{subjectName}, '%')</if>
+             <if test="starttime != null "> and a.starttime &gt;= #{starttime}</if>
+             <if test="endtime != null "> and a.endtime &lt;= #{endtime}</if>
+            <if test="classId != null "> and a.class_id = #{classId}</if>
+            <if test="majorId != null and majorId != '' and majorId != '0'"> and c.major_id = #{majorId}</if>
+            <if test="classes != null and classes != ''"> and a.class_id in
+                <foreach item="classes" collection="classes" open="(" separator="," close=")">
+                    #{classes}
+                </foreach>
+            </if>
+         </where>
+        order by a.starttime desc
+    </select>
+
+    <select id="selectTeachSubjectListCount" resultType="int">
+        SELECT COUNT(0) FROM teach_subject WHERE class_id = #{classId} and endtime between #{starttime} and #{endtime}
+    </select>
+
+    <select id="selectTeachSubjectList1" parameterType="TeachSubject" resultMap="TeachSubjectResult">
+        select a.bestnum, a.goodnum, a.poornum, a.unfinishednum, a.studentnum, a.best_attendance, a.subject_id, a.subject_name, a.starttime, a.endtime,
+        b.dept_name school_name, c.major_name, tc.class_name from teach_subject a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        WHERE a.class_id = #{classId} and a.endtime between #{starttime} and #{endtime}
+        order by a.starttime desc
+    </select>
+    
+    <select id="selectTeachSubjectById" parameterType="Integer" resultMap="TeachSubjectResult">
+        select a.subject_id, a.class_id, a.subject_name, a.starttime, a.endtime, tc.class_name from teach_subject a
+        join teach_classes tc on tc.class_id = a.class_id
+        where a.subject_id = #{subjectId}
+    </select>
+
+    <select id="selectSum" resultType="int">
+        SELECT COUNT(0) FROM teach_subject
+    </select>
+
+    <select id="selectMaxId" resultType="int">
+        SELECT MAX(subject_id) FROM teach_subject
+    </select>
+        
+    <insert id="insertTeachSubject" parameterType="TeachSubject">
+        insert into teach_subject
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="subjectId != null  ">subject_id,</if>
+			<if test="classId != null  ">class_id,</if>
+			<if test="subjectName != null  and subjectName != ''  ">subject_name,</if>
+			<if test="starttime != null  ">starttime,</if>
+			<if test="endtime != null  ">endtime,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="subjectId != null  ">#{subjectId},</if>
+			<if test="classId != null  ">#{classId},</if>
+			<if test="subjectName != null  and subjectName != ''  ">#{subjectName},</if>
+			<if test="starttime != null  ">#{starttime},</if>
+			<if test="endtime != null  ">#{endtime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachSubject" parameterType="TeachSubject">
+        update teach_subject
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  ">class_id = #{classId},</if>
+            <if test="subjectName != null  and subjectName != ''  ">subject_name = #{subjectName},</if>
+            <if test="starttime != null  ">starttime = #{starttime},</if>
+            <if test="endtime != null  ">endtime = #{endtime},</if>
+        </trim>
+        where subject_id = #{subjectId}
+    </update>
+
+	<delete id="deleteTeachSubjectById" parameterType="Integer">
+        delete from teach_subject where subject_id = #{subjectId}
+    </delete>
+	
+    <delete id="deleteTeachSubjectByIds" parameterType="String">
+        delete from teach_subject where subject_id in 
+        <foreach item="subjectId" collection="array" open="(" separator="," close=")">
+            #{subjectId}
+        </foreach>
+    </delete>
+    
+</mapper>

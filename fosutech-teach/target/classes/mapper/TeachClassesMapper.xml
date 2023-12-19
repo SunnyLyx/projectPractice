@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachClassesMapper">
+    
+    <resultMap type="TeachClasses" id="TeachClassesResult">
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageNew"    column="stage_new"    />
+        <result property="stageStarttime"    column="stage_starttime"    />
+        <result property="stageEndtime"    column="stage_endtime"    />
+        <result property="createtime"    column="createtime"    />
+        <!--<association property="sysDept"  column="dept_id" javaType="SysDept" resultMap="SysDeptResult" />
+        <association property="majors"  column="major_id" javaType="TeachMajor" resultMap="TeachMajorResult" />
+        <association property="majorStage"  column="id" javaType="TeachMajorStage" resultMap="TeachMajorStageResult" />-->
+        <result property="stageName"    column="stage_name"    />
+        <result property="schoolName"    column="school_name"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="majorType"     column="major_type"  />
+        <result property="linkStatus"     column="link_status"  />
+    </resultMap>
+
+<!--    <resultMap type="SysDept" id="SysDeptResult">
+        <id     property="deptId"     column="dept_id"     />
+        <result property="parentId"   column="parent_id"   />
+        <result property="ancestors"  column="ancestors"   />
+        <result property="deptName"   column="dept_name"   />
+        <result property="orderNum"   column="order_num"   />
+        <result property="leader"     column="leader"      />
+        <result property="phone"      column="phone"       />
+        <result property="email"      column="email"       />
+        <result property="status"     column="status"      />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="parentName" column="parent_name" />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <resultMap type="TeachMajor" id="TeachMajorResult">
+        <result property="majorId"    column="major_id"    />
+        <result property="majorName"    column="major_name"    />
+    </resultMap>
+
+    <resultMap type="TeachMajorStage" id="TeachMajorStageResult">
+        <result property="id"    column="id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageName"    column="stage_name"    />
+        <result property="sort"    column="sort"    />
+    </resultMap>-->
+	
+	<sql id="selectTeachClassesVo">
+        select class_id, class_name, school_id, major_id, stage_new, stage_starttime, stage_endtime, createtime, link_status from teach_classes
+    </sql>
+	
+    <select id="selectTeachClassesList" parameterType="TeachClasses" resultMap="TeachClassesResult">
+        SELECT a.*,b.dept_name school_name,c.major_name,d.stage_name,c.major_type FROM teach_classes a
+        LEFT JOIN sys_dept b ON b.dept_id = a.school_id LEFT JOIN teach_major c ON a.major_id = c.major_id LEFT JOIN teach_major_stage d ON a.stage_new = d.id
+        <where>  
+            <if test="classId != null "> and a.class_id = #{classId}</if>
+             <if test="className != null  and className != '' "> and a.class_name LIKE concat('%',#{className},'%')</if>
+             <if test="schoolId != null "> and a.school_id = #{schoolId}</if>
+             <if test="majorId != null and majorId != '' and majorId != '0'"> and a.major_id = #{majorId}</if>
+             <if test="stageNew != null  and stageNew != '' "> and a.stage_new = #{stageNew}</if>
+             <if test="stageStarttime != null "> and a.stage_starttime = #{stageStarttime}</if>
+             <if test="stageEndtime != null "> and a.stage_endtime = #{stageEndtime}</if>
+             <if test="createtime != null "> and a.createtime = #{createtime}</if>
+            <if test="classes != null and classes != ''"> and class_id in
+                <foreach item="classes" collection="classes" open="(" separator="," close=")">
+                    #{classes}
+                </foreach>
+            </if>
+         </where>
+        order by a.createTime desc
+    </select>
+
+    <select id="selectClassesBySchoolId" resultType="String">
+        select distinct class_id from teach_classes WHERE school_id = #{deptId}
+    </select>
+
+    <select id="selectAllClasses" resultType="String">
+        select distinct class_id from teach_classes
+    </select>
+
+    <select id="selectTeachClassesById" parameterType="Integer" resultMap="TeachClassesResult">
+        SELECT a.*,b.dept_name school_name,c.major_name,d.stage_name FROM teach_classes a
+        LEFT JOIN sys_dept b ON b.dept_id = a.school_id LEFT JOIN teach_major c ON a.major_id = c.major_id LEFT JOIN teach_major_stage d ON a.stage_new = d.id
+        where class_id = #{classId}
+    </select>
+
+    <select id="selectTeachClassById" parameterType="Integer" resultMap="TeachClassesResult">
+         SELECT a.*,b.dept_name,c.major_name FROM teach_classes a
+        LEFT JOIN sys_dept b ON b.dept_id = a.school_id LEFT JOIN teach_major c ON a.major_id = c.major_id
+        where class_id = #{classId}
+    </select>
+
+    <select id="selectSum" resultType="int">
+        SELECT COUNT(0) FROM teach_classes
+    </select>
+
+    <select id="selectMaxId" resultType="int">
+        SELECT MAX(class_id) FROM teach_classes
+    </select>
+
+    <select id="selectByClassName" resultType="Integer" parameterType="String">
+        SELECT class_id FROM teach_classes WHERE class_name = #{className}
+    </select>
+
+    <insert id="insertTeachClasses" parameterType="TeachClasses">
+        insert into teach_classes
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="classId != null  ">class_id,</if>
+			<if test="className != null  and className != ''  ">class_name,</if>
+			<if test="schoolId != null  ">school_id,</if>
+			<if test="majorId != null  ">major_id,</if>
+			<if test="stageNew != null  and stageNew != ''  ">stage_new,</if>
+			<if test="stageStarttime != null  ">stage_starttime,</if>
+			<if test="stageEndtime != null  ">stage_endtime,</if>
+			<if test="createtime != null  ">createtime,</if>
+            <if test="linkStatus != null  ">link_status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="classId != null  ">#{classId},</if>
+			<if test="className != null  and className != ''  ">#{className},</if>
+			<if test="schoolId != null  ">#{schoolId},</if>
+			<if test="majorId != null  ">#{majorId},</if>
+			<if test="stageNew != null  and stageNew != ''  ">#{stageNew},</if>
+			<if test="stageStarttime != null  ">#{stageStarttime},</if>
+			<if test="stageEndtime != null  ">#{stageEndtime},</if>
+			<if test="createtime != null  ">#{createtime},</if>
+            <if test="linkStatus != null  ">#{linkStatus},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachClasses" parameterType="TeachClasses">
+        update teach_classes
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="className != null  and className != ''  ">class_name = #{className},</if>
+            <if test="schoolId != null  ">school_id = #{schoolId},</if>
+            <if test="majorId != null  ">major_id = #{majorId},</if>
+            <if test="stageNew != null  and stageNew != ''  ">stage_new = #{stageNew},</if>
+            <if test="stageStarttime != null  ">stage_starttime = #{stageStarttime},</if>
+            <if test="stageEndtime != null  ">stage_endtime = #{stageEndtime},</if>
+            <if test="createtime != null  ">createtime = #{createtime},</if>
+            <if test="linkStatus != null  ">link_status = #{linkStatus},</if>
+        </trim>
+        where class_id = #{classId}
+    </update>
+
+	<delete id="deleteTeachClassesById" parameterType="Integer">
+        delete from teach_classes where class_id = #{classId}
+    </delete>
+	
+    <delete id="deleteTeachClassesByIds" parameterType="String">
+        delete from teach_classes where class_id in 
+        <foreach item="classId" collection="array" open="(" separator="," close=")">
+            #{classId}
+        </foreach>
+    </delete>
+
+    <update id="changeTeachClassesByIds" parameterType="String">
+        UPDATE teach_student SET status = 9 WHERE status = 1 AND class_no = #{classId}
+    </update>
+
+    <select id="selectCountByMajor" resultType="int">
+        SELECT COUNT(0) FROM teach_classes WHERE major_id = #{majorId}
+    </select>
+</mapper>

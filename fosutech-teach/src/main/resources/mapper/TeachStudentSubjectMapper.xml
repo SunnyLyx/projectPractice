@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachStudentSubjectMapper">
+    
+    <resultMap type="TeachStudentSubject" id="TeachStudentSubjectResult">
+        <result property="id"    column="id"    />
+        <result property="subjectId"    column="subject_id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="studentName"    column="student_name"    />
+        <result property="submit"    column="submit"    />
+        <result property="subjectUrl"    column="subject_url"    />
+        <result property="evaluate"    column="evaluate"    />
+        <association property="subject"  column="subject_id" javaType="TeachSubject" resultMap="TeachSubjectResult" />
+        <association property="classes"  column="class_id" javaType="TeachClasses" resultMap="TeachClassesResult" />
+    </resultMap>
+
+    <resultMap type="TeachSubject" id="TeachSubjectResult">
+        <result property="subjectId"    column="subject_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="subjectName"    column="subject_name"    />
+        <result property="starttime"    column="starttime"    />
+        <result property="endtime"    column="endtime"    />
+    </resultMap>
+
+    <resultMap type="TeachClasses" id="TeachClassesResult">
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageNew"    column="stage_new"    />
+        <result property="stageStarttime"    column="stage_starttime"    />
+        <result property="stageEndtime"    column="stage_endtime"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+	
+	<sql id="selectTeachStudentSubjectVo">
+        select id, subject_id, student_id, subject_url, evaluate, submit from teach_student_subject
+    </sql>
+	
+    <select id="selectTeachStudentSubjectList" parameterType="TeachStudentSubject" resultMap="TeachStudentSubjectResult">
+        select a.id, a.student_id, a.subject_url, a.evaluate, a.submit, b.student_name from teach_student_subject a
+        JOIN teach_student b ON a.student_id = b.student_id
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="subjectId != null "> and a.subject_id = #{subjectId}</if>
+             <if test="studentId != null "> and a.student_id = #{studentId}</if>
+             <if test="subjectUrl != null  and subjectUrl != '' "> and a.subject_url = #{subjectUrl}</if>
+             <if test="evaluate != null "> and a.evaluate = #{evaluate}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachStudentSubjectById" parameterType="Integer" resultMap="TeachStudentSubjectResult">
+        <include refid="selectTeachStudentSubjectVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachStudentSubject" parameterType="Integer" resultMap="TeachStudentSubjectResult">
+        select ssub.*,c.class_name,sub.subject_name,sub.starttime,sub.endtime from teach_student_subject ssub
+        left join teach_subject sub on ssub.subject_id = sub.subject_id
+        left join teach_classes c on sub.class_id = c.class_id
+        where ssub.student_id = #{subjectId}
+        order by sub.starttime desc
+    </select>
+        
+    <insert id="insertTeachStudentSubject" parameterType="TeachStudentSubject">
+        insert into teach_student_subject
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="subjectId != null  ">subject_id,</if>
+			<if test="studentId != null  ">student_id,</if>
+			<if test="subjectUrl != null  and subjectUrl != ''  ">subject_url,</if>
+			<if test="evaluate != null  ">evaluate,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="subjectId != null  ">#{subjectId},</if>
+			<if test="studentId != null  ">#{studentId},</if>
+			<if test="subjectUrl != null  and subjectUrl != ''  ">#{subjectUrl},</if>
+			<if test="evaluate != null  ">#{evaluate},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachStudentSubject" parameterType="TeachStudentSubject">
+        update teach_student_subject
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="subjectId != null  ">subject_id = #{subjectId},</if>
+            <if test="studentId != null  ">student_id = #{studentId},</if>
+            <if test="subjectUrl != null  and subjectUrl != ''  ">subject_url = #{subjectUrl},</if>
+            <if test="evaluate != null  ">evaluate = #{evaluate},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachStudentSubjectById" parameterType="Integer">
+        delete from teach_student_subject where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachStudentSubjectByIds" parameterType="String">
+        delete from teach_student_subject where subject_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+
+    </delete>
+    
+</mapper>

@@ -1,0 +1,118 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-teachExam-edit" th:object="${teachExam}">
+        <input id="examId" name="examId" th:field="*{examId}"  type="hidden">
+        <input id="classId" name="classId" type="hidden" th:field="*{classId}">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">班级：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" readonly="true" id="className" th:field="*{className}" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">考试阶段：</label>
+            <div class="col-sm-8">
+                <select name="stageId" id="stageId" class="form-control" disabled="disabled">
+                    <option th:each="obj,eStat:${list}" th:value="${obj.id}"
+                            th:text="${obj.stageName}" th:selected="${#strings.contains(teachExam.stageId,obj.id)}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">考试时间：</label>
+            <div class="col-sm-8">
+                <input id="datetime" name="datetime" th:field="*{datetime}" class="form-control" type="text" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">及格线：</label>
+            <div class="col-sm-8">
+                <input id="cutOffscores" name="cutOffscores" th:field="*{cutOffscores}" class="form-control" type="text" disabled="disabled">
+            </div>
+        </div>
+        <input id="invigilator" name="invigilator" type="hidden" th:field="*{invigilator}">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">主考老师：</label>
+            <div class="col-sm-8">
+                <input id="TeacherName" class="form-control" type="text" onclick="selectTeacherList()" readonly="true" th:field="*{teacherName}"  disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">考试地点：</label>
+            <div class="col-sm-8">
+                <input id="address" name="address" th:field="*{address}" class="form-control" type="text" disabled="disabled">
+            </div>
+        </div>
+        <div id="BadstudenUser">
+            <h4 style="display: inline-block">非在读学生：</h4>
+        </div>
+        <hr/>
+        <h3>在读学生考试</h3>
+        <hr/>
+        <table class="table " id="Professional">
+            <tr id="biaoti">
+                <th style="display: none">学生id</th>
+                <th>学生</th>
+                <th>成绩</th>
+                <th>备注</th>
+            </tr>
+        </table>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var myajax = $.ajax({
+        cache: true,
+        type: "POST",
+        url: ctx + "teach/teachStudentExam/list",
+        data: {"examId": $("#examId").val()},
+        success : function(data) {
+            var dataRow =data.rows;
+            for(var i=0;i<dataRow.length;i++){
+                if(dataRow[i].score == null){
+                    dataRow[i].score = "";
+                }
+                if(dataRow[i].remark == null){
+                    dataRow[i].remark = "";
+                }
+                var stu="<tr>\n" +
+                    "\t\t\t\t\t<td><span style='width: 55%;display: inline-block' disabled=\"disabled\">"+dataRow[i].studentName+"</span></td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "\t\t\t\t\t\t<input class='score' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" placeholder=\"请输入考试成绩\" value='"+dataRow[i].score+"' disabled=\"disabled\">\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "\t\t\t\t\t\t<input class='remark' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" placeholder=\"请输入备注\" value='"+dataRow[i].remark+"' disabled=\"disabled\">\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t</tr>";
+                $("#Professional").append(stu);
+            }
+        }
+    })
+
+    $.ajax({
+        cache: true,
+        type: "POST",
+        url: ctx + "teach/student/classOtherStudents",
+        data: {"classNo": $("input[name='classId']").val()},
+        error: function (request) {
+            $.modal.alertError("系统错误");
+        },
+        success: function (data) {
+            var dataRow = data.rows;
+            $("#BadstudenUser>span").remove();
+            for(var i=0;i<dataRow.length;i++){
+                var datas="<span style='width: 80px;display: inline-block;text-align: center;height:30px;line-height:30px;margin-left: 15px;border-radius: 20px;font-size: 14px;color: #ffffff;background-color: #0d8ddb'>"+dataRow[i].studentName+"</span>";
+                $("#BadstudenUser").append(datas)
+            }
+            if(dataRow.length==0){
+                $("#BadstudenUser").append("<span>无</span>");
+            }
+        }
+    })
+</script>
+</body>
+</html>

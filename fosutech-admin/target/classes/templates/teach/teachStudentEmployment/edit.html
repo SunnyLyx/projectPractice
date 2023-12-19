@@ -1,0 +1,213 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachStudentEmployment-edit" th:object="${teachStudentEmployment}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<input name="studentId"  type="hidden" id="studentId" th:field="*{studentId}"/>
+			<input name="student"  type="hidden" id="student" th:field="*{studentId}"/>
+
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">学生：</label>
+					<div class="col-sm-8">
+						<!--<input id="studentId" name="studentId" th:field="*{studentId}" class="form-control" type="text">-->
+						<input class="form-control" type="text" name="studentName" onclick="selectList()" readonly="true" id="studentName" th:field="*{student.studentName}">
+					</div>
+				</div>
+			</div>
+			<!--<div class="form-group">
+				<label class="col-sm-3 control-label">更新时间：</label>
+				<div class="col-sm-8">
+					<input id="edittime" name="edittime" th:field="*{edittime}" class="form-control" type="text">
+				</div>
+			</div>-->
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">就业方式：</label>
+					<div class="col-sm-8">
+						<input id="employmentWay" name="employmentWay" th:field="*{employmentWay}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">入职时间：</label>
+					<div class="col-sm-8">
+						<input id="hiredate" name="hiredate" th:field="*{hiredate}" class="form-control" type="text" placeholder="yyyy-MM-dd">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">就业城市：</label>
+					<div class="col-sm-8">
+						<input id="urbanEmployment" name="urbanEmployment" th:field="*{urbanEmployment}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">单位：</label>
+					<div class="col-sm-8">
+						<input id="einheit" name="einheit" th:field="*{einheit}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">所属行业：</label>
+					<div class="col-sm-8">
+						<input id="industry" name="industry" th:field="*{industry}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">试用薪资：</label>
+					<div class="col-sm-8">
+						<input id="probationSalary" name="probationSalary" th:field="*{probationSalary}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">转正薪资：</label>
+					<div class="col-sm-8">
+						<input id="obtainmentSalary" name="obtainmentSalary" th:field="*{obtainmentSalary}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachStudentEmployment";
+		$("#form-teachStudentEmployment-edit").validate({
+
+		});
+
+        /*学生就业信息管理-修改-选择学生*/
+        function selectList() {
+            var url = ctx + "teach/student/selectList";
+            var options = {
+                title: '选择学生',
+                width: "800",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            if(data != "undefined" && data != "" && data != null){
+                $("#studentName").val(body.find('.selected')[0].children[2].innerHTML);
+                $("#studentId").val(body.find('.selected')[0].children[1].innerHTML);
+            }else{
+                layer.msg("请选择一位学生");
+            }
+            layer.close(index);
+        }
+
+        //时间选择器
+        $(function(){
+            laydate.render({
+                elem: '#hiredate',trigger: 'click'
+            });
+        });
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+                edit();
+	        }
+	    }
+
+        function edit() {
+		    var id = $("#id").val();
+            var studentId = $("#studentId").val();
+            var employmentWay = $("#employmentWay").val();
+            var hiredate = $("#hiredate").val();
+            var urbanEmployment = $("#urbanEmployment").val();
+            var einheit = $("#einheit").val();
+            var probationSalary = $("#probationSalary").val();
+            var obtainmentSalary = $("#obtainmentSalary").val();
+            var industry = $("#industry").val();
+
+            var student = $("#student").val();
+            if(student != studentId){
+                $.ajax({
+                    cache : true,
+                    type : "POST",
+                    url : prefix + "/schoolIdUnique",
+                    data : {
+                        "studentId": studentId
+                    },
+                    async : false,
+                    error : function(request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success : function(data) {
+                        if(data == "1"){
+                            layer.msg("此学生已存在,请重新选择",{icon: 0});
+                            return;
+                        }
+                        $.ajax({
+                            cache : true,
+                            type : "POST",
+                            url : prefix + "/edit",
+                            data : {
+                                "id":id,
+                                "studentId": studentId,
+                                "employmentWay": employmentWay,
+                                "hiredate": hiredate,
+                                "urbanEmployment": urbanEmployment,
+                                "einheit":einheit,
+                                "probationSalary":probationSalary,
+                                "obtainmentSalary":obtainmentSalary,
+                                "industry":industry
+                            },
+                            async : false,
+                            error : function(request) {
+                                $.modal.alertError("系统错误");
+                            },
+                            success : function(data) {
+                                $.operate.successCallback(data);
+                            }
+                        });
+                    }
+                });
+			}else {
+                $.ajax({
+                    cache : true,
+                    type : "POST",
+                    url : prefix + "/edit",
+                    data : {
+                        "id":id,
+                        "studentId": studentId,
+                        "employmentWay": employmentWay,
+                        "hiredate": hiredate,
+                        "urbanEmployment": urbanEmployment,
+                        "einheit":einheit,
+                        "probationSalary":probationSalary,
+                        "obtainmentSalary":obtainmentSalary,
+                        "industry":industry
+                    },
+                    async : false,
+                    error : function(request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success : function(data) {
+                        $.operate.successCallback(data);
+                    }
+                });
+			}
+
+        }
+
+	</script>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachAssessMonthMapper">
+    
+    <resultMap type="TeachAssessMonth" id="TeachAssessMonthResult">
+        <result property="id"    column="id"    />
+        <result property="assessMonth"    column="assess_month"    />
+        <result property="classId"    column="class_id"    />
+        <result property="attendanceOne"    column="attendance_one"    />
+        <result property="attendanceOneStandard"    column="attendance_one_standard"    />
+        <result property="attendanceTwo"    column="attendance_two"    />
+        <result property="attendanceTwoStandard"    column="attendance_two_standard"    />
+        <result property="attendanceThree"    column="attendance_three"    />
+        <result property="attendanceThreeStandard"    column="attendance_three_standard"    />
+        <result property="examOne"    column="exam_one"    />
+        <result property="examOneStandard"    column="exam_one_standard"    />
+        <result property="examTwo"    column="exam_two"    />
+        <result property="examTwoStandard"    column="exam_two_standard"    />
+        <result property="examThree"    column="exam_three"    />
+        <result property="examThreeStandard"    column="exam_three_standard"    />
+        <result property="taskOne"    column="task_one"    />
+        <result property="taskOneStandard"    column="task_one_standard"    />
+        <result property="taskTwo"    column="task_two"    />
+        <result property="taskTwoStandard"    column="task_two_standard"    />
+        <result property="taskThree"    column="task_three"    />
+        <result property="taskThreeStandard"    column="task_three_standard"    />
+        <result property="subjectOne"    column="subject_one"    />
+        <result property="subjectOneStandard"    column="subject_one_standard"    />
+        <result property="subjectTwo"    column="subject_two"    />
+        <result property="subjectTwoStandard"    column="subject_two_standard"    />
+        <result property="subjectThree"    column="subject_three"    />
+        <result property="subjectThreeStandard"    column="subject_three_standard"    />
+        <association property="classes"  column="class_id" javaType="TeachClasses" resultMap="TeachClassesResult" />
+        <association property="sysDept"  column="dept_id" javaType="SysDept" resultMap="SysDeptResult" />
+        <association property="majors"  column="major_id" javaType="TeachMajor" resultMap="TeachMajorResult" />
+    </resultMap>
+
+    <resultMap type="TeachClasses" id="TeachClassesResult">
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageNew"    column="stage_new"    />
+        <result property="stageStarttime"    column="stage_starttime"    />
+        <result property="stageEndtime"    column="stage_endtime"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <resultMap type="SysDept" id="SysDeptResult">
+        <id     property="deptId"     column="dept_id"     />
+        <result property="parentId"   column="parent_id"   />
+        <result property="ancestors"  column="ancestors"   />
+        <result property="deptName"   column="dept_name"   />
+        <result property="orderNum"   column="order_num"   />
+        <result property="leader"     column="leader"      />
+        <result property="phone"      column="phone"       />
+        <result property="email"      column="email"       />
+        <result property="status"     column="status"      />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="parentName" column="parent_name" />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+
+    <resultMap type="TeachMajor" id="TeachMajorResult">
+        <result property="majorId"    column="major_id"    />
+        <result property="majorName"    column="major_name"    />
+    </resultMap>
+	
+	<sql id="selectTeachAssessMonthVo">
+        select id, assess_month, class_id, attendance_one, attendance_one_standard, attendance_two, attendance_two_standard, attendance_three, attendance_three_standard, exam_one, exam_one_standard, exam_two, exam_two_standard, exam_three, exam_three_standard, task_one, task_one_standard, task_two, task_two_standard, task_three, task_three_standard, subject_one, subject_one_standard, subject_two, subject_two_standard, subject_three, subject_three_standard from teach_assess_month
+    </sql>
+	
+    <select id="selectTeachAssessMonthList" parameterType="TeachAssessMonth" resultMap="TeachAssessMonthResult">
+        select am.*,c.class_name,d.dept_name,m.major_name from teach_assess_month am
+        left join teach_classes c on am.class_id = c.class_id
+        left join sys_dept d on c.school_id = d.dept_id
+        left join teach_major m on c.major_id = m.major_id
+        <where>
+            <if test="majorId != null and majorId != 0">
+                m.major_id = #{majorId}
+            </if>
+            <if test="className != null and className != ''">
+                and c.class_name like concat('%',#{className},'%')
+            </if>
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND am.assess_month &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND am.assess_month &lt;= #{params.endTime}
+            </if>
+            <if test="teacherClass != null and teacherClass != ''"> and c.class_id in
+                <foreach item="teacherClass" collection="teacherClass" open="(" separator="," close=")">
+                    #{teacherClass}
+                </foreach>
+            </if>
+         </where>
+    </select>
+    
+    <select id="selectTeachAssessMonthById" parameterType="Integer" resultMap="TeachAssessMonthResult">
+        <include refid="selectTeachAssessMonthVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachAssessMonthBySchoolId" parameterType="Integer" resultMap="TeachAssessMonthResult">
+        select am.*,c.class_name,d.dept_name,m.major_name from teach_assess_month am
+        left join teach_classes c on am.class_id = c.class_id
+        left join sys_dept d on c.school_id = d.dept_id
+        left join teach_major m on c.major_id = m.major_id
+        where c.school_id = #{schoolId}
+    </select>
+
+    <select id="selectTeachAssessMonthListById" parameterType="Integer" resultMap="TeachAssessMonthResult">
+        select am.*,c.class_name from teach_assess_month am
+        left join teach_classes c on am.class_id = c.class_id
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTeachAssessMonth" parameterType="TeachAssessMonth">
+        insert into teach_assess_month
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="assessMonth != null  ">assess_month,</if>
+			<if test="classId != null  ">class_id,</if>
+			<if test="attendanceOne != null  and attendanceOne != ''  ">attendance_one,</if>
+			<if test="attendanceOneStandard != null  and attendanceOneStandard != ''  ">attendance_one_standard,</if>
+			<if test="attendanceTwo != null  and attendanceTwo != ''  ">attendance_two,</if>
+			<if test="attendanceTwoStandard != null  and attendanceTwoStandard != ''  ">attendance_two_standard,</if>
+			<if test="attendanceThree != null  and attendanceThree != ''  ">attendance_three,</if>
+			<if test="attendanceThreeStandard != null  and attendanceThreeStandard != ''  ">attendance_three_standard,</if>
+			<if test="examOne != null  and examOne != ''  ">exam_one,</if>
+			<if test="examOneStandard != null  and examOneStandard != ''  ">exam_one_standard,</if>
+			<if test="examTwo != null  and examTwo != ''  ">exam_two,</if>
+			<if test="examTwoStandard != null  and examTwoStandard != ''  ">exam_two_standard,</if>
+			<if test="examThree != null  and examThree != ''  ">exam_three,</if>
+			<if test="examThreeStandard != null  and examThreeStandard != ''  ">exam_three_standard,</if>
+			<if test="taskOne != null  and taskOne != ''  ">task_one,</if>
+			<if test="taskOneStandard != null  and taskOneStandard != ''  ">task_one_standard,</if>
+			<if test="taskTwo != null  and taskTwo != ''  ">task_two,</if>
+			<if test="taskTwoStandard != null  and taskTwoStandard != ''  ">task_two_standard,</if>
+			<if test="taskThree != null  and taskThree != ''  ">task_three,</if>
+			<if test="taskThreeStandard != null  and taskThreeStandard != ''  ">task_three_standard,</if>
+			<if test="subjectOne != null  and subjectOne != ''  ">subject_one,</if>
+			<if test="subjectOneStandard != null  and subjectOneStandard != ''  ">subject_one_standard,</if>
+			<if test="subjectTwo != null  and subjectTwo != ''  ">subject_two,</if>
+			<if test="subjectTwoStandard != null  and subjectTwoStandard != ''  ">subject_two_standard,</if>
+			<if test="subjectThree != null  and subjectThree != ''  ">subject_three,</if>
+			<if test="subjectThreeStandard != null  and subjectThreeStandard != ''  ">subject_three_standard,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="assessMonth != null  ">#{assessMonth},</if>
+			<if test="classId != null  ">#{classId},</if>
+			<if test="attendanceOne != null  and attendanceOne != ''  ">#{attendanceOne},</if>
+			<if test="attendanceOneStandard != null  and attendanceOneStandard != ''  ">#{attendanceOneStandard},</if>
+			<if test="attendanceTwo != null  and attendanceTwo != ''  ">#{attendanceTwo},</if>
+			<if test="attendanceTwoStandard != null  and attendanceTwoStandard != ''  ">#{attendanceTwoStandard},</if>
+			<if test="attendanceThree != null  and attendanceThree != ''  ">#{attendanceThree},</if>
+			<if test="attendanceThreeStandard != null  and attendanceThreeStandard != ''  ">#{attendanceThreeStandard},</if>
+			<if test="examOne != null  and examOne != ''  ">#{examOne},</if>
+			<if test="examOneStandard != null  and examOneStandard != ''  ">#{examOneStandard},</if>
+			<if test="examTwo != null  and examTwo != ''  ">#{examTwo},</if>
+			<if test="examTwoStandard != null  and examTwoStandard != ''  ">#{examTwoStandard},</if>
+			<if test="examThree != null  and examThree != ''  ">#{examThree},</if>
+			<if test="examThreeStandard != null  and examThreeStandard != ''  ">#{examThreeStandard},</if>
+			<if test="taskOne != null  and taskOne != ''  ">#{taskOne},</if>
+			<if test="taskOneStandard != null  and taskOneStandard != ''  ">#{taskOneStandard},</if>
+			<if test="taskTwo != null  and taskTwo != ''  ">#{taskTwo},</if>
+			<if test="taskTwoStandard != null  and taskTwoStandard != ''  ">#{taskTwoStandard},</if>
+			<if test="taskThree != null  and taskThree != ''  ">#{taskThree},</if>
+			<if test="taskThreeStandard != null  and taskThreeStandard != ''  ">#{taskThreeStandard},</if>
+			<if test="subjectOne != null  and subjectOne != ''  ">#{subjectOne},</if>
+			<if test="subjectOneStandard != null  and subjectOneStandard != ''  ">#{subjectOneStandard},</if>
+			<if test="subjectTwo != null  and subjectTwo != ''  ">#{subjectTwo},</if>
+			<if test="subjectTwoStandard != null  and subjectTwoStandard != ''  ">#{subjectTwoStandard},</if>
+			<if test="subjectThree != null  and subjectThree != ''  ">#{subjectThree},</if>
+			<if test="subjectThreeStandard != null  and subjectThreeStandard != ''  ">#{subjectThreeStandard},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachAssessMonth" parameterType="TeachAssessMonth">
+        update teach_assess_month
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="assessMonth != null  ">assess_month = #{assessMonth},</if>
+            <if test="classId != null  ">class_id = #{classId},</if>
+            <if test="attendanceOne != null  and attendanceOne != ''  ">attendance_one = #{attendanceOne},</if>
+            <if test="attendanceOneStandard != null  and attendanceOneStandard != ''  ">attendance_one_standard = #{attendanceOneStandard},</if>
+            <if test="attendanceTwo != null  and attendanceTwo != ''  ">attendance_two = #{attendanceTwo},</if>
+            <if test="attendanceTwoStandard != null  and attendanceTwoStandard != ''  ">attendance_two_standard = #{attendanceTwoStandard},</if>
+            <if test="attendanceThree != null  and attendanceThree != ''  ">attendance_three = #{attendanceThree},</if>
+            <if test="attendanceThreeStandard != null  and attendanceThreeStandard != ''  ">attendance_three_standard = #{attendanceThreeStandard},</if>
+            <if test="examOne != null  and examOne != ''  ">exam_one = #{examOne},</if>
+            <if test="examOneStandard != null  and examOneStandard != ''  ">exam_one_standard = #{examOneStandard},</if>
+            <if test="examTwo != null  and examTwo != ''  ">exam_two = #{examTwo},</if>
+            <if test="examTwoStandard != null  and examTwoStandard != ''  ">exam_two_standard = #{examTwoStandard},</if>
+            <if test="examThree != null  and examThree != ''  ">exam_three = #{examThree},</if>
+            <if test="examThreeStandard != null  and examThreeStandard != ''  ">exam_three_standard = #{examThreeStandard},</if>
+            <if test="taskOne != null  and taskOne != ''  ">task_one = #{taskOne},</if>
+            <if test="taskOneStandard != null  and taskOneStandard != ''  ">task_one_standard = #{taskOneStandard},</if>
+            <if test="taskTwo != null  and taskTwo != ''  ">task_two = #{taskTwo},</if>
+            <if test="taskTwoStandard != null  and taskTwoStandard != ''  ">task_two_standard = #{taskTwoStandard},</if>
+            <if test="taskThree != null  and taskThree != ''  ">task_three = #{taskThree},</if>
+            <if test="taskThreeStandard != null  and taskThreeStandard != ''  ">task_three_standard = #{taskThreeStandard},</if>
+            <if test="subjectOne != null  and subjectOne != ''  ">subject_one = #{subjectOne},</if>
+            <if test="subjectOneStandard != null  and subjectOneStandard != ''  ">subject_one_standard = #{subjectOneStandard},</if>
+            <if test="subjectTwo != null  and subjectTwo != ''  ">subject_two = #{subjectTwo},</if>
+            <if test="subjectTwoStandard != null  and subjectTwoStandard != ''  ">subject_two_standard = #{subjectTwoStandard},</if>
+            <if test="subjectThree != null  and subjectThree != ''  ">subject_three = #{subjectThree},</if>
+            <if test="subjectThreeStandard != null  and subjectThreeStandard != ''  ">subject_three_standard = #{subjectThreeStandard},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachAssessMonthById" parameterType="Integer">
+        delete from teach_assess_month where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachAssessMonthByIds" parameterType="String">
+        delete from teach_assess_month where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

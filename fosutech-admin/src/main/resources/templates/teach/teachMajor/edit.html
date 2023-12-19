@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachMajor-edit" th:object="${teachMajor}">
+            <input id="majorId" name="majorId" th:field="*{majorId}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-2 control-label">专业名称：</label>
+				<div class="col-sm-8">
+					<input id="majorName" name="majorName" th:field="*{majorName}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label">专业类别：</label>
+				<div class="col-sm-8">
+					<!--<input id="majorType" name="majorType" class="form-control" type="text">-->
+					<select id="majorType" class="form-control m-b" th:with="type=${@dict.getType('teach_major_type')}">
+						<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{majorType}"></option>
+					</select>
+				</div>
+			</div>
+			<button type="button" class="btn btn-primary" onclick="add()">添加</button>
+			<table class="table" id="Professional">
+				<tr>
+					<th>名称</th>
+					<th>排序</th>
+					<th>操作</th>
+				</tr>
+				<!--<tr>
+					<td>
+						<input type="text" class="stageName" placeholder="请输入阶段名称" style="height: 30px;width: 80%;border: none;">
+					</td>
+					<td>
+						<input type="text" class="numberNo" placeholder="请输入序号" style="height: 30px;width: 80%;border: none;">
+					</td>
+					<td>
+						<button type="button" class="btn btn-danger" onclick="del(this)">删除</button>
+					</td>
+				</tr>-->
+			</table>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachMajor";
+		$("#form-teachMajor-edit").validate({
+            rules: {
+                majorName:{
+                    required:true,
+                    remote: {
+                        url: prefix + "/checkMajorNameUnique",
+                        type: "post",
+                        dataType: "json",
+                        data: {
+                            "majorName": function() {
+                                return $.common.trim($("#majorName").val());
+                            }
+                        },
+                        dataFilter: function(data, type) {
+                            // console.log($.validate.unique(data));
+                            return $.validate.unique(data);
+                        }
+                    }
+                }
+            },
+            messages: {
+                "majorName":{
+                    remote: "此专业已经存在"
+                }
+            }
+		});
+
+        function add() {
+            var trs="<tr>\n" +
+                "\t\t\t\t\t\t<input type=\"hidden\" class=\"id\">\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<input type=\"text\" class=\"stageName\" required=\"required\" placeholder=\"请输入阶段名称\" style=\"height: 30px;width: 80%;border: none;\">\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<input type=\"text\" class=\"numberNo\" required=\"required\" placeholder=\"请输入序号\" style=\"height: 30px;width: 80%;border: none;\">\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-danger\" onclick='del(this)'>删除</button>\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t</tr>";
+            $("#Professional").append(trs);
+        }
+        function del(data) {
+            console.log(data.parentNode.parentNode.childNodes[1].value);
+            var id = data.parentNode.parentNode.childNodes[1].value;
+            if(id != null && id.length != 0 && id != ""){
+                $.ajax({
+                    cache: true,
+                    type: "POST",
+                    url: ctx + "teach/teachMajorStage/delete",
+                    data: {"id": id},
+                    success : function(data) {
+                        var dataRow =data.rows;
+                        console.log(dataRow);
+                    }
+                });
+			}
+            data.parentNode.parentNode.remove();
+        }
+
+		function submitHandler() {
+			var isValid = true;
+			var stageNames = document.getElementsByClassName("stageName");
+			var numberNos = document.getElementsByClassName("numberNo");
+
+			// 检查是否至少存在一个stageName
+			var hasStageName = false;
+			for (var i = 0; i < stageNames.length; i++) {
+				if (stageNames[i].value.trim() !== "") {
+					hasStageName = true;
+					break;
+				}
+			}
+
+			// 检查numberNo是否为空
+			for (var i = 0; i < numberNos.length; i++) {
+				if (numberNos[i].value.trim() === "") {
+					isValid = false;
+					break;
+				}
+			}
+
+			if (!hasStageName || !isValid) {
+				$.modal.alertWarning("所有序号必须填写，且至少需要一个阶段。")
+			}
+
+			if ($.validate.form()) {
+				addMajor();
+			}
+		}
+
+        function editMajor() {
+            var majorId = $("input[name='majorId']").val();
+            var majorName = $("input[name='majorName']").val();
+            var majorType = $("#majorType option:selected").val();
+            var majors =[];
+            var stageName = document.getElementsByClassName("stageName");
+            var numberNo = document.getElementsByClassName("numberNo");
+            var id = document.getElementsByClassName("id");
+            for(var i = 0;i<stageName.length;i++){
+                if(stageName[i].value != null && stageName[i].value != "" && stageName[i].value != "undefined"){
+                    if(numberNo[i].value != null && numberNo[i].value != "" && numberNo[i].value != "undefined"){
+                        var stage = stageName[i].value;
+                        var no = numberNo[i].value;
+                        var stageId = id[i].value;
+                        majors.push({"id":stageId,"stage":stage,"no":no});
+                    }
+                }
+            }
+            var major = JSON.stringify(majors);
+            // console.log(major);
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/edit",
+                data : {
+                    "majorId":majorId,
+                    "majorName": majorName,
+                    "major":major,
+                    "majorType":majorType
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: ctx + "teach/teachMajorStage/list",
+            data: {"majorId": $("#majorId").val()},
+            success : function(data) {
+                var dataRow =data.rows;
+                // console.log(dataRow);
+                for(var i=0;i<dataRow.length;i++){
+                    var trs="<tr>\n" +
+                        "\t\t\t\t\t\t<input type=\"hidden\" class=\"id\" value='"+dataRow[i].id+"'>\n" +
+                        "\t\t\t\t\t<td>\n" +
+                        "\t\t\t\t\t\t<input type=\"text\" class=\"stageName\" value='"+dataRow[i].stageName+"' style=\"height: 30px;width: 80%;border: none;\">\n" +
+                        "\t\t\t\t\t</td>\n" +
+                        "\t\t\t\t\t<td>\n" +
+                        "\t\t\t\t\t\t<input type=\"text\" class=\"numberNo\" value='"+dataRow[i].sort+"' style=\"height: 30px;width: 80%;border: none;\">\n" +
+                        "\t\t\t\t\t</td>\n" +
+                        "\t\t\t\t\t<td>\n" +
+                        "\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-danger\" onclick='del(this)'>删除</button>\n" +
+                        "\t\t\t\t\t</td>\n" +
+                        "\t\t\t\t</tr>";
+                    $("#Professional").append(trs);
+                }
+            }
+        });
+
+	</script>
+</body>
+</html>

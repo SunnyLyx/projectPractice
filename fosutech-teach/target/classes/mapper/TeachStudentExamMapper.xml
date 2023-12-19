@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachStudentExamMapper">
+    
+    <resultMap type="TeachStudentExam" id="TeachStudentExamResult">
+        <result property="id"    column="id"    />
+        <result property="examId"    column="exam_id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="studentName"    column="student_name"    />
+        <result property="score"    column="score"    />
+        <result property="remark"    column="remark"    />
+        <association property="teachExam"  column="exam_id" javaType="TeachExam" resultMap="TeachExam" />
+        <association property="classes"  column="class_id" javaType="TeachClasses" resultMap="TeachClassesResult" />
+        <association property="majorStage"  column="id" javaType="TeachMajorStage" resultMap="TeachMajorStageResult" />
+    </resultMap>
+
+    <resultMap type="TeachExam" id="TeachExam">
+        <result property="examId"    column="exam_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="datetime"    column="datetime"    />
+        <result property="cutOffscores"    column="cut_offscores"    />
+        <result property="invigilator"    column="invigilator"    />
+        <result property="address"    column="address"    />
+        <result property="stageId"    column="stage_id"    />
+    </resultMap>
+
+    <resultMap type="TeachClasses" id="TeachClassesResult">
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageNew"    column="stage_new"    />
+        <result property="stageStarttime"    column="stage_starttime"    />
+        <result property="stageEndtime"    column="stage_endtime"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <resultMap type="TeachMajorStage" id="TeachMajorStageResult">
+        <result property="id"    column="id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageName"    column="stage_name"    />
+        <result property="sort"    column="sort"    />
+    </resultMap>
+
+	<sql id="selectTeachStudentExamVo">
+        select id, exam_id, student_id, score, remark from teach_student_exam
+    </sql>
+	
+    <select id="selectTeachStudentExamList" parameterType="TeachStudentExam" resultMap="TeachStudentExamResult">
+        select a.id, a.student_id, a.score, a.remark, b.student_name from teach_student_exam a
+        JOIN teach_student b ON a.student_id = b.student_id
+        <where>  
+            <if test="id != null "> and a.id = #{id}</if>
+             <if test="examId != null "> and a.exam_id = #{examId}</if>
+             <if test="studentId != null "> and a.student_id = #{studentId}</if>
+             <if test="score != null  and score != '' "> and a.score = #{score}</if>
+             <if test="remark != null  and remark != '' "> and a.remark = #{remark}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachStudentExamById" parameterType="Integer" resultMap="TeachStudentExamResult">
+        <include refid="selectTeachStudentExamVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachStudentExam" parameterType="TeachStudentExam" resultMap="TeachStudentExamResult">
+        select stue.*,c.class_name,e.datetime,ms.stage_name from teach_student_exam stue
+        left join teach_exam e on stue.exam_id = e.exam_id
+        left join teach_classes c on e.class_id = c.class_id
+        left join teach_major_stage ms on e.stage_id = ms.id
+        <where>
+            stue.student_id = #{studentId}
+            <if test="startTime != null and startTime != ''"><!-- 开始时间检索 -->
+                AND date_format(e.datetime,'%y%m%d') &gt;= date_format(#{startTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(e.datetime,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+        order by e.datetime desc
+    </select>
+        
+    <insert id="insertTeachStudentExam" parameterType="TeachStudentExam">
+        insert into teach_student_exam
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="examId != null  ">exam_id,</if>
+			<if test="studentId != null  ">student_id,</if>
+			<if test="score != null  and score != ''  ">score,</if>
+			<if test="remark != null  and remark != ''  ">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="examId != null  ">#{examId},</if>
+			<if test="studentId != null  ">#{studentId},</if>
+			<if test="score != null  and score != ''  ">#{score},</if>
+			<if test="remark != null  and remark != ''  ">#{remark},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachStudentExam" parameterType="TeachStudentExam">
+        update teach_student_exam
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="examId != null  ">exam_id = #{examId},</if>
+            <if test="studentId != null  ">student_id = #{studentId},</if>
+            <if test="score != null  and score != ''  ">score = #{score},</if>
+            <if test="remark != null  and remark != ''  ">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachStudentExamById" parameterType="Integer">
+        delete from teach_student_exam where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachStudentExamByIds" parameterType="String">
+        delete from teach_student_exam where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTeachStudentExamByExamIds" parameterType="String">
+        delete from teach_student_exam where exam_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

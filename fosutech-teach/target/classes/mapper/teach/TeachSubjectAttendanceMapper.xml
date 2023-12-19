@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachSubjectAttendanceMapper">
+    
+    <resultMap type="TeachSubjectAttendance" id="TeachSubjectAttendanceResult">
+        <result property="id"    column="id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="subjectId"    column="subject_id"    />
+        <result property="attendanceStarttime"    column="attendance_starttime"    />
+        <result property="attendanceEndtime"    column="attendance_endtime"    />
+        <result property="subjectname"    column="subjectname"    />
+        <result property="bestnum"    column="bestnum"    />
+        <result property="goodnum"    column="goodnum"    />
+        <result property="poornum"    column="poornum"    />
+        <result property="unfinishednum"    column="unfinishednum"    />
+        <result property="studentnum"    column="studentnum"    />
+        <result property="bestAttendance"    column="best_attendance"    />
+        <result property="goodAttendance"    column="good_attendance"    />
+        <result property="poorAttendance"    column="poor_attendance"    />
+    </resultMap>
+	
+	<sql id="selectTeachSubjectAttendanceVo">
+        select id, class_id, subject_id, attendance_starttime, attendance_endtime, subjectname, bestnum, goodnum, poornum, unfinishednum, studentnum, best_attendance, good_attendance, poor_attendance from teach_subject_attendance
+    </sql>
+	
+    <select id="selectTeachSubjectAttendanceList" parameterType="TeachSubjectAttendance" resultMap="TeachSubjectAttendanceResult">
+        <include refid="selectTeachSubjectAttendanceVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="classId != null  and classId != '' "> and class_id = #{classId}</if>
+             <if test="subjectId != null  and subjectId != '' "> and subject_id = #{subjectId}</if>
+             <if test="attendanceStarttime != null "> and attendance_starttime = #{attendanceStarttime}</if>
+             <if test="attendanceEndtime != null "> and attendance_endtime = #{attendanceEndtime}</if>
+             <if test="subjectname != null  and subjectname != '' "> and subjectname = #{subjectname}</if>
+             <if test="bestnum != null "> and bestnum = #{bestnum}</if>
+             <if test="goodnum != null "> and goodnum = #{goodnum}</if>
+             <if test="poornum != null "> and poornum = #{poornum}</if>
+             <if test="unfinishednum != null "> and unfinishednum = #{unfinishednum}</if>
+             <if test="studentnum != null "> and studentnum = #{studentnum}</if>
+             <if test="bestAttendance != null  and bestAttendance != '' "> and best_attendance = #{bestAttendance}</if>
+             <if test="goodAttendance != null  and goodAttendance != '' "> and good_attendance = #{goodAttendance}</if>
+             <if test="poorAttendance != null  and poorAttendance != '' "> and poor_attendance = #{poorAttendance}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachSubjectAttendanceById" parameterType="Integer" resultMap="TeachSubjectAttendanceResult">
+        <include refid="selectTeachSubjectAttendanceVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectTeachSubjectAttendanceTask" parameterType="Integer" resultMap="TeachSubjectAttendanceResult">
+        SELECT subject_id,class_id,subject_name as subjectname,starttime as attendance_starttime,endtime as attendance_endtime,sum(studentnum) as studentnum ,sum(bestnum)  as bestnum ,sum(goodnum) as goodnum ,sum(poornum) as poornum ,sum(unfinishednum) as unfinishednum  from
+        (
+        SELECT ts.subject_id,ts.class_id,ts.subject_name,ts.starttime,ts.endtime,count(0) as studentnum,0 as bestnum,0 as goodnum ,0 as poornum ,0 as unfinishednum
+        from teach_subject  ts
+        join teach_student_subject tsb
+        on ts.subject_id = tsb.subject_id
+        -- WHERE DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ts.class_id,ts.subject_id,ts.subject_name
+        union
+        SELECT ts.subject_id,ts.class_id,ts.subject_name,ts.starttime,ts.endtime,0 as studentnum,count(tsb.submit) as bestnum,0 as goodnum ,0 as poornum ,0 as unfinishednum
+        from teach_subject  ts
+        join teach_student_subject tsb
+        on ts.subject_id = tsb.subject_id
+        WHERE
+        tsb.submit = '1'
+        -- and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ts.class_id,ts.subject_id,ts.subject_name
+        union
+        SELECT ts.subject_id,ts.class_id,ts.subject_name,ts.starttime,ts.endtime,0 as studentnum, 0 as bestnum,count(tsb.submit) as goodnum ,0 as poornum ,0 as unfinishednum
+        from teach_subject  ts
+        join teach_student_subject tsb
+        on ts.subject_id = tsb.subject_id
+        WHERE
+        tsb.submit = '2'
+        -- and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ts.class_id,ts.subject_id,ts.subject_name
+        union
+        SELECT ts.subject_id,ts.class_id,ts.subject_name,ts.starttime,ts.endtime,0 as studentnum,0 as bestnum,0 as goodnum ,count(tsb.submit) as poornum ,0 as unfinishednum
+        from teach_subject  ts
+        join teach_student_subject tsb
+        on ts.subject_id = tsb.subject_id
+        WHERE
+        tsb.submit = '3'
+        -- and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ts.class_id,ts.subject_id,ts.subject_name
+        union
+        SELECT ts.subject_id,ts.class_id,ts.subject_name,ts.starttime,ts.endtime,0 as studentnum,0 as bestnum,0 as goodnum ,0 as poornum ,count(tsb.submit) as unfinishednum
+        from teach_subject  ts
+        join teach_student_subject tsb
+        on ts.subject_id = tsb.subject_id
+        WHERE
+        tsb.submit = '4'
+        -- and DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY  ts.class_id,ts.subject_id,ts.subject_name
+        ) a
+        GROUP BY  a.class_id,a.subject_id,a.subject_name
+
+    </select>
+
+    <insert id="insertTeachSubjectAttendance" parameterType="TeachSubjectAttendance">
+        insert into teach_subject_attendance
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="classId != null  and classId != ''  ">class_id,</if>
+			<if test="subjectId != null  and subjectId != ''  ">subject_id,</if>
+			<if test="attendanceStarttime != null  ">attendance_starttime,</if>
+			<if test="attendanceEndtime != null  ">attendance_endtime,</if>
+			<if test="subjectname != null  and subjectname != ''  ">subjectname,</if>
+			<if test="bestnum != null  ">bestnum,</if>
+			<if test="goodnum != null  ">goodnum,</if>
+			<if test="poornum != null  ">poornum,</if>
+			<if test="unfinishednum != null  ">unfinishednum,</if>
+			<if test="studentnum != null  ">studentnum,</if>
+			<if test="bestAttendance != null  and bestAttendance != ''  ">best_attendance,</if>
+			<if test="goodAttendance != null  and goodAttendance != ''  ">good_attendance,</if>
+			<if test="poorAttendance != null  and poorAttendance != ''  ">poor_attendance,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="classId != null  and classId != ''  ">#{classId},</if>
+			<if test="subjectId != null  and subjectId != ''  ">#{subjectId},</if>
+			<if test="attendanceStarttime != null  ">#{attendanceStarttime},</if>
+			<if test="attendanceEndtime != null  ">#{attendanceEndtime},</if>
+			<if test="subjectname != null  and subjectname != ''  ">#{subjectname},</if>
+			<if test="bestnum != null  ">#{bestnum},</if>
+			<if test="goodnum != null  ">#{goodnum},</if>
+			<if test="poornum != null  ">#{poornum},</if>
+			<if test="unfinishednum != null  ">#{unfinishednum},</if>
+			<if test="studentnum != null  ">#{studentnum},</if>
+			<if test="bestAttendance != null  and bestAttendance != ''  ">#{bestAttendance},</if>
+			<if test="goodAttendance != null  and goodAttendance != ''  ">#{goodAttendance},</if>
+			<if test="poorAttendance != null  and poorAttendance != ''  ">#{poorAttendance},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachSubjectAttendance" parameterType="TeachSubjectAttendance">
+        update teach_subject_attendance
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  and classId != ''  ">class_id = #{classId},</if>
+            <if test="subjectId != null  and subjectId != ''  ">subject_id = #{subjectId},</if>
+            <if test="attendanceStarttime != null  ">attendance_starttime = #{attendanceStarttime},</if>
+            <if test="attendanceEndtime != null  ">attendance_endtime = #{attendanceEndtime},</if>
+            <if test="subjectname != null  and subjectname != ''  ">subjectname = #{subjectname},</if>
+            <if test="bestnum != null  ">bestnum = #{bestnum},</if>
+            <if test="goodnum != null  ">goodnum = #{goodnum},</if>
+            <if test="poornum != null  ">poornum = #{poornum},</if>
+            <if test="unfinishednum != null  ">unfinishednum = #{unfinishednum},</if>
+            <if test="studentnum != null  ">studentnum = #{studentnum},</if>
+            <if test="bestAttendance != null  and bestAttendance != ''  ">best_attendance = #{bestAttendance},</if>
+            <if test="goodAttendance != null  and goodAttendance != ''  ">good_attendance = #{goodAttendance},</if>
+            <if test="poorAttendance != null  and poorAttendance != ''  ">poor_attendance = #{poorAttendance},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachSubjectAttendanceById" parameterType="Integer">
+        delete from teach_subject_attendance where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachSubjectAttendanceByIds" parameterType="String">
+        delete from teach_subject_attendance where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

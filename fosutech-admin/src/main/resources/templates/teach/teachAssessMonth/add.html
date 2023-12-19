@@ -1,0 +1,363 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachAssessMonth-add">
+			<input name="classId"  type="hidden" id="classId"/>
+
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考核月份：</label>
+					<div class="col-sm-8 input-group">
+						<input id="assessMonth" name="assessMonth" class="form-control" type="text" placeholder="yyyy-MM">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">班级：</label>
+					<div class="col-sm-8 input-group">
+						<input class="form-control" type="text" name="className" onclick="selectList()" readonly="true" id="className">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考勤大于等于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="attendanceOne" name="attendanceOne" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考勤大于等于计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="attendanceOneStandard" name="attendanceOneStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考勤大于等于-考勤小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="attendanceTwo" name="attendanceTwo" required="required" class="form-control" type="text" placeholder="例如：50%-80%">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考勤在两者之间计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="attendanceTwoStandard" name="attendanceTwoStandard" required="required" class="form-control" type="text" placeholder="例如：50%-80%">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考勤小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="attendanceThree" name="attendanceThree" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考勤小于的计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="attendanceThreeStandard" name="attendanceThreeStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考试大于等于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="examOne" name="examOne" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考试大于等于计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="examOneStandard" name="examOneStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考试大于等于-考试小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="examTwo" name="examTwo" required="required" class="form-control" type="text" placeholder="例如：50%-80%">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考试在两者之间计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="examTwoStandard" name="examTwoStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考试小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="examThree" name="examThree" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考试小于计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="examThreeStandard" name="examThreeStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">作业大于等于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="taskOne" name="taskOne" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">作业大于等于计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="taskOneStandard" name="taskOneStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">作业大于等于-作业小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="taskTwo" name="taskTwo" required="required" class="form-control" type="text" placeholder="例如：50%-80%">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">作业在两者之间计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="taskTwoStandard" name="taskTwoStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">作业小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="taskThree" name="taskThree" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">作业小于计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="taskThreeStandard" name="taskThreeStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目大于等于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="subjectOne" name="subjectOne" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目大于等于计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="subjectOneStandard" name="subjectOneStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目大于等于-项目小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="subjectTwo" name="subjectTwo" required="required" class="form-control" type="text" placeholder="例如：50%-80%">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目在两者之间计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="subjectTwoStandard" name="subjectTwoStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目小于：</label>
+					<div class="col-sm-8 input-group">
+						<input id="subjectThree" name="subjectThree" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目小于计算标准：</label>
+					<div class="col-sm-8 input-group">
+						<input id="subjectThreeStandard" name="subjectThreeStandard" required="required" class="form-control" type="text" placeholder="例如：50%或者0">
+						<span class="input-group-addon" style="background-color: #EEEEEE">%</span>
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachAssessMonth";
+		$("#form-teachAssessMonth-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                add();
+            }
+        }
+
+        function add() {
+            var assessMonth = $("input[name='assessMonth']").val();
+            // alert(assessMonth);
+            var classId = $("input[name='classId']").val();
+            var attendanceOne = $("input[name='attendanceOne']").val();
+            var attendanceOneStandard = $("input[name='attendanceOneStandard']").val();
+            var attendanceTwo = $("input[name='attendanceTwo']").val();
+            var attendanceTwoStandard = $("input[name='attendanceTwoStandard']").val();
+            var attendanceThree = $("input[name='attendanceThree']").val();
+            var attendanceThreeStandard = $("input[name='attendanceThreeStandard']").val();
+            var examOne = $("input[name='examOne']").val();
+            var examOneStandard = $("input[name='examOneStandard']").val();
+            var examTwo = $("input[name='examTwo']").val();
+            var examTwoStandard = $("input[name='examTwoStandard']").val();
+            var examThree = $("input[name='examThree']").val();
+            var examThreeStandard = $("input[name='examThreeStandard']").val();
+            var taskOne = $("input[name='taskOne']").val();
+            var taskOneStandard = $("input[name='taskOneStandard']").val();
+            var taskTwo = $("input[name='taskTwo']").val();
+            var taskTwoStandard = $("input[name='taskTwoStandard']").val();
+            var taskThree = $("input[name='taskThree']").val();
+            var taskThreeStandard = $("input[name='taskThreeStandard']").val();
+            var subjectOne = $("input[name='subjectOne']").val();
+            var subjectOneStandard = $("input[name='subjectOneStandard']").val();
+            var subjectTwo = $("input[name='subjectTwo']").val();
+            var subjectTwoStandard = $("input[name='subjectTwoStandard']").val();
+            var subjectThree = $("input[name='subjectThree']").val();
+            var subjectThreeStandard = $("input[name='subjectThreeStandard']").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : {
+                    // "studentId": studentId,
+                    "classId": classId,
+                    "assessMonth": assessMonth,
+                    "attendanceOne": attendanceOne,
+                    "attendanceOneStandard": attendanceOneStandard,
+                    "attendanceTwo": attendanceTwo,
+                    "attendanceTwoStandard": attendanceTwoStandard,
+                    "attendanceThree": attendanceThree,
+					"attendanceThreeStandard":attendanceThreeStandard,
+                    "examOne": examOne,
+                    "examOneStandard": examOneStandard,
+                    "examTwo": examTwo,
+                    "examTwoStandard": examTwoStandard,
+                    "examThree": examThree,
+                    "examThreeStandard": examThreeStandard,
+                    "taskOne": taskOne,
+                    "taskOneStandard": taskOneStandard,
+                    "taskTwo": taskTwo,
+                    "taskTwoStandard": taskTwoStandard,
+                    "taskThree": taskThree,
+                    "taskThreeStandard": taskThreeStandard,
+                    "subjectOne": subjectOne,
+                    "subjectOneStandard": subjectOneStandard,
+                    "subjectTwo": subjectTwo,
+                    "subjectTwoStandard": subjectTwoStandard,
+                    "subjectThree": subjectThree,
+                    "subjectThreeStandard": subjectThreeStandard
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+
+        //年月选择器
+        laydate.render({
+            elem: '#assessMonth'
+            ,type: 'month',trigger: 'click'
+        });
+
+        /*月度考核-新增-选择班级*/
+        function selectList() {
+            var url = ctx + "teach/teachClasses/selectList";
+            var options = {
+                title: '选择班级',
+                width: "800",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            if(data != "undefined" && data != "" && data != null){
+                $("#className").val(body.find('.selected')[0].children[2].innerHTML);
+                $("#classId").val(body.find('.selected')[0].children[1].innerHTML);
+            }else{
+                layer.msg("请选择一个班级");
+            }
+            layer.close(index);
+        }
+	</script>
+</body>
+</html>

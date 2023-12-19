@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachAssessmentCriterion-edit" th:object="${teachAssessmentCriterion}">
+            <input id="assessId" name="assessId" th:field="*{assessId}"  type="hidden">
+			<input name="schoolId"  type="hidden"  th:field="*{schoolId}" id="treeId"/>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">分部：</label>
+					<div class="col-sm-8">
+						<input class="form-control" type="text" readonly="true" id="treeName" th:field="*{sysDept.deptName}">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">角色：</label>
+					<div class="col-sm-8">
+						<!--<select id="characterNo" name="characterNo" class="form-control" type="text" >
+							<option th:each="obj,eStat:${role}" th:value="${obj.roleId}"
+									th:text="${obj.roleName}" th:selected="${#strings.contains(teachAssessmentCriterion.characterNo,obj.roleId)}"></option>
+						</select>-->
+						<input class="form-control" type="text" readonly="true" id="role" th:field="*{sysRole.roleName}">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考核项：</label>
+					<div class="col-sm-8">
+						<div class="input-group" style="margin-bottom: 10px">
+							<input name="itemsId" type="hidden">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="专业课出勤率">专业课出勤率：
+							</span>
+							<input id="courses" name="itemsNo" readonly="true" class="form-control" type="number" />
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<input name="itemsId" type="hidden">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="实践课出勤率">实践课出勤率：
+							</span>
+							<input id="practiceCourse" readonly="true" name="itemsNo" class="form-control" type="number" />
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<input name="itemsId" type="hidden">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="项目合格率">项目合格率：
+							</span>
+							<input id="preparation" readonly="true" name="itemsNo" class="form-control" type="number" />
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<input name="itemsId" type="hidden">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="作业完成率">作业完成率：
+							</span>
+							<input id="task" name="itemsNo" readonly="true" class="form-control" type="number" />
+						</div>
+						<div class="input-group" style="margin-bottom: 10px">
+							<input name="itemsId" type="hidden">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="满意度">满意度：
+							</span>
+							<input id="satisfaction" readonly="true" name="itemsNo" class="form-control" type="number" />
+						</div>
+						<div class="input-group">
+							<input name="itemsId" type="hidden">
+							<span class="input-group-addon" style="background-color: #EEEEEE">
+								<input type="checkbox" name="items" value="考试合格率">考试合格率：
+							</span>
+							<input id="test" name="itemsNo" readonly="true" class="form-control" type="number" />
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">考核占分比：</label>
+					<div class="col-sm-8">
+						<input id="assessProportion" name="assessProportion" readonly="true" th:field="*{assessProportion}" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachAssessmentCriterion";
+		$("#form-teachAssessmentCriterion-edit").validate({
+			rules:{
+				xxxx:{
+					required:true
+				}
+			}
+		});
+
+        function selectDeptTree() {
+            var treeId = $("#treeId").val();
+            var deptId = $.common.isEmpty(treeId) ? "100" : $("#treeId").val();
+            var url = ctx + "system/dept/selectDeptTree/" + deptId;
+            var options = {
+                title: '选择分部',
+                width: "380",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
+
+        var dataRow;
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "teach/teachInspectionItems/list",
+            data : {"assessId": $("#assessId").val()},
+            async : false,
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                dataRow =data.rows;
+
+                var boxObj = $("input:checkbox[name='items']");  //获取所有的复选框
+                for(var i=0;i<boxObj.length;i++){
+                    for(var j=0;j<dataRow.length;j++){
+                        if(boxObj[i].value == dataRow[j].inspectionItemsWeight)  //如果值与修改前的值相等
+                        {
+                            boxObj[i].checked= true;
+                            $(boxObj[i]).parent().next().val(dataRow[j].inspectionItemsNo);
+                            $(boxObj[i]).parent().prev().val(dataRow[j].inspectionItemsId);
+                            // console.log($(boxObj[i]).prev().val());
+                            break;
+                        }
+                    }
+                }
+            }
+        });
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+                edit();
+	        }
+	    }
+
+	    function edit() {
+		    // console.log(dataRow);
+            var assessId = $("#assessId").val();
+            var options=$("#characterNo option:selected");  //获取选中的项
+            var characterNo = options.val();
+            var schoolId = $("input[name='schoolId']").val();
+            var assessProportion = $("#assessProportion").val();
+            var data = [];
+
+            $("input[type='checkbox']").each(function () {
+                if ($(this).is(":checked")) {
+                    var items = $(this).val();
+                    var itemsNo = $(this).parent().next().val();
+                    var itemsId = $(this).parent().prev().val();
+                    if(itemsNo != null && itemsNo != "" && itemsNo.length != 0){
+                        data.push({"itemsNo":itemsNo,"items":items,"itemsId":itemsId});
+                    }
+                }
+            });
+            // console.log(data);
+            var index;
+            for(var i =0;i<dataRow.length;i++){
+                for(var j=0;j<data.length;j++){
+                    if(dataRow[i].inspectionItemsId == data[j].itemsId)  //如果值与修改前的值相等
+                    {
+                        index = dataRow[i].inspectionItemsId;
+                        break;
+                    }
+                }
+                if(index != dataRow[i].inspectionItemsId){
+                   // console.log(dataRow[i].inspectionItemsId);
+                   var id = dataRow[i].inspectionItemsId;
+                    $.ajax({
+                        cache : true,
+                        type : "POST",
+                        url : ctx + "teach/teachInspectionItems/remove",
+                        data : {"ids": id},
+                        async : false,
+                        success : function(data) {
+                            console.log("成功");
+                        }
+                    });
+				}
+			}
+
+            var assess = JSON.stringify(data);
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/edit",
+                data : {
+                    "assessId": assessId,
+                    "characterNo": characterNo,
+                    "schoolId": schoolId,
+                    "assessProportion": assessProportion,
+                    "assess":assess
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+	</script>
+</body>
+</html>

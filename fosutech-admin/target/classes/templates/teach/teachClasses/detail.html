@@ -1,0 +1,167 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+    .stageNew{
+        width: 100px;
+    }
+    .stageStarttime{
+        width: 40%;
+        display: inline-block;
+    }
+    .stageEndtime{
+        width: 40%;
+        display: inline-block;
+    }
+
+</style>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-teachClasses-edit" th:object="${teachClasses}">
+        <input id="classId" name="classId" th:field="*{classId}"  type="hidden">
+        <input id="schoolId" name="schoolId" th:field="*{schoolId}" type="hidden">
+        <input id="majorId" name="majorId" th:field="*{majorId}" type="hidden">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">班级名称：</label>
+            <div class="col-sm-8">
+                <input id="className" name="className" th:field="*{className}" class="form-control" type="text"  disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所属分部：</label>
+            <div class="col-sm-8">
+                <input id="schoolName" name="schoolName" th:field="*{schoolName}" class="form-control" type="text" readonly="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">所属专业：</label>
+            <div class="col-sm-8">
+                <input id="majorName" name="majorName" th:field="*{majorName}" class="form-control" type="text" readonly="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">创建时间：</label>
+            <div class="col-sm-8">
+                <input id="createtime" name="createtime" th:field="*{createtime}" class="form-control" type="text" readonly="true">
+            </div>
+        </div>
+        <!--<button type="button" class="btn btn-primary" onclick="adds()">添加</button>-->
+        <table class="table " id="Professional">
+            <tr>
+                <th>阶段</th>
+                <th>阶段时间</th>
+                <th>班主任</th>
+                <th>教师</th>
+                <th>助教</th>
+            </tr>
+        </table>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript" >
+    selectMajor();
+    //根据选择的专业级联查询阶段存入当前阶段下拉框
+    function selectMajor() {
+        var majorId1 =$("#majorId").val();
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "teach/teachMajorStage/list",
+            data : {"majorId" : majorId1},
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                if (data && data.rows.length > 0) {
+                    project = data.rows;
+                    addOptions(project);
+                }
+            }
+        })
+    }
+    function addOptions(project) {
+        var pro = $('select[name="stageNew"]');
+        pro.children().remove();
+        var options = "";
+        $(project).each(function() {
+            options += '<option value="' + this.id + '" >' + this.stageName + '</option>';
+        });
+        pro.append(options);
+        var stageId = document.getElementsByClassName("stageId");
+        for(var i=0;i<$(".stageNew").length;i++){
+            for(var j=0;j<$(".stageNew").eq(i).children().length;j++){
+                if($(".stageNew").eq(i).children().eq(j).val()==stageId[i].value){
+                    $(".stageNew").eq(i).children().eq(j).attr("selected",true);
+                }
+            }
+        }
+    }
+    var myajax = $.ajax({
+        cache: true,
+        type: "POST",
+        url: ctx + "teach/teachClassesTeacher/list",
+        data: {"classId": $("#classId").val()},
+        success : function(data) {
+            var dataRow = data.rows;
+            for (var i = 0; i < dataRow.length; i++) {
+                if(dataRow[i].stageEndtime == null){
+                    dataRow[i].stageEndtime = "";
+                }
+                if(dataRow[i].teacherName2 == null){
+                    dataRow[i].teacherName2 = "";
+                    dataRow[i].assistantId = "";
+                }
+                if(dataRow[i].teacherName3 == null){
+                    dataRow[i].teacherName3 = "";
+                    dataRow[i].instructorId = "";
+                }
+                var trs="\t\t\t\t<tr class='trs'>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "\t\t\t\t\t\t<div class=\"form-group jieduan\" style=\"margin-bottom: 0px;\">\n" +
+                    "\t\t\t\t\t\t\t<div class=\"col-sm-8\">\n" +
+                    "<input type='hidden' class='stageId' value='"+dataRow[i].stageId+"'>" +
+                    '<select name="stageNew"  class="form-control stageNew" type="text"  disabled="disabled">' +
+                    '</select>'+
+                    "\t\t\t\t\t\t\t</div>\n" +
+                    "\t\t\t\t\t\t</div>\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    '<td><input id="stageStarttime'+timeNum+'"  name="stageStarttime " class="form-control stageStarttime" value="'+dataRow[i].stageStarttime+'"  type="text" readonly="true">-'+
+                    '<input id="stageEndtime'+timeNum+'" name="stageEndtime" class="form-control stageEndtime" type="text" value="'+dataRow[i].stageEndtime+'" readonly="true"></td>'+
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "<input type='hidden' class='teacherId' value='"+dataRow[i].teacherId+"'>" +
+                    "<input type='hidden' class='post' value='"+dataRow[i].post+"'>" +
+                    "<input class=\"nunbers\" type='hidden' value='"+(Num)+"'>" +
+                    "\t\t\t\t\t\t<input class=\"form-control TeacherName\"  type=\"text\" name=\"classNo\" required=\"true\" placeholder=\"点击请选择班主任\" onclick=\"selectTeacherList(this)\" readonly=\"true\" value='"+dataRow[i].teacherName+"'>\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "<input type='hidden' class='teacherId' value='"+dataRow[i].instructorId+"'>" +
+                    "<input type='hidden' class='post' value='"+dataRow[i].post+"'>" +
+                    "<input class=\"nunbers\" type='hidden' value='"+(Num)+"'>" +
+                    "\t\t\t\t\t\t<input class=\"form-control TeacherName\"  type=\"text\" name=\"classNo\"  placeholder=\"点击请选择教师\" onclick=\"selectTeacherList1(this)\" readonly=\"true\" value='"+dataRow[i].teacherName3+"'>\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "<input type='hidden' class='teacherId' value='"+dataRow[i].assistantId+"'>" +
+                    "<input type='hidden' class='post' value='"+dataRow[i].post+"'>" +
+                    "<input class=\"nunbers\" type='hidden' value='"+(Num++)+"'>" +
+                    "\t\t\t\t\t\t<input class=\"form-control TeacherName\"  type=\"text\" name=\"classNo\" placeholder=\"点击请选择助教\" onclick=\"selectTeacherList2(this)\" readonly=\"true\" value='"+dataRow[i].teacherName2+"'>\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t</tr>\n"
+                selectMajor();
+                $("#Professional").children().append(trs);
+                timeNum++;
+            }
+        }
+    })
+
+    //定义隐藏域判定值
+    var Num=1;
+    var timeNum=0;
+    //先判断下拉框是否存在，不存在把隐藏值更改为0
+    if($("trs").length==0){
+        Num=0;
+    }
+</script>
+</body>
+</html>

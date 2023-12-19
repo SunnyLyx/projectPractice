@@ -1,0 +1,449 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<style>
+	.stageNew{
+		width: 100px;
+	}
+	.stageStarttime{
+		width: 40%;
+		display: inline-block;
+	}
+	.stageEndtime{
+		width: 40%;
+		display: inline-block;
+	}
+
+</style>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachClasses-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级名称：</label>
+				<div class="col-sm-8">
+					<input id="className" name="className" class="form-control" type="text">
+				</div>
+			</div>
+			<input name="schoolId"  type="hidden" id="treeId"/>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">所属分部：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" name="schoolName" onclick="selectDeptTree()" readonly="true" id="treeName">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">所属专业：</label>
+				<div class="col-sm-8">
+					<select id="majorId" name="majorId" class="form-control" type="text">
+						<option th:each="obj,eStat:${major}" th:value="${obj.majorId}"
+								th:text="${obj.majorName}"></option>
+					</select>
+				</div>
+			</div>
+<!--			<div class="form-group">-->
+<!--				<label class="col-sm-3 control-label">链接状态：</label>-->
+<!--				<div class="col-sm-8">-->
+<!--					<div class="onoffswitch">-->
+<!--						<input type="checkbox" th:checked="true" class="onoffswitch-checkbox" id="linkStatus" name="linkStatus">-->
+<!--						<label class="onoffswitch-label" for="linkStatus">-->
+<!--							<span class="onoffswitch-inner"></span>-->
+<!--							<span class="onoffswitch-switch"></span>-->
+<!--						</label>-->
+<!--					</div>-->
+<!--				</div>-->
+<!--			</div>-->
+			<button type="button" class="btn btn-primary" onclick="adds()">添加</button>
+			<table class="table " id="Professional">
+				<tr>
+					<th>阶段</th>
+					<th>阶段时间</th>
+					<th>班主任</th>
+					<th>教师</th>
+					<th>助教</th>
+					<th>操作</th>
+				</tr>
+				<tr class='trs'>
+					<td>
+						<div class="form-group jieduan" style="margin-bottom: 0px;">
+							<div class="col-sm-8">
+								<select  name="stageNew" class="form-control stageNew" type="text"></select>
+							</div>
+						</div>
+					</td>
+					<td>
+						<input name="stageStarttime" class="form-control stageStarttime" type="text" required="required">-
+						<input name="stageEndtime" class="form-control stageEndtime" type="text">
+					</td>
+					<td>
+						<input type="hidden" class="teacherId">
+						<input class="nunbers" type="hidden" value="0">
+						<input class="form-control TeacherName"  type="text" name="classNo" required placeholder="点击请选择班主任" onclick="selectTeacherList(this)" readonly="true">
+					</td>
+					<td>
+						<input type="hidden" class="teacherId">
+						<input class="nunbers" type="hidden" value="0">
+						<input class="form-control TeacherName"  type="text" name="classNo" placeholder="点击请选择教师" onclick="selectTeacherList1(this)" readonly="true">
+					</td>
+					<td>
+						<input type="hidden" class="teacherId">
+						<input class="nunbers" type="hidden" value="0">
+						<input class="form-control TeacherName"  type="text" name="classNo" placeholder="点击请选择助教" onclick="selectTeacherList2(this)" readonly="true">
+					</td>
+					<td>
+						<button type="button" class="btn btn-danger" onclick="del(this)">删除</button>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachClasses"
+		$("#form-teachClasses-add").validate({
+			rules:{
+                schoolName:{
+					required:true,
+				},
+                className:{
+                    required:true,
+                },
+                majorId:{
+                    required:true,
+				}
+			}
+		});
+
+		//进入默认查询当前专业阶段值存入下拉框
+        var majorId = $("select[name='majorId']").val();
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "teach/teachMajorStage/list",
+            data : {"majorId" : majorId},
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                if (data && data.rows.length > 0) {
+                    project = data.rows;
+                    addOptions(project);
+                }
+            }
+        })
+
+		//初始化分部控件
+        function selectDeptTree() {
+            var treeId = $("#treeId").val();
+            var deptId = $.common.isEmpty(treeId) ? "100" : $("#treeId").val();
+            var options = {
+                title: '选择分部',
+                width: "500",
+                url: ctx + "system/dept/selectDeptTree/" + deptId,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
+
+        //时间选择器
+        times();
+        var jieshu =document.getElementsByClassName("stageEndtime");
+        var kaishi = document.getElementsByClassName("stageStarttime");
+        var xData;
+        var EedData;
+		function times() {
+            laydate.render({
+                elem: '.stageStarttime',
+                trigger: 'click',
+                done: function(value, date, endDate){
+                    var Sdata = value.split("-");	//截取字符串
+                    xData = Sdata[0]+Sdata[1]+Sdata[2];  	//从新组织新的字符串
+                    if(xData>EedData){
+                        layer.alert("开始日期不能大于结束日期,请正确选择日期");
+                        jieshu[0].value=kaishi[0].value;
+                    }
+
+                }
+
+            });
+            laydate.render({
+                elem: '.stageEndtime',
+                trigger: 'click',
+                done: function(value, date, endDate){
+                    var Sdata = value.split("-");	//截取字符串
+                    EedData = Sdata[0]+Sdata[1]+Sdata[2];  	//从新组织新的字符串
+                    if(EedData<xData){
+                        layer.alert("结束日期不能小于开始日期,请正确选择日期");
+                        kaishi[0].value=jieshu[0].value;
+                    }
+				}
+
+            });
+        }
+
+        //根据选择的专业级联查询阶段存入当前阶段下拉框
+        $("#majorId").bind("input propertychange",function () {
+            var majorId1 = $("select[name='majorId']").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachMajorStage/list",
+                data : {"majorId" : majorId1},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    if (data && data.rows.length > 0) {
+                        project = data.rows;
+                        addOptions(project);
+                    }
+                }
+            })
+		})
+
+        function addOptions(project) {
+
+            var pro = $('select[name="stageNew"]');
+            pro.children().remove();
+
+            var options = "";
+            $(project).each(function() {
+                options += '<option value="' + this.id + '" >' + this.stageName + '</option>';
+            });
+
+            pro.append(options);
+        }
+
+        function submitHandler() {
+            if ($.validate.form()) {
+                add();
+            }
+        }
+
+        function add() {
+            var children =[];
+            var linkStatus = $("input[name='linkStatus']").is(':checked') == true ? 0 : 1;
+            var jieduan = document.getElementsByClassName("stageNew");
+            var starttime = document.getElementsByClassName("stageStarttime");
+            var endtime = document.getElementsByClassName("stageEndtime");
+            for(var i=0;i<$(".trs").length;i++){
+                var stageId= jieduan[i].value;
+                var teacherId1 = $(".trs").eq(i).children().eq(2).children().eq(0).val();
+                var teacherId2 = $(".trs").eq(i).children().eq(3).children().eq(0).val();
+                var teacherId3 = $(".trs").eq(i).children().eq(4).children().eq(0).val();
+                var stageStarttime = starttime[i].value;
+                var stageEndtime = endtime[i].value;
+				children.push({teacherId1:teacherId1,stageId:stageId,teacherId2:teacherId2,teacherId3:teacherId3,stageStarttime:stageStarttime,stageEndtime:stageEndtime});
+            }
+            var aaaa = JSON.stringify(children);
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : {
+                    "className": $("#className").val(),
+                    "schoolId": $("#treeId").val(),
+                    "majorId": $("#majorId").val(),
+					"aaaa": aaaa,
+					"linkStatus":linkStatus
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+		}
+        function selectTeacherList2(data) {
+            var url = ctx + "system/user/selectList";
+            var options = {
+                title: '选择老师',
+                width: "800",
+                url: url,
+                data:data,
+                callBack: TeacherOpen2
+            };
+            $.modal.openOptions(options);
+        }
+        function selectTeacherList1(data) {
+            var url = ctx + "system/user/selectList";
+            var options = {
+                title: '选择老师',
+                width: "800",
+                url: url,
+                data:data,
+                callBack: TeacherOpen1
+            };
+            $.modal.openOptions(options);
+        }
+        function selectTeacherList(data) {
+            var url = ctx + "system/user/selectList";
+            var options = {
+                title: '选择老师',
+                width: "800",
+                url: url,
+                data:data,
+                callBack: TeacherOpen
+            };
+            $.modal.openOptions(options);
+        }
+        function TeacherOpen2(index, layero){
+            //获取相对应的隐藏域的值
+            var indexs =this.data.previousSibling.previousSibling.value;
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+//            console.log($(".trs").eq(i).children().eq(3).children().eq(2))
+            if(data != "undefined" && data != "" && data != null){
+                for(var i=0;i<$(".trs").length;i++){
+                    //如果和找到的相等就添加
+                    if(i==indexs){
+                        $(".trs").eq(i).children().eq(4).children().eq(2).val(body.find('.selected')[0].children[2].innerHTML)
+                        $(".trs").eq(i).children().eq(4).children().eq(0).val(body.find('.selected')[0].children[1].innerHTML)
+                    }
+                }
+            }else{
+                layer.msg("请选择一个老师");
+            }
+            layer.close(index);
+
+        }
+        function TeacherOpen1(index, layero){
+            //获取相对应的隐藏域的值
+            var indexs =this.data.previousSibling.previousSibling.value;
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+//            console.log($(".trs").eq(i).children().eq(3).children().eq(2))
+            if(data != "undefined" && data != "" && data != null){
+                for(var i=0;i<$(".trs").length;i++){
+                    //如果和找到的相等就添加
+                    if(i==indexs){
+                        $(".trs").eq(i).children().eq(3).children().eq(2).val(body.find('.selected')[0].children[2].innerHTML)
+                        $(".trs").eq(i).children().eq(3).children().eq(0).val(body.find('.selected')[0].children[1].innerHTML)
+                    }
+                }
+            }else{
+                layer.msg("请选择一个老师");
+            }
+            layer.close(index);
+
+        }
+        function TeacherOpen(index, layero){
+            //获取相对应的隐藏域的值
+            var indexs =this.data.previousSibling.previousSibling.value;
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+//            console.log($(".trs").eq(i).children().eq(3).children().eq(2))
+            if(data != "undefined" && data != "" && data != null){
+				for(var i=0;i<$(".trs").length;i++){
+				    //如果和找到的相等就添加
+				    if(i==indexs){
+                        $(".trs").eq(i).children().eq(2).children().eq(2).val(body.find('.selected')[0].children[2].innerHTML)
+                        $(".trs").eq(i).children().eq(2).children().eq(0).val(body.find('.selected')[0].children[1].innerHTML)
+					}
+				}
+            }else{
+                layer.msg("请选择一个老师");
+            }
+            layer.close(index);
+
+        }
+        //定义隐藏域判定值
+		var Num=1;
+        var timeNum=0;
+        function adds() {
+            var trs="\t\t\t\t<tr class='trs'>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<div class=\"form-group jieduan\" style=\"margin-bottom: 0px;\">\n" +
+                "\t\t\t\t\t\t\t<div class=\"col-sm-8\">\n" +
+                "\t\t\t\t\t\t\t\t<select  name=\"stageNew\" class=\"form-control stageNew\" type=\"text\"></select>\n" +
+                "\t\t\t\t\t\t\t</div>\n" +
+                "\t\t\t\t\t\t</div>\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<input id=\"stageStarttime"+timeNum+"\" name=\"stageStarttime\" class=\"form-control stageStarttime\" type=\"text\" required=\"required\">-\n" +
+                "\t\t\t\t\t\t<input id=\"stageEndtime"+timeNum+"\" name=\"stageEndtime\" class=\"form-control stageEndtime\" type=\"text\">\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<input type=\"hidden\" class=\"teacherId\">\n" +
+                "\t\t\t\t\t\t<input class=\"nunbers\" type=\"hidden\" value="+(Num)+">\n" +
+                "\t\t\t\t\t\t<input class=\"form-control TeacherName\"  type=\"text\" name=\"classNo\" aria-required=\"true\" placeholder=\"点击请选择班主任\" onclick=\"selectTeacherList(this)\" readonly=\"true\">\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<input type=\"hidden\" class=\"teacherId\">\n" +
+                "\t\t\t\t\t\t<input class=\"nunbers\" type=\"hidden\" value="+(Num)+">\n" +
+                "\t\t\t\t\t\t<input class=\"form-control TeacherName\"  type=\"text\" name=\"classNo\" placeholder=\"点击请选择教师\" onclick=\"selectTeacherList1(this)\" readonly=\"true\">\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<input type=\"hidden\" class=\"teacherId\">\n" +
+                "\t\t\t\t\t\t<input class=\"nunbers\" type=\"hidden\" value="+(Num++)+">\n" +
+                "\t\t\t\t\t\t<input class=\"form-control TeacherName\"  type=\"text\" name=\"classNo\" placeholder=\"点击请选择助教\" onclick=\"selectTeacherList2(this)\" readonly=\"true\">\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t\t<td>\n" +
+                "\t\t\t\t\t\t<button type=\"button\" class=\"btn btn-danger\" onclick=\"del(this)\">删除</button>\n" +
+                "\t\t\t\t\t</td>\n" +
+                "\t\t\t\t</tr>\n"
+            $("#Professional").children().append(trs);
+            addOptions(project);
+            var xData;
+            var EedData;
+            var jieshu =document.getElementById('stageStarttime'+timeNum);
+            var kaishi = document.getElementById('stageEndtime'+timeNum);
+            laydate.render({
+                elem: '#stageStarttime'+timeNum,
+                format: 'yyyy-MM-dd',
+                trigger: 'click',
+                done: function(value, date, endDate){
+					var Sdata = value.split("-");	//截取字符串
+					xData = Sdata[0]+Sdata[1]+Sdata[2];  	//从新组织新的字符串
+                    if(xData>EedData){
+						layer.alert("开始日期不能大于结束日期,请正确选择日期");
+                        jieshu.value=kaishi.value
+                    }
+            	}
+            });
+            laydate.render({
+                elem: '#stageEndtime'+timeNum,
+                format: 'yyyy-MM-dd',
+                trigger: 'click',
+                done: function(value, date, endDate){
+                    var Sdata = value.split("-");	//截取字符串
+					EedData = Sdata[0]+Sdata[1]+Sdata[2];  	//从新组织新的字符串
+                    if(EedData<xData){
+                        layer.alert("结束日期不能小于开始日期,请正确选择日期");
+                        kaishi.value=jieshu.value
+                    }
+
+                }
+
+            });
+            timeNum++;
+        }
+        //删除方法
+        function del(data) {
+            //清空子标签的值
+            data.parentNode.parentNode.remove();
+            //重新给隐藏域里面的值进行赋值
+			var trs = document.getElementsByClassName("trs");
+			for (var i=0;i<$(".trs").length;i++){
+                $(".trs").eq(i).children().eq(2).children().eq(1).val(i);
+                $(".trs").eq(i).children().eq(3).children().eq(1).val(i);
+                $(".trs").eq(i).children().eq(4).children().eq(1).val(i);
+			}
+			//把最大值返回给Num变量
+            Num=$(".trs").length;
+
+        }
+
+
+	</script>
+</body>
+</html>

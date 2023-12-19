@@ -1,0 +1,152 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org"
+	  xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<style>
+    /*#father{
+        width: 40%;
+        margin: auto;
+    }*/
+    p{
+        width: 50%;
+        border: #D9D9D9 1px solid;
+        text-align: center;
+    }
+    .one{
+        padding: 0px;
+        margin-top: 10px;
+        background-color: #bce8f1;
+    }
+</style>
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div id="father">
+        <div class="one">
+            <input class="btn btn-success" id="kgc" style="margin: 10px" type="button" value="课工场导出" />
+            <input class="btn btn-primary" id="kgcRecord" style="margin: 10px" type="button" value="课工场档案导出" />
+        </div>
+        <div class="one">
+            <input class="btn btn-success" id="accp" style="margin: 10px" type="button" value="ACCP导出" />
+            <input class="btn btn-primary" id="accpRecord" style="margin: 10px" type="button" value="ACCP档案导出" />
+        </div>
+    </div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        $(function() {
+            var shuju = sessionStorage.getItem('data');  //获取sessionStorage的值
+            var obj = JSON.parse(shuju);  //json字符串转换成json对象
+            console.log(obj);
+            var num = 0;
+            var ids;
+            if(obj[1].num == 1){
+                num = 1;
+                ids = obj[0].ids;
+            }
+            $("input").bind('click',function(e){
+                var kgc =$(this).val();
+                if(kgc == "课工场导出"){
+                    var url = ctx + "teach/student/exportKgc";
+                    if (num == 0) { //判断是勾选导出还是全部或查询导出
+                        obj.push({"name":"number","value":1});   //number:判断是课工场导出还是课工场档案导出
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, obj, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }else{
+                        var data = [{"name":"ids","value":ids},{"name":"number","value":1}];
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, data, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }
+                }else if(kgc == "课工场档案导出"){
+                    var url = ctx + "teach/student/exportKgcFile";
+                    if (num == 0) { //判断是勾选导出还是全部或查询导出
+                        obj.push({"name":"number","value":1});
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, obj, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }else{
+                        var data = [{"name":"ids","value":ids},{"name":"number","value":1}];
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, data, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }
+                }else if(kgc == "ACCP导出"){
+                    var url = ctx + "teach/student/exportAccp";
+                    if (num == 0) { //判断是勾选导出还是全部或查询导出
+                        obj.push({"name":"number","value":2});
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, obj, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }else{
+                        var data = [{"name":"ids","value":ids},{"name":"number","value":2}];
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, data, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }
+                }else if(kgc == "ACCP档案导出"){
+                    var url = ctx + "teach/student/exportAccpFile";
+                    if (num == 0) { //判断是勾选导出还是全部或查询导出
+                        obj.push({"name":"number","value":2});
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, obj, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }else{
+                        var data = [{"name":"ids","value":ids},{"name":"number","value":2}];
+                        $.modal.loading("正在导出数据，请稍后...");
+                        $.post(url, data, function(result) {
+                            if (result.code == web_status.SUCCESS) {
+                                window.location.href = ctx + "common/download?fileName=" + result.msg + "&delete=" + true;
+                            } else {
+                                $.modal.alertError(result.msg);
+                            }
+                            $.modal.closeLoading();
+                        });
+                    }
+                }
+            })
+        });
+    </script>
+</body>
+</html>

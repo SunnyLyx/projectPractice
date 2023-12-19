@@ -1,0 +1,126 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-teachSubject-edit" th:object="${teachSubject}">
+        <input id="subjectId" name="subjectId" th:field="*{subjectId}"  type="hidden">
+        <input name="classId"  type="hidden" id="classId" th:field="*{classId}"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">班级：</label>
+            <div class="col-sm-8">
+                <input id="className" name="className" th:field="*{className}" class="form-control" type="text" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">项目名称：</label>
+            <div class="col-sm-8">
+                <input id="subjectName" name="subjectName" th:field="*{subjectName}" class="form-control" type="text" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">项目开始时间：</label>
+            <div class="col-sm-8">
+                <input id="starttime" name="starttime" th:field="*{starttime}" class="form-control" type="text" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">结束时间：</label>
+            <div class="col-sm-8">
+                <input id="endtime" name="endtime" th:field="*{endtime}" class="form-control" type="text"  disabled="disabled">
+            </div>
+        </div>
+        <div id="BadstudenUser">
+            <h4 style="display: inline-block">非在读学生：</h4>
+        </div>
+        <hr/>
+        <h3>在读学生项目</h3>
+        <hr/>
+        <table class="table " id="Professional">
+            <tr>
+                <th style="display: none">学生id</th>
+                <th>学生</th>
+                <th>提交情况</th>
+                <th>视频地址</th>
+                <th>评价</th>
+            </tr>
+        </table>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var myajax = $.ajax({
+        cache: true,
+        type: "POST",
+        url: ctx + "teach/teachStudentSubject/list",
+        data: {"subjectId": $("#subjectId").val()},
+        success : function(data) {
+            var dataRow =data.rows;
+            for(var i=0;i<dataRow.length;i++){
+                if(dataRow[i].subjectUrl == null){
+                    dataRow[i].subjectUrl = "";
+                }
+                if(dataRow[i].evaluate == null){
+                    dataRow[i].evaluate = "";
+                }
+                var stu="<tr>\n" +
+                    "\t\t\t\t\t<td style=\"display: none\"><input class=\"stuChildrenList\" type=\"hidden\" value='"+dataRow[i].submit+"' /></td>\n" +
+                    "\t\t\t\t\t<td><span style='width: 55%;display: inline-block'>"+dataRow[i].studentName+"</span></td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "\t\t\t\t\t\t<select  class=\"selectId\"  disabled=\"disabled\">\n" +
+                    "\t\t\t\t\t\t\t<option value=\"1\">提交优</option>\n" +
+                    "\t\t\t\t\t\t\t<option value=\"2\">提交良好</option>\n" +
+                    "\t\t\t\t\t\t\t<option value=\"3\">提交差</option>\n" +
+                    "\t\t\t\t\t\t\t<option value=\"4\">未完成</option>\n" +
+                    "\t\t\t\t\t\t</select>\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "<a target=\"_blank\" href='"+dataRow[i].subjectUrl+"'>"+dataRow[i].subjectUrl+"</a>"+
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t\t<td style=\"display: none\">\n" +
+                    "\t\t\t\t\t\t<input class='urls' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" value='"+dataRow[i].subjectUrl+"' >\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t\t<td>\n" +
+                    "\t\t\t\t\t\t<input class='evaluate' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" placeholder=\"请输入评价\" value='"+dataRow[i].evaluate+"'  disabled=\"disabled\">\n" +
+                    "\t\t\t\t\t</td>\n" +
+                    "\t\t\t\t</tr>";
+                $("#Professional").append(stu);
+            }
+        }
+    })
+    $.when(myajax).done(function () {
+        //要执行的操作
+        var stuChildrenList = document.getElementsByClassName("stuChildrenList");
+        for(var i=0;i<$(".selectId").length;i++){
+            for(var j=0;j<$(".selectId").eq(i).children().length;j++){
+                if($(".selectId").eq(i).children().eq(j).val()==stuChildrenList[i].value){
+                    $(".selectId").eq(i).children().eq(j).attr("selected",true);
+                }
+            }
+        }
+    });
+
+    $.ajax({
+        cache: true,
+        type: "POST",
+        url: ctx + "teach/student/classOtherStudents",
+        data: {"classNo": $("input[name='classId']").val()},
+        error: function (request) {
+            $.modal.alertError("系统错误");
+        },
+        success: function (data) {
+            var dataRow = data.rows;
+            $("#BadstudenUser>span").remove();
+            for(var i=0;i<dataRow.length;i++){
+                var datas="<span style='width: 80px;display: inline-block;text-align: center;height:30px;line-height:30px;margin-left: 15px;border-radius: 20px;font-size: 14px;color: #ffffff;background-color: #0d8ddb'>"+dataRow[i].studentName+"</span>";
+                $("#BadstudenUser").append(datas)
+            }
+            if(dataRow.length==0){
+                $("#BadstudenUser").append("<span>无</span>");
+            }
+        }
+    })
+</script>
+</body>
+</html>

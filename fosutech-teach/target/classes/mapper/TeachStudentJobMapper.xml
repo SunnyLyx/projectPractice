@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachStudentJobMapper">
+    
+    <resultMap type="TeachStudentJob" id="TeachStudentJobResult">
+        <result property="id"    column="id"    />
+        <result property="jobId"    column="job_id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="jobResult"    column="job_result"    />
+        <result property="studentName"    column="student_name"    />
+        <association property="teachJob"  column="job_id" javaType="TeachJob" resultMap="TeachJobResult" />
+        <association property="classes"  column="class_id" javaType="TeachClasses" resultMap="TeachClassesResult" />
+    </resultMap>
+
+    <resultMap type="TeachJob" id="TeachJobResult">
+        <result property="jobId"    column="job_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="datetime"    column="datetime"    />
+        <result property="jobContent"    column="job_content"    />
+        <result property="className"    column="class_name"    />
+    </resultMap>
+
+    <resultMap type="TeachClasses" id="TeachClassesResult">
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageNew"    column="stage_new"    />
+        <result property="stageStarttime"    column="stage_starttime"    />
+        <result property="stageEndtime"    column="stage_endtime"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+	
+	<sql id="selectTeachStudentJobVo">
+        select id, job_id, student_id, job_result from teach_student_job
+    </sql>
+	
+    <select id="selectTeachStudentJobList" parameterType="TeachStudentJob" resultMap="TeachStudentJobResult">
+        select a.id, a.student_id, a.job_result, b.student_name from teach_student_job a
+        JOIN teach_student b ON a.student_id = b.student_id
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="jobId != null "> and job_id = #{jobId}</if>
+             <if test="studentId != null "> and student_id = #{studentId}</if>
+             <if test="jobResult != null "> and job_result = #{jobResult}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachStudentJobById" parameterType="Integer" resultMap="TeachStudentJobResult">
+        <include refid="selectTeachStudentJobVo"/>
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachStudentJob" parameterType="TeachStudentJob" resultMap="TeachStudentJobResult">
+        select stuj.*,c.class_name,j.datetime from teach_student_job stuj
+        left join teach_job j on stuj.job_id = j.job_id
+        left join teach_classes c on j.class_id = c.class_id
+        <where>
+            stuj.student_id = #{studentId}
+            <if test="startTime != null and startTime != ''"><!-- 开始时间检索 -->
+                AND date_format(j.datetime,'%y%m%d') &gt;= date_format(#{startTime},'%y%m%d')
+            </if>
+            <if test="endTime != null and endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(j.datetime,'%y%m%d') &lt;= date_format(#{endTime},'%y%m%d')
+            </if>
+        </where>
+        order by j.datetime desc
+    </select>
+
+    <insert id="insertTeachStudentJob" parameterType="TeachStudentJob">
+        insert into teach_student_job
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="jobId != null  ">job_id,</if>
+			<if test="studentId != null  ">student_id,</if>
+			<if test="jobResult != null  ">job_result,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="jobId != null  ">#{jobId},</if>
+			<if test="studentId != null  ">#{studentId},</if>
+			<if test="jobResult != null  ">#{jobResult},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachStudentJob" parameterType="TeachStudentJob">
+        update teach_student_job
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="jobId != null  ">job_id = #{jobId},</if>
+            <if test="studentId != null  ">student_id = #{studentId},</if>
+            <if test="jobResult != null  ">job_result = #{jobResult},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachStudentJobById" parameterType="Integer">
+        delete from teach_student_job where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachStudentJobByIds" parameterType="String">
+        delete from teach_student_job where job_id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachExamStatisticsMapper">
+    
+    <resultMap type="TeachExamStatistics" id="TeachExamStatisticsResult">
+        <result property="id"    column="id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="examTime"    column="exam_time"    />
+        <result property="stageId"    column="stage_id"    />
+        <result property="pass"    column="pass"    />
+        <result property="fail"    column="fail"    />
+        <result property="studentNum"    column="student_num"    />
+        <result property="acceptability"    column="acceptability"    />
+        <result property="invigilator"    column="invigilator"    />
+        <result property="address"    column="address"    />
+        <result property="className"    column="class_name"    />
+        <result property="teacherName"    column="teacher_name"    />
+        <result property="stageName"    column="stage_name"    />
+    </resultMap>
+	
+	<sql id="selectTeachExamStatisticsVo">
+        select id, class_id, exam_time, stage_id, pass, fail, student_num, acceptability, invigilator, address from teach_exam_statistics
+    </sql>
+	
+    <select id="selectTeachExamStatisticsList" parameterType="TeachExamStatistics" resultMap="TeachExamStatisticsResult">
+        select a.id, a.class_id, a.exam_time, a.stage_id, a.pass, a.fail, a.student_num, a.acceptability, a.invigilator, a.address, tc.class_name,su.user_name teacher_name, tms.stage_name from teach_exam_statistics a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        JOIN sys_user su ON su.user_id = a.invigilator
+        JOIN teach_major_stage tms ON tms.id = a.stage_id
+        <where>
+            <if test="id != null "> and id = #{id}</if>
+             <if test="classId != null "> and class_id = #{classId}</if>
+             <if test="examTime != null "> and exam_time = #{examTime}</if>
+             <if test="stageId != null  and stageId != '' "> and stage_id = #{stageId}</if>
+             <if test="pass != null "> and pass = #{pass}</if>
+             <if test="fail != null "> and fail = #{fail}</if>
+             <if test="studentNum != null "> and student_num = #{studentNum}</if>
+             <if test="acceptability != null  and acceptability != '' "> and acceptability = #{acceptability}</if>
+             <if test="invigilator != null "> and invigilator = #{invigilator}</if>
+             <if test="address != null  and address != '' "> and address = #{address}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachExamStatisticsById" parameterType="Integer" resultMap="TeachExamStatisticsResult">
+        <include refid="selectTeachExamStatisticsVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTeachExamStatistics" parameterType="TeachExamStatistics">
+        insert into teach_exam_statistics
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="classId != null  ">class_id,</if>
+			<if test="examTime != null  ">exam_time,</if>
+			<if test="stageId != null  and stageId != ''  ">stage_id,</if>
+			<if test="pass != null  ">pass,</if>
+			<if test="fail != null  ">fail,</if>
+			<if test="studentNum != null  ">student_num,</if>
+			<if test="acceptability != null  and acceptability != ''  ">acceptability,</if>
+			<if test="invigilator != null  ">invigilator,</if>
+			<if test="address != null  and address != ''  ">address,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="classId != null  ">#{classId},</if>
+			<if test="examTime != null  ">#{examTime},</if>
+			<if test="stageId != null  and stageId != ''  ">#{stageId},</if>
+			<if test="pass != null  ">#{pass},</if>
+			<if test="fail != null  ">#{fail},</if>
+			<if test="studentNum != null  ">#{studentNum},</if>
+			<if test="acceptability != null  and acceptability != ''  ">#{acceptability},</if>
+			<if test="invigilator != null  ">#{invigilator},</if>
+			<if test="address != null  and address != ''  ">#{address},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachExamStatistics" parameterType="TeachExamStatistics">
+        update teach_exam_statistics
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  ">class_id = #{classId},</if>
+            <if test="examTime != null  ">exam_time = #{examTime},</if>
+            <if test="stageId != null  and stageId != ''  ">stage_id = #{stageId},</if>
+            <if test="pass != null  ">pass = #{pass},</if>
+            <if test="fail != null  ">fail = #{fail},</if>
+            <if test="studentNum != null  ">student_num = #{studentNum},</if>
+            <if test="acceptability != null  and acceptability != ''  ">acceptability = #{acceptability},</if>
+            <if test="invigilator != null  ">invigilator = #{invigilator},</if>
+            <if test="address != null  and address != ''  ">address = #{address},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachExamStatisticsById" parameterType="Integer">
+        delete from teach_exam_statistics where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachExamStatisticsByIds" parameterType="String">
+        delete from teach_exam_statistics where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectTeachExamStatisticsTask" resultMap="TeachExamStatisticsResult">
+        SELECT
+        class_id,
+        datetime exam_time,
+        stage_id,
+        cut_offscores,
+        invigilator,
+        address,
+        sum(studentnum) AS student_num,
+        sum(exam_pass) AS pass,
+        sum(exam_notpass) AS fail
+        FROM
+        (
+        SELECT
+        class_id,
+        datetime,
+        stage_id,
+        cut_offscores,
+        invigilator,
+        address,
+        count(0) AS studentnum,
+        0 AS exam_pass,
+        0 AS exam_notpass
+        FROM
+        teach_exam te
+        JOIN teach_student_exam tse ON te.exam_id = tse.exam_id
+        GROUP BY
+        te.datetime,
+        te.class_id
+        UNION
+        SELECT
+        class_id,
+        datetime,
+        stage_id,
+        cut_offscores,
+        invigilator,
+        address,
+        0 AS studentnum,
+        COUNT(score) AS exam_pass,
+        0 AS exam_notpass
+        FROM
+        teach_exam te
+        JOIN teach_student_exam tse ON te.exam_id = tse.exam_id
+        WHERE
+        tse.score &gt;= 60
+        GROUP BY
+        te.datetime,
+        te.class_id
+        UNION
+        SELECT
+        class_id,
+        datetime,
+        stage_id,
+        cut_offscores,
+        invigilator,
+        address,
+        0 AS studentnum,
+        0 AS exam_pass,
+        COUNT(score) AS exam_notpass
+        FROM
+        teach_exam te
+        JOIN teach_student_exam tse ON te.exam_id = tse.exam_id
+        WHERE
+        tse.score &lt; 60
+        GROUP BY
+        te.datetime,
+        te.class_id
+        ) a
+        GROUP BY
+        a.class_id,
+        a.datetime,
+        a.stage_id,
+        a.cut_offscores,
+        a.invigilator,
+        a.address
+    </select>
+</mapper>

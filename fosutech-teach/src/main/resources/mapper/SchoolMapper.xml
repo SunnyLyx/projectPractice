@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.SchoolMapper">
+    
+    <resultMap type="School" id="SchoolResult">
+        <result property="schoolId"    column="school_id"    />
+        <result property="schoolName"    column="school_name"    />
+        <result property="headmaster"    column="headmaster"    />
+        <result property="president"    column="president"    />
+        <result property="datetime"    column="datetime"    />
+    </resultMap>
+	
+	<sql id="selectSchoolVo">
+        select school_id, school_name, headmaster, president, datetime from teach_school
+    </sql>
+	
+    <select id="selectSchoolList" parameterType="School" resultMap="SchoolResult">
+        <include refid="selectSchoolVo"/>
+        <where>  
+            <if test="schoolId != null "> and school_id = #{schoolId}</if>
+             <if test="schoolName != null  and schoolName != '' "> and school_name like concat('%',#{schoolName},'%')</if>
+             <if test="headmaster != null  and headmaster != '' "> and headmaster like concat('%',#{headmaster},'%')</if>
+             <if test="president != null  and president != '' "> and president like concat('%',#{president},'%')</if>
+             <if test="datetime != null "> and datetime = #{datetime}</if>
+         </where>
+    </select>
+    
+    <select id="selectSchoolById" parameterType="Integer" resultMap="SchoolResult">
+        <include refid="selectSchoolVo"/>
+        where school_id = #{schoolId}
+    </select>
+        
+    <insert id="insertSchool" parameterType="School">
+        insert into teach_school
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="schoolId != null  ">school_id,</if>
+			<if test="schoolName != null  and schoolName != ''  ">school_name,</if>
+			<if test="headmaster != null  and headmaster != ''  ">headmaster,</if>
+			<if test="president != null  and president != ''  ">president,</if>
+			<if test="datetime != null  ">datetime,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="schoolId != null  ">#{schoolId},</if>
+			<if test="schoolName != null  and schoolName != ''  ">#{schoolName},</if>
+			<if test="headmaster != null  and headmaster != ''  ">#{headmaster},</if>
+			<if test="president != null  and president != ''  ">#{president},</if>
+			<if test="datetime != null  ">#{datetime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateSchool" parameterType="School">
+        update teach_school
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="schoolName != null  and schoolName != ''  ">school_name = #{schoolName},</if>
+            <if test="headmaster != null  and headmaster != ''  ">headmaster = #{headmaster},</if>
+            <if test="president != null  and president != ''  ">president = #{president},</if>
+            <if test="datetime != null  ">datetime = #{datetime},</if>
+        </trim>
+        where school_id = #{schoolId}
+    </update>
+
+	<delete id="deleteSchoolById" parameterType="Integer">
+        delete from teach_school where school_id = #{schoolId}
+    </delete>
+	
+    <delete id="deleteSchoolByIds" parameterType="String">
+        delete from teach_school where school_id in 
+        <foreach item="schoolId" collection="array" open="(" separator="," close=")">
+            #{schoolId}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachFileCollectionMapper">
+    
+    <resultMap type="TeachFileCollection" id="TeachFileCollectionResult">
+        <result property="studentId"    column="student_id"    />
+        <result property="kgcNo"    column="kgc_no"    />
+        <result property="kgcUid"    column="kgc_uid"    />
+        <result property="kgcNickname"    column="kgc_nickname"    />
+        <result property="status"    column="status"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="postname"    column="postname"    />
+        <result property="studentName"    column="student_name"    />
+        <result property="studentSex"    column="student_sex"    />
+        <result property="nativePlace"    column="native_place"    />
+        <result property="idCardNo"    column="id_card_no"    />
+        <result property="education"    column="education"    />
+        <result property="phone"    column="phone"    />
+        <result property="mail"    column="mail"    />
+        <result property="address"    column="address"    />
+        <result property="classNo"    column="class_no"    />
+        <result property="extend1"    column="extend1"    />
+        <result property="extend2"    column="extend2"    />
+        <result property="extend3"    column="extend3"    />
+        <result property="graduateInstitutions"    column="graduate_institutions"    />
+        <result property="workExperience"    column="work_experience"    />
+        <result property="base"    column="base"    />
+        <result property="englishLevel"    column="english_level"    />
+        <result property="degreeInNature"    column="degree_in_nature"    />
+        <result property="graduateDate"    column="graduate_date"    />
+        <result property="major"    column="major"    />
+        <result property="upTime"    column="up_time"    />
+        <result property="emergencyContact"    column="emergency_contact"    />
+        <result property="emergencyContactPhone"    column="emergency_contact_phone"    />
+        <result property="jobCity"    column="job_city"    />
+        <result property="textbookNo"    column="textbook_no"    />
+        <result property="trafficPermit"    column="traffic_permit"    />
+        <result property="postalCode"    column="postal_code"    />
+        <result property="studentNamePinyin"    column="student_name_pinyin"    />
+        <result property="extend4"    column="extend4"    />
+        <result property="extend5"    column="extend5"    />
+        <result property="className"   column="class_name"  />
+        <result property="modifyTime"   column="modify_time"  />
+        <result property="createUser"   column="create_user"  />
+        <result property="modifyUser"   column="modify_user"  />
+    </resultMap>
+	
+	<sql id="selectTeachFileCollectionVo">
+        select student_id, kgc_no, kgc_uid, kgc_nickname, status, start_time, postname, student_name, student_sex, native_place, id_card_no, education, phone, mail, address, class_no, extend1, extend2, extend3, graduate_institutions, work_experience, base, english_level, degree_in_nature, graduate_date, major, up_time, emergency_contact, emergency_contact_phone, job_city, textbook_no, traffic_permit,
+        postal_code, student_name_pinyin, extend4, extend5, modify_time, create_user, modify_user from teach_file_collection
+    </sql>
+	
+    <select id="selectTeachFileCollectionList" parameterType="TeachFileCollection" resultMap="TeachFileCollectionResult">
+        select fc.*,c.class_name from teach_file_collection fc
+        left join teach_classes c on fc.class_no = c.class_id
+        <where>  
+            <if test="studentId != null "> and student_id = #{studentId}</if>
+            <if test="studentName != null  and studentName != '' "> and fc.student_name like concat('%',#{studentName},'%')</if>
+            <if test="className != null  and className != '' "> and c.class_name like concat('%',#{className},'%')</if>
+             <if test="kgcNo != null  and kgcNo != '' "> and kgc_no = #{kgcNo}</if>
+             <if test="kgcUid != null  and kgcUid != '' "> and kgc_uid = #{kgcUid}</if>
+             <if test="kgcNickname != null  and kgcNickname != '' "> and kgc_nickname = #{kgcNickname}</if>
+             <if test="status != null "> and status = #{status}</if>
+             <if test="startTime != null  and startTime != '' "> and start_time = #{startTime}</if>
+             <if test="postname != null  and postname != '' "> and postname = #{postname}</if>
+             <if test="studentSex != null "> and student_sex = #{studentSex}</if>
+             <if test="nativePlace != null  and nativePlace != '' "> and native_place = #{nativePlace}</if>
+             <if test="idCardNo != null  and idCardNo != '' "> and id_card_no = #{idCardNo}</if>
+             <if test="education != null "> and education = #{education}</if>
+             <if test="phone != null  and phone != '' "> and phone = #{phone}</if>
+             <if test="mail != null  and mail != '' "> and mail = #{mail}</if>
+             <if test="address != null  and address != '' "> and address = #{address}</if>
+             <if test="classNo != null "> and class_no = #{classNo}</if>
+             <if test="extend1 != null "> and extend1 = #{extend1}</if>
+             <if test="extend2 != null  and extend2 != '' "> and extend2 = #{extend2}</if>
+             <if test="extend3 != null and extend3 != '' "> and date_format(fc.extend3,'%y%m%d') = date_format(#{extend3},'%y%m%d')</if>
+             <if test="graduateInstitutions != null  and graduateInstitutions != '' "> and graduate_institutions = #{graduateInstitutions}</if>
+             <if test="workExperience != null  and workExperience != '' "> and work_experience = #{workExperience}</if>
+             <if test="base != null "> and base = #{base}</if>
+             <if test="englishLevel != null "> and english_level = #{englishLevel}</if>
+             <if test="degreeInNature != null "> and degree_in_nature = #{degreeInNature}</if>
+             <if test="graduateDate != null  and graduateDate != '' "> and graduate_date = #{graduateDate}</if>
+             <if test="major != null  and major != '' "> and major = #{major}</if>
+             <if test="upTime != null  and upTime != '' "> and up_time = #{upTime}</if>
+             <if test="emergencyContact != null  and emergencyContact != '' "> and emergency_contact = #{emergencyContact}</if>
+             <if test="emergencyContactPhone != null  and emergencyContactPhone != '' "> and emergency_contact_phone = #{emergencyContactPhone}</if>
+             <if test="jobCity != null "> and job_city = #{jobCity}</if>
+             <if test="textbookNo != null  and textbookNo != '' "> and textbook_no = #{textbookNo}</if>
+             <if test="trafficPermit != null  and trafficPermit != '' "> and traffic_permit = #{trafficPermit}</if>
+             <if test="postalCode != null  and postalCode != '' "> and postal_code = #{postalCode}</if>
+             <if test="studentNamePinyin != null  and studentNamePinyin != '' "> and student_name_pinyin = #{studentNamePinyin}</if>
+             <if test="extend4 != null  and extend4 != '' "> and extend4 = #{extend4}</if>
+             <if test="extend5 != null and extend5 != -1 "> and extend5 = #{extend5}</if>
+        </where>
+        order by extend3 desc
+    </select>
+    
+    <select id="selectTeachFileCollectionById" parameterType="Integer" resultMap="TeachFileCollectionResult">
+        select fc.*,c.class_name from teach_file_collection fc
+        left join teach_classes c on fc.class_no = c.class_id
+        where student_id = #{studentId}
+    </select>
+        
+    <insert id="insertTeachFileCollection" parameterType="TeachFileCollection">
+        insert into teach_file_collection
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="studentId != null  ">student_id,</if>
+			<if test="kgcNo != null  and kgcNo != ''  ">kgc_no,</if>
+			<if test="kgcUid != null  and kgcUid != ''  ">kgc_uid,</if>
+			<if test="kgcNickname != null  and kgcNickname != ''  ">kgc_nickname,</if>
+			<if test="status != null  ">status,</if>
+			<if test="startTime != null  and startTime != ''  ">start_time,</if>
+			<if test="postname != null  and postname != ''  ">postname,</if>
+			<if test="studentName != null  and studentName != ''  ">student_name,</if>
+			<if test="studentSex != null  ">student_sex,</if>
+			<if test="nativePlace != null  and nativePlace != ''  ">native_place,</if>
+			<if test="idCardNo != null  and idCardNo != ''  ">id_card_no,</if>
+			<if test="education != null  ">education,</if>
+			<if test="phone != null  and phone != ''  ">phone,</if>
+			<if test="mail != null  and mail != ''  ">mail,</if>
+			<if test="address != null  and address != ''  ">address,</if>
+			<if test="classNo != null  ">class_no,</if>
+			<if test="extend1 != null  ">extend1,</if>
+			<if test="extend2 != null  and extend2 != ''  ">extend2,</if>
+			<if test="extend3 != null  ">extend3,</if>
+			<if test="graduateInstitutions != null  and graduateInstitutions != ''  ">graduate_institutions,</if>
+			<if test="workExperience != null  and workExperience != ''  ">work_experience,</if>
+			<if test="base != null  ">base,</if>
+			<if test="englishLevel != null  ">english_level,</if>
+			<if test="degreeInNature != null  ">degree_in_nature,</if>
+			<if test="graduateDate != null  and graduateDate != ''  ">graduate_date,</if>
+			<if test="major != null  and major != ''  ">major,</if>
+			<if test="upTime != null  and upTime != ''  ">up_time,</if>
+			<if test="emergencyContact != null  and emergencyContact != ''  ">emergency_contact,</if>
+			<if test="emergencyContactPhone != null  and emergencyContactPhone != ''  ">emergency_contact_phone,</if>
+			<if test="jobCity != null  ">job_city,</if>
+			<if test="textbookNo != null  and textbookNo != ''  ">textbook_no,</if>
+			<if test="trafficPermit != null  and trafficPermit != ''  ">traffic_permit,</if>
+			<if test="postalCode != null  and postalCode != ''  ">postal_code,</if>
+			<if test="studentNamePinyin != null  and studentNamePinyin != ''  ">student_name_pinyin,</if>
+			<if test="extend4 != null  and extend4 != ''  ">extend4,</if>
+            <if test="extend5 != null  and extend5 != ''  ">extend5,</if>
+			<if test="modifyTime != null  and modifyTime != ''  ">modify_time,</if>
+            <if test="createUser != null  and createUser != ''  ">create_user,</if>
+            <if test="modifyUser != null  and modifyUser != ''  ">modify_user,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="studentId != null  ">#{studentId},</if>
+			<if test="kgcNo != null  and kgcNo != ''  ">#{kgcNo},</if>
+			<if test="kgcUid != null  and kgcUid != ''  ">#{kgcUid},</if>
+			<if test="kgcNickname != null  and kgcNickname != ''  ">#{kgcNickname},</if>
+			<if test="status != null  ">#{status},</if>
+			<if test="startTime != null  and startTime != ''  ">#{startTime},</if>
+			<if test="postname != null  and postname != ''  ">#{postname},</if>
+			<if test="studentName != null  and studentName != ''  ">#{studentName},</if>
+			<if test="studentSex != null  ">#{studentSex},</if>
+			<if test="nativePlace != null  and nativePlace != ''  ">#{nativePlace},</if>
+			<if test="idCardNo != null  and idCardNo != ''  ">#{idCardNo},</if>
+			<if test="education != null  ">#{education},</if>
+			<if test="phone != null  and phone != ''  ">#{phone},</if>
+			<if test="mail != null  and mail != ''  ">#{mail},</if>
+			<if test="address != null  and address != ''  ">#{address},</if>
+			<if test="classNo != null  ">#{classNo},</if>
+			<if test="extend1 != null  ">#{extend1},</if>
+			<if test="extend2 != null  and extend2 != ''  ">#{extend2},</if>
+			<if test="extend3 != null  ">#{extend3},</if>
+			<if test="graduateInstitutions != null  and graduateInstitutions != ''  ">#{graduateInstitutions},</if>
+			<if test="workExperience != null  and workExperience != ''  ">#{workExperience},</if>
+			<if test="base != null  ">#{base},</if>
+			<if test="englishLevel != null  ">#{englishLevel},</if>
+			<if test="degreeInNature != null  ">#{degreeInNature},</if>
+			<if test="graduateDate != null  and graduateDate != ''  ">#{graduateDate},</if>
+			<if test="major != null  and major != ''  ">#{major},</if>
+			<if test="upTime != null  and upTime != ''  ">#{upTime},</if>
+			<if test="emergencyContact != null  and emergencyContact != ''  ">#{emergencyContact},</if>
+			<if test="emergencyContactPhone != null  and emergencyContactPhone != ''  ">#{emergencyContactPhone},</if>
+			<if test="jobCity != null  ">#{jobCity},</if>
+			<if test="textbookNo != null  and textbookNo != ''  ">#{textbookNo},</if>
+			<if test="trafficPermit != null  and trafficPermit != ''  ">#{trafficPermit},</if>
+			<if test="postalCode != null  and postalCode != ''  ">#{postalCode},</if>
+			<if test="studentNamePinyin != null  and studentNamePinyin != ''  ">#{studentNamePinyin},</if>
+			<if test="extend4 != null  and extend4 != ''  ">#{extend4},</if>
+			<if test="extend5 != null  and extend5 != ''  ">#{extend5},</if>
+            <if test="modifyTime != null  and modifyTime != ''  ">#{modifyTime},</if>
+            <if test="createUser != null  and createUser != ''  ">#{createUser},</if>
+            <if test="modifyUser != null  and modifyUser != ''  ">#{modifyUser},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachFileCollection" parameterType="TeachFileCollection">
+        update teach_file_collection
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="kgcNo != null  and kgcNo != ''  ">kgc_no = #{kgcNo},</if>
+            <if test="kgcUid != null  and kgcUid != ''  ">kgc_uid = #{kgcUid},</if>
+            <if test="kgcNickname != null  and kgcNickname != ''  ">kgc_nickname = #{kgcNickname},</if>
+            <if test="status != null  ">status = #{status},</if>
+            <if test="startTime != null  and startTime != ''  ">start_time = #{startTime},</if>
+            <if test="postname != null  and postname != ''  ">postname = #{postname},</if>
+            <if test="studentName != null  and studentName != ''  ">student_name = #{studentName},</if>
+            <if test="studentSex != null  ">student_sex = #{studentSex},</if>
+            <if test="nativePlace != null  and nativePlace != ''  ">native_place = #{nativePlace},</if>
+            <if test="idCardNo != null  and idCardNo != ''  ">id_card_no = #{idCardNo},</if>
+            <if test="education != null  ">education = #{education},</if>
+            <if test="phone != null  and phone != ''  ">phone = #{phone},</if>
+            <if test="mail != null  and mail != ''  ">mail = #{mail},</if>
+            <if test="address != null  and address != ''  ">address = #{address},</if>
+            <if test="classNo != null  ">class_no = #{classNo},</if>
+            <if test="extend1 != null  ">extend1 = #{extend1},</if>
+            <if test="extend2 != null  and extend2 != ''  ">extend2 = #{extend2},</if>
+            <if test="extend3 != null  ">extend3 = #{extend3},</if>
+            <if test="graduateInstitutions != null  and graduateInstitutions != ''  ">graduate_institutions = #{graduateInstitutions},</if>
+            <if test="workExperience != null  and workExperience != ''  ">work_experience = #{workExperience},</if>
+            <if test="base != null  ">base = #{base},</if>
+            <if test="englishLevel != null  ">english_level = #{englishLevel},</if>
+            <if test="degreeInNature != null  ">degree_in_nature = #{degreeInNature},</if>
+            <if test="graduateDate != null  and graduateDate != ''  ">graduate_date = #{graduateDate},</if>
+            <if test="major != null  and major != ''  ">major = #{major},</if>
+            <if test="upTime != null  and upTime != ''  ">up_time = #{upTime},</if>
+            <if test="emergencyContact != null  and emergencyContact != ''  ">emergency_contact = #{emergencyContact},</if>
+            <if test="emergencyContactPhone != null  and emergencyContactPhone != ''  ">emergency_contact_phone = #{emergencyContactPhone},</if>
+            <if test="jobCity != null  ">job_city = #{jobCity},</if>
+            <if test="textbookNo != null  and textbookNo != ''  ">textbook_no = #{textbookNo},</if>
+            <if test="trafficPermit != null  and trafficPermit != ''  ">traffic_permit = #{trafficPermit},</if>
+            <if test="postalCode != null  and postalCode != ''  ">postal_code = #{postalCode},</if>
+            <if test="studentNamePinyin != null  and studentNamePinyin != ''  ">student_name_pinyin = #{studentNamePinyin},</if>
+            <if test="extend4 != null  and extend4 != ''  ">extend4 = #{extend4},</if>
+            <if test="extend5 != null ">extend5 = #{extend5},</if>
+            <if test="modifyTime != null  and modifyTime != ''  ">modify_time = #{modifyTime},</if>
+            <if test="createUser != null  and createUser != ''  ">create_user = #{createUser},</if>
+            <if test="modifyUser != null  and modifyUser != ''  ">modify_user = #{modifyUser},</if>
+        </trim>
+        where student_id = #{studentId}
+    </update>
+
+	<delete id="deleteTeachFileCollectionById" parameterType="Integer">
+        delete from teach_file_collection where student_id = #{studentId}
+    </delete>
+	
+    <delete id="deleteTeachFileCollectionByIds" parameterType="String">
+        delete from teach_file_collection where student_id in 
+        <foreach item="studentId" collection="array" open="(" separator="," close=")">
+            #{studentId}
+        </foreach>
+    </delete>
+    
+</mapper>

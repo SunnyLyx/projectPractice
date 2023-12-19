@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachClassStatisticsMapper">
+    
+    <resultMap type="TeachClassStatistics" id="TeachClassStatisticsResult">
+        <result property="id"    column="id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="month"    column="month"    />
+        <result property="attendence"    column="attendence"    />
+        <result property="subjectPercentageComplete"    column="subject_percentage_complete"    />
+        <result property="jobPercentageComplete"    column="job_percentage_complete"    />
+        <result property="examAcceptability"    column="exam_acceptability"    />
+    </resultMap>
+	
+	<sql id="selectTeachClassStatisticsVo">
+        select id, class_id, createtime, month, attendence, subject_percentage_complete, job_percentage_complete, exam_acceptability from teach_class_statistics
+    </sql>
+	
+    <select id="selectTeachClassStatisticsList" parameterType="TeachClassStatistics" resultMap="TeachClassStatisticsResult">
+        select a.id, a.class_id, a.createtime, a.month, a.attendence, a.subject_percentage_complete, a.job_percentage_complete, a.exam_acceptability,tc.class_name
+        from teach_class_statistics a JOIN teach_classes tc ON tc.class_id = a.class_id
+        <where>  
+            <if test="id != null "> and a.id = #{id}</if>
+             <if test="classId != null "> and a.class_id = #{classId}</if>
+             <if test="createtime != null "> and a.createtime = #{createtime}</if>
+             <!--<if test="month != null "> and month = #{month}</if>-->
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND a.month &gt;= #{params.beginTime}
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND a.month &lt;= #{params.endTime}
+            </if>
+             <if test="attendence != null "> and a.attendence = #{attendence}</if>
+             <if test="subjectPercentageComplete != null "> and a.subject_percentage_complete = #{subjectPercentageComplete}</if>
+             <if test="jobPercentageComplete != null "> and a.job_percentage_complete = #{jobPercentageComplete}</if>
+             <if test="examAcceptability != null "> and a.exam_acceptability = #{examAcceptability}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachClassStatisticsById" parameterType="Integer" resultMap="TeachClassStatisticsResult">
+        <include refid="selectTeachClassStatisticsVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTeachClassStatistics" parameterType="TeachClassStatistics">
+        insert into teach_class_statistics
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="classId != null  ">class_id,</if>
+			<if test="createtime != null  ">createtime,</if>
+			<if test="month != null  ">month,</if>
+			<if test="attendence != null  ">attendence,</if>
+			<if test="subjectPercentageComplete != null  ">subject_percentage_complete,</if>
+			<if test="jobPercentageComplete != null  ">job_percentage_complete,</if>
+			<if test="examAcceptability != null  ">exam_acceptability,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="classId != null  ">#{classId},</if>
+			<if test="createtime != null  ">#{createtime},</if>
+			<if test="month != null  ">#{month},</if>
+			<if test="attendence != null  ">#{attendence},</if>
+			<if test="subjectPercentageComplete != null  ">#{subjectPercentageComplete},</if>
+			<if test="jobPercentageComplete != null  ">#{jobPercentageComplete},</if>
+			<if test="examAcceptability != null  ">#{examAcceptability},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachClassStatistics" parameterType="TeachClassStatistics">
+        update teach_class_statistics
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  ">class_id = #{classId},</if>
+            <if test="createtime != null  ">createtime = #{createtime},</if>
+            <if test="month != null  ">month = #{month},</if>
+            <if test="attendence != null  ">attendence = #{attendence},</if>
+            <if test="subjectPercentageComplete != null  ">subject_percentage_complete = #{subjectPercentageComplete},</if>
+            <if test="jobPercentageComplete != null  ">job_percentage_complete = #{jobPercentageComplete},</if>
+            <if test="examAcceptability != null  ">exam_acceptability = #{examAcceptability},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachClassStatisticsById" parameterType="Integer">
+        delete from teach_class_statistics where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachClassStatisticsByIds" parameterType="String">
+        delete from teach_class_statistics where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.MajorMapper">
+    
+    <resultMap type="Major" id="MajorResult">
+        <result property="majorId"    column="major_id"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="stageOne"    column="stage_one"    />
+        <result property="stageTwo"    column="stage_two"    />
+        <result property="stageThree"    column="stage_three"    />
+        <result property="stageFour"    column="stage_four"    />
+    </resultMap>
+	
+	<sql id="selectMajorVo">
+        select major_id, school_id, major_name, stage_one, stage_two, stage_three, stage_four from teach_major
+    </sql>
+	
+    <select id="selectMajorList" parameterType="Major" resultMap="MajorResult">
+        <include refid="selectMajorVo"/>
+        <where>  
+            <if test="majorId != null "> and major_id = #{majorId}</if>
+             <if test="schoolId != null "> and school_id = #{schoolId}</if>
+             <if test="majorName != null  and majorName != '' "> and major_name = #{majorName}</if>
+             <if test="stageOne != null  and stageOne != '' "> and stage_one = #{stageOne}</if>
+             <if test="stageTwo != null  and stageTwo != '' "> and stage_two = #{stageTwo}</if>
+             <if test="stageThree != null  and stageThree != '' "> and stage_three = #{stageThree}</if>
+             <if test="stageFour != null  and stageFour != '' "> and stage_four = #{stageFour}</if>
+         </where>
+    </select>
+    
+    <select id="selectMajorById" parameterType="Integer" resultMap="MajorResult">
+        <include refid="selectMajorVo"/>
+        where major_id = #{majorId}
+    </select>
+        
+    <insert id="insertMajor" parameterType="Major">
+        insert into teach_major
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="majorId != null  ">major_id,</if>
+			<if test="schoolId != null  ">school_id,</if>
+			<if test="majorName != null  and majorName != ''  ">major_name,</if>
+			<if test="stageOne != null  and stageOne != ''  ">stage_one,</if>
+			<if test="stageTwo != null  and stageTwo != ''  ">stage_two,</if>
+			<if test="stageThree != null  and stageThree != ''  ">stage_three,</if>
+			<if test="stageFour != null  and stageFour != ''  ">stage_four,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="majorId != null  ">#{majorId},</if>
+			<if test="schoolId != null  ">#{schoolId},</if>
+			<if test="majorName != null  and majorName != ''  ">#{majorName},</if>
+			<if test="stageOne != null  and stageOne != ''  ">#{stageOne},</if>
+			<if test="stageTwo != null  and stageTwo != ''  ">#{stageTwo},</if>
+			<if test="stageThree != null  and stageThree != ''  ">#{stageThree},</if>
+			<if test="stageFour != null  and stageFour != ''  ">#{stageFour},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateMajor" parameterType="Major">
+        update teach_major
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="schoolId != null  ">school_id = #{schoolId},</if>
+            <if test="majorName != null  and majorName != ''  ">major_name = #{majorName},</if>
+            <if test="stageOne != null  and stageOne != ''  ">stage_one = #{stageOne},</if>
+            <if test="stageTwo != null  and stageTwo != ''  ">stage_two = #{stageTwo},</if>
+            <if test="stageThree != null  and stageThree != ''  ">stage_three = #{stageThree},</if>
+            <if test="stageFour != null  and stageFour != ''  ">stage_four = #{stageFour},</if>
+        </trim>
+        where major_id = #{majorId}
+    </update>
+
+	<delete id="deleteMajorById" parameterType="Integer">
+        delete from teach_major where major_id = #{majorId}
+    </delete>
+	
+    <delete id="deleteMajorByIds" parameterType="String">
+        delete from teach_major where major_id in 
+        <foreach item="majorId" collection="array" open="(" separator="," close=")">
+            #{majorId}
+        </foreach>
+    </delete>
+    
+</mapper>

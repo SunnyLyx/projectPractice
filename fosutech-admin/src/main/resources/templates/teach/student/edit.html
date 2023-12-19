@@ -1,0 +1,449 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<script th:src="@{/ajax/libs/laydate/laydate.js}"></script>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-student-edit" th:object="${student}">
+        <input id="studentId" name="studentId" th:field="*{studentId}" type="hidden">
+        <input name="classId"  type="hidden" id="classId" th:field="*{classNo}"/>
+        <input name="sclass"  type="hidden" id="sclass" th:field="*{classes.className}"/>
+        <h3 style="color: red">必填字段(*)</h3>
+        <hr/>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">学生姓名：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="studentName" name="studentName" th:field="*{studentName}" class="form-control"
+                           type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+<!--        <div class="col-md-4">-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-5 control-label">任课老师：</label>-->
+<!--                <div class="col-sm-6 input-group">-->
+<!--                    <input id="studentNamePinyin" name="studentNamePinyin" th:field="*{studentNamePinyin}" class="form-control" type="text">-->
+<!--                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">班级名称：</label>
+                <div class="col-sm-6 input-group">
+                    <input class="form-control" type="text" name="classNo" readonly="readonly" id="className" th:field="*{classes.className}">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">进班时间：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="startTime" name="startTime" th:field="*{startTime}" class="form-control" type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">学生状态：</label>
+                <div class="col-sm-6 input-group">
+                    <!--<select id="status" name="status" class="form-control m-b" th:with="type=${@dict.getType('teach_status')}">-->
+                        <!--<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{status}"></option>-->
+                    <!--</select>-->
+                    <!--<span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>-->
+                    <input id="status" name="status" th:value="${student.params.state}" readonly="readonly" class="form-control" type="text">
+                </div>
+            </div>
+        </div>
+<!--        <div class="col-md-4">-->
+<!--            <div class="form-group">-->
+<!--                <label class="col-sm-5 control-label">学生项目地址：</label>-->
+<!--                <div class="col-sm-6 input-group">-->
+<!--                    <input id="postname" name="postname" th:field="*{postname}" class="form-control" type="text">-->
+<!--                    &lt;!&ndash;<span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>&ndash;&gt;-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">身份证号：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="idCardNo" name="idCardNo" th:field="*{idCardNo}" class="form-control" type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">电话：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="phone" name="phone" th:field="*{phone}" class="form-control" type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">邮箱：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="mail" name="mail" th:field="*{mail}" class="form-control" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">学历：</label>
+                <div class="col-sm-6 input-group">
+                    <select id="education" class="form-control m-b" th:with="type=${@dict.getType('teach_education')}">
+                        <option value="">请选择</option>
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{education}"></option>
+                    </select>
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">毕业/在读学校：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="graduateInstitutions" name="graduateInstitutions" th:field="*{graduateInstitutions}"
+                           class="form-control" type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">专业/年级：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="major" name="major" th:field="*{major}" class="form-control" type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">学历性质：</label>
+                <div class="col-sm-6 input-group">
+                    <select id="degreeInNature" name="degreeInNature" class="form-control m-b" th:with="type=${@dict.getType('teach_nature')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{degreeInNature}"></option>
+                    </select>
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">通讯地址：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="address" name="address" th:field="*{address}" class="form-control" type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">预计结束时间：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="graduateDate" name="graduateDate" th:field="*{graduateDate}" class="form-control"
+                           type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">学生性别：</label>
+                <div class="col-sm-6 input-group">
+                    <select id="studentSex" name="studentSex" class="form-control m-b" th:with="type=${@dict.getType('sys_user_sex')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{studentSex}"></option>
+                    </select>
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <br/>
+        <hr />
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">就业城市：</label>
+                <div class="col-sm-6 input-group">
+                    <!--<input id="jobCity" name="jobCity" class="form-control" type="text">-->
+                    <select id="jobCity" class="form-control m-b" th:with="type=${@dict.getType('teach_job_city')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{jobCity}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">缴费金额：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="workExperience" name="workExperience" th:field="*{workExperience}" class="form-control"
+                           type="text">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">学生来源：</label>
+                <div class="col-sm-6 input-group">
+                    <select id="extend1" class="form-control m-b" th:with="type=${@dict.getType('teach_student_source')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{extend1}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">是否有基础：</label>
+                <div class="col-sm-6 input-group">
+                    <select id="base" name="base" class="form-control m-b" th:with="type=${@dict.getType('teach_basic')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{base}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">英语水平：</label>
+                <div class="col-sm-6 input-group">
+                    <select id="englishLevel" class="form-control m-b" th:with="type=${@dict.getType('teach_english_level')}">
+                        <option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{englishLevel}"></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">籍贯：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="nativePlace" name="nativePlace" th:field="*{nativePlace}" class="form-control"
+                           type="text">
+                    <span class="input-group-addon" style="color: red;background-color: #EEEEEE">*</span>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">与紧急联系人关系：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="emergencyContact" name="emergencyContact" th:field="*{emergencyContact}" class="form-control" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">紧急联系人电话：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="emergencyContactPhone" name="emergencyContactPhone" th:field="*{emergencyContactPhone}" class="form-control" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">备注：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="extend2" name="extend2" th:field="*{extend2}" class="form-control" type="text">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label class="col-sm-5 control-label">创建时间：</label>
+                <div class="col-sm-6 input-group">
+                    <input id="extend3" name="extend3" th:field="*{extend3}" class="form-control" type="text" readonly="readonly">
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<!--<script th:src="@{/ajax/libs/select/select2.js}"></script>-->
+<script type="text/javascript">
+    var prefix = ctx + "teach/student";
+
+    $("#form-student-edit").validate({
+        rules: {
+            studentName: {
+                required: true
+            },
+            startTime:{
+                required: true
+            },
+            idCardNo:{
+                required: true
+            },
+            phone:{
+                required: true
+            },
+            graduateInstitutions:{
+                required: true
+            },
+            major:{
+                required: true
+            },
+            address:{
+                required: true
+            },
+            nativePlace: {
+                required: true
+            },
+            graduateDate:{
+                required: true
+            },
+        },
+    });
+
+    /*学生管理-新增-选择班级*/
+    function selectList() {
+        var url = ctx + "teach/teachClasses/selectList";
+        var options = {
+            title: '选择班级',
+            width: "800",
+            url: url,
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero){
+        var body = layer.getChildFrame('body', index);
+        var data = body.find('.selected')[0];
+        if(data != "undefined" && data != "" && data != null){
+            $("#className").val(body.find('.selected')[0].children[2].innerHTML);
+            $("#classId").val(body.find('.selected')[0].children[1].innerHTML);
+            // console.log($("#classId").val());
+        }else{
+            layer.msg("请选择一个班级");
+        }
+        layer.close(index);
+    }
+
+    //时间选择器
+    $(function(){
+        laydate.render({
+            elem: '#startTime',trigger: 'click'
+        });
+        laydate.render({
+            elem: '#graduateDate',trigger: 'click'
+        });
+    });
+
+    function submitHandler() {
+        if ($.validate.form()) {
+            // $.operate.save(prefix + "/edit", $('#form-student-edit').serialize());
+            edit();
+        }
+    }
+
+    function edit() {
+        var studentId = $("input[name='studentId']").val();  //学生id
+        var classId = $("input[name='classId']").val(); //班级编号
+        var kgcNo = $("input[name='kgcNo']").val();  //课工场编号
+        var kgcUid = $("input[name='kgcUid']").val();  //课工场UID
+        var kgcNickname = $("input[name='kgcNickname']").val();  //课工场名称
+        var status = $("#status option:selected").val();  //状态
+        var startTime = $("#startTime").val();  //进班时间
+        var postname = $("input[name='postname']").val();  //学生项目地址
+        var studentName = $("input[name='studentName']").val();  //学生姓名
+        var studentSex = $("#studentSex option:selected").val();  //学生性别
+        var nativePlace = $("input[name='nativePlace']").val();  //籍贯
+        var idCardNo = $("input[name='idCardNo']").val();  //身份证号
+        var education = $("#education option:selected").val();  //学历
+        var phone = $("input[name='phone']").val();  //电话
+        var mail = $("input[name='mail']").val();  //邮箱
+        var address = $("input[name='address']").val();  //地址
+        /*var studentFatherName = $("input[name='studentFatherName']").val();
+        var studentFatherPhone = $("input[name='studentFatherPhone']").val();
+        var studentFatherUnit = $("input[name='studentFatherUnit']").val();
+        var studentMotherName = $("input[name='studentMotherName']").val();
+        var studentMotherPhone = $("input[name='studentMotherPhone']").val();
+        var studentMotherUnit = $("input[name='studentMotherUnit']").val();
+        var studentAnotherName = $("input[name='studentAnotherName']").val();
+        var singleParent = $("#singleParent option:selected").val();*/
+        var graduateInstitutions = $("input[name='graduateInstitutions']").val();  //毕业院校
+        var workExperience = $("input[name='workExperience']").val();  //学前工作经历
+        var base = $("#base option:selected").val();  //是否有基础
+        var englishLevel = $("#englishLevel option:selected").val();  //英语水平
+        var degreeInNature = $("#degreeInNature option:selected").val();  //学历性质
+        var graduateDate = $("#graduateDate").val();  //毕业时间
+        var major = $("input[name='major']").val();  //学前专业
+        var extend1 = $("#extend1 option:selected").val();  //学生来源
+        var extend2 = $("input[name='extend2']").val();  //备注
+        var emergencyContact = $("#emergencyContact").val();  //与紧急联系人关系
+        var emergencyContactPhone = $("#emergencyContactPhone").val();  //紧急联系人电话
+        var postalCode = $("input[name='postalCode']").val();  //邮政编码
+        var studentNamePinyin = $("input[name='studentNamePinyin']").val();  //学生姓名拼音
+        var trafficPermit = $("input[name='trafficPermit']").val();  //通行证
+        var textbookNo = $("input[name='textbookNo']").val();  //教材编号
+        var jobCity = $("#jobCity option:selected").val();   //就业意向城市
+        var extend3 = $("input[name='extend3']").val();  //创建时间
+
+        var className = $("#className").val();
+        var sclass = $("#sclass").val();
+        if(className != sclass){
+            status = 3; //转班的状态编号
+        }
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : prefix + "/edit",
+            data : {
+                "studentId": studentId,
+                "classNo": classId,
+                "oldClass":sclass,
+                "className":className,
+                "kgcNo": kgcNo,
+                "kgcUid": kgcUid,
+                "kgcNickname": kgcNickname,
+                "status": status,
+                "startTime": startTime,
+                "postname": postname,
+                "studentName": studentName,
+                "studentSex": studentSex,
+                "nativePlace": nativePlace,
+                "idCardNo": idCardNo,
+                "education": education,
+                "phone": phone,
+                "mail": mail,
+                "address": address,
+                "graduateInstitutions": graduateInstitutions,
+                "workExperience": workExperience,
+                "base": base,
+                "englishLevel": englishLevel,
+                "degreeInNature": degreeInNature,
+                "graduateDate": graduateDate,
+                "major": major,
+                "extend1":extend1,
+                "extend2":extend2,
+                "extend3":extend3,
+                "emergencyContact":emergencyContact,
+                "emergencyContactPhone":emergencyContactPhone,
+                "postalCode":postalCode,
+                "studentNamePinyin":studentNamePinyin,
+                "trafficPermit":trafficPermit,
+                "textbookNo":textbookNo,
+                "jobCity":jobCity
+            },
+            async : false,
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                // console.log(data);
+                $.operate.successCallback(data);
+            }
+        });
+    }
+
+
+</script>
+</body>
+</html>

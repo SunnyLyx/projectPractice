@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.StudentMapper">
+    
+    <resultMap type="Student" id="StudentResult">
+        <result property="studentId"    column="student_id"    />
+        <result property="kgcNo"    column="kgc_no"    />
+        <result property="kgcUid"    column="kgc_uid"    />
+        <result property="kgcNickname"    column="kgc_nickname"    />
+        <result property="status"    column="status"    />
+        <result property="startTime"    column="start_time"    />
+        <result property="postname"    column="postname"    />
+        <result property="studentName"    column="student_name"    />
+        <result property="studentSex"    column="student_sex"    />
+        <result property="ethnic"    column="ethnic"    />
+        <result property="nativePlace"    column="native_place"    />
+        <result property="idCardNo"    column="id_card_no"    />
+        <result property="birthday"    column="birthday"    />
+        <result property="education"    column="education"    />
+        <result property="politicsStatus"    column="politics_status"    />
+        <result property="phone"    column="phone"    />
+        <result property="mail"    column="mail"    />
+        <result property="qq"    column="qq"    />
+        <result property="city"    column="city"    />
+        <result property="address"    column="address"    />
+        <result property="classNo"    column="class_no"    />
+        <result property="dormitory"    column="dormitory"    />
+        <result property="studentFatherName"    column="student_father_name"    />
+        <result property="studentFatherPhone"    column="student_father_phone"    />
+        <result property="studentFatherUnit"    column="student_father_unit"    />
+        <result property="studentMotherName"    column="student_mother_name"    />
+        <result property="studentMotherPhone"    column="student_mother_phone"    />
+        <result property="studentMotherUnit"    column="student_mother_unit"    />
+        <result property="studentAnotherName"    column="student_another_name"    />
+        <result property="singleParent"    column="single_parent"    />
+        <result property="extend1"    column="extend1"    />
+        <result property="extend2"    column="extend2"    />
+        <result property="extend3"    column="extend3"    />
+        <result property="graduateInstitutions"    column="graduate_institutions"    />
+        <result property="workExperience"    column="work_experience"    />
+        <result property="base"    column="base"    />
+        <result property="englishLevel"    column="english_level"    />
+        <result property="degreeInNature"    column="degree_in_nature"    />
+        <result property="graduateDate"    column="graduate_date"    />
+        <result property="major"    column="major"    />
+        <result property="schoolId" column="school_id"/>
+        <result property="upTime"    column="up_time"  />
+        <result property="emergencyContact"  column="emergency_contact" />
+        <result property="emergencyContactPhone"  column="emergency_contact_phone" />
+        <result property="jobCity"  column="job_city"  />
+        <result property="textbookNo"   column="textbook_no"  />
+        <result property="trafficPermit"  column="traffic_permit"  />
+        <result property="postalCode"   column="postal_code"  />
+        <result property="studentNamePinyin"   column="student_name_pinyin" />
+        <result property="majorType"     column="major_type"  />
+        <association property="classes"  column="class_id" javaType="TeachClasses" resultMap="TeachClassesResult" />
+        <association property="sysDept"  column="dept_id" javaType="SysDept" resultMap="SysDeptResult" />
+        <association property="majors"  column="major_id" javaType="TeachMajor" resultMap="TeachMajorResult" />
+        <association property="majorStage"  column="id" javaType="TeachMajorStage" resultMap="TeachMajorStageResult" />
+    </resultMap>
+
+    <resultMap type="TeachClasses" id="TeachClassesResult">
+        <result property="classId"    column="class_id"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageNew"    column="stage_new"    />
+        <result property="stageStarttime"    column="stage_starttime"    />
+        <result property="stageEndtime"    column="stage_endtime"    />
+        <result property="createtime"    column="createtime"    />
+    </resultMap>
+
+    <resultMap type="SysDept" id="SysDeptResult">
+        <id     property="deptId"     column="dept_id"     />
+        <result property="parentId"   column="parent_id"   />
+        <result property="ancestors"  column="ancestors"   />
+        <result property="deptName"   column="dept_name"   />
+        <result property="orderNum"   column="order_num"   />
+        <result property="leader"     column="leader"      />
+        <result property="phone"      column="phone"       />
+        <result property="email"      column="email"       />
+        <result property="status"     column="status"      />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="parentName" column="parent_name" />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+
+    <resultMap type="TeachMajor" id="TeachMajorResult">
+        <result property="majorId"    column="major_id"    />
+        <result property="majorName"    column="major_name"    />
+    </resultMap>
+
+    <resultMap type="TeachMajorStage" id="TeachMajorStageResult">
+        <result property="id"    column="id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="stageName"    column="stage_name"    />
+        <result property="sort"    column="sort"    />
+    </resultMap>
+
+	<sql id="selectStudentVo">
+        select student_id, kgc_no, kgc_uid, kgc_nickname, status, start_time, postname, student_name, student_sex, ethnic, native_place, id_card_no, birthday, education, politics_status, phone, mail, qq, city, address, class_no, dormitory, student_father_name, student_father_phone, student_father_unit, student_mother_name, student_mother_phone, student_mother_unit, student_another_name, single_parent, extend1, extend2, extend3, graduate_institutions, work_experience, base, english_level, degree_in_nature, graduate_date, major,
+        upTime, emergency_contact, emergencyContactPhone, job_city, textbook_no, traffic_permit, postal_code, student_name_pinyin from teach_student
+    </sql>
+
+    <!--根据条件查询学生信息-->
+    <select id="selectStudentList" parameterType="Student" resultMap="StudentResult">
+        select stu.*,c.class_name,m.major_name,d.dept_name,c.school_id from teach_student stu
+        left join teach_classes c on stu.class_no = c.class_id
+        left join teach_major m on m.major_id = c.major_id
+        left join sys_dept d on d.dept_id = c.school_id
+        <where>
+            <if test="schoolId != null  and schoolId != '' ">c.school_id = #{schoolId}</if>
+            <if test="studentName != null  and studentName != '' "> and stu.student_name like concat('%',#{studentName},'%')</if>
+            <if test="className != null  and className != '' "> and c.class_name like concat('%',#{className},'%')</if>
+            <if test="classNo != null  and classNo != '' "> and stu.class_no = #{classNo}</if>
+            <if test="status != null "> and stu.status = #{status}</if>
+            <if test="majorType != null "> and m.major_type = #{majorType}</if>
+            <if test="teacherClass != null and teacherClass != ''"> and stu.class_no in
+                <foreach item="teacherClass" collection="teacherClass" open="(" separator="," close=")">
+                    #{teacherClass}
+                </foreach>
+            </if>
+        </where>
+        order by extend3 desc
+    </select>
+
+    <select id="selectclassStudents" parameterType="Student" resultMap="StudentResult">
+        select student_id,student_name,postname FROM teach_student WHERE class_no = #{classNo} and status in (1,3) order by extend3 desc
+    </select>
+
+    <select id="classOtherStudents" parameterType="Student" resultMap="StudentResult">
+        select student_id,student_name FROM teach_student WHERE class_no = #{classNo} and status not in (1,3) order by extend3 desc
+    </select>
+
+    <select id="classOtherStudent" parameterType="Student" resultMap="StudentResult">
+        select student_id,student_name FROM teach_student WHERE class_no = #{classNo} and status not in (1,3,7,9) order by extend3 desc
+    </select>
+
+    <!--根据树形菜单（分部）查询学生信息-->
+    <select id="selectStudentListById" parameterType="Student" resultMap="StudentResult">
+        select stu.*,c.class_name,m.major_name,d.dept_name,c.school_id from teach_student stu
+        left join teach_classes c on stu.class_no = c.class_id
+        left join teach_major m on m.major_id = c.major_id
+        left join sys_dept d on d.dept_id = c.school_id
+        <where>
+            c.school_id = #{schoolId}
+            <if test="teacherClass != null and teacherClass != ''"> and stu.class_no in
+                <foreach item="teacherClass" collection="teacherClass" open="(" separator="," close=")">
+                    #{teacherClass}
+                </foreach>
+            </if>
+        </where>
+        order by extend3 desc
+    </select>
+
+    <select id="selectStudentsById" parameterType="Integer" resultMap="StudentResult">
+        select stu.*,c.class_name,m.major_name,d.dept_name,c.school_id from teach_student stu
+        left join teach_classes c on stu.class_no = c.class_id
+        left join teach_major m on m.major_id = c.major_id
+        left join sys_dept d on d.dept_id = c.school_id
+        <where>
+            stu.student_id = #{studentId}
+        </where>
+        order by extend3 desc
+    </select>
+
+    <select id="selectStudentByIdsAndStudent" parameterType="String" resultMap="StudentResult">
+        select stu.*,c.class_name,m.major_name,d.dept_name,c.school_id from teach_student stu
+        left join teach_classes c on stu.class_no = c.class_id
+        left join teach_major m on m.major_id = c.major_id
+        left join sys_dept d on d.dept_id = c.school_id
+        <where>
+            and stu.student_id in
+            <foreach item="studentId" collection="array" open="(" separator="," close=")">
+                #{studentId}
+            </foreach>
+        </where>
+        order by extend3 desc
+    </select>
+
+    <select id="selectStudentByIdsAndStudentAndType" parameterType="Student" resultMap="StudentResult">
+        select stu.*,c.class_name,m.major_name,d.dept_name,c.school_id from teach_student stu
+        left join teach_classes c on stu.class_no = c.class_id
+        left join teach_major m on m.major_id = c.major_id
+        left join sys_dept d on d.dept_id = c.school_id
+        <where>
+            <if test="majorType != null "> and m.major_type = #{majorType}</if>
+            <if test="studentIds != null and studentIds != ''">
+                and stu.student_id in
+                <foreach item="studentIds" collection="studentIds" open="(" separator="," close=")">
+                    #{studentIds}
+                </foreach>
+            </if>
+        </where>
+        order by extend3 desc
+    </select>
+    
+    <select id="selectStudentById" parameterType="Integer" resultMap="StudentResult">
+        <!--<include refid="selectStudentVo"/>-->
+        select stu.*,c.class_name,m.major_name from teach_student stu
+        left join teach_classes c on stu.class_no = c.class_id
+        left join teach_major m on c.major_id = m.major_id
+        where student_id = #{studentId}
+    </select>
+
+    <select id="selectStudentByClassId" parameterType="Integer" resultType="Map">
+        select stu.student_id,stu.student_name,stu.phone,stu.education from teach_student stu
+        where stu.status in (1,3,7,9) and stu.class_no = #{classNo}
+    </select>
+
+    <select id="checkKgcUnique" parameterType="String" resultType="Map">
+        select student_id, kgc_uid from teach_student where kgc_uid=#{kgcUid}
+    </select>
+
+    <select id="selectMajorByKgcUid" resultType="String">
+        select m.major_name from teach_classes c
+        left join teach_major m on c.major_id = m.major_id
+        where c.class_id in (select class_no from teach_student
+        where kgc_uid = #{kgcUid})
+    </select>
+
+    <select id="selectMajorByClassId" resultType="String">
+        select m.major_name from teach_classes c
+        left join teach_major m on c.major_id = m.major_id
+        where c.class_id = #{classNo}
+    </select>
+
+    <select id="selectStudentCount" parameterType="Integer" resultType="String">
+        select count(1) sum from teach_student stu
+        WHERE stu.class_no = #{classId}
+    </select>
+
+    <select id="selectStudentByKgcUid" parameterType="String" resultMap="StudentResult">
+        <include refid="selectStudentVo"/>
+        where kgc_uid = #{kgcUid}
+    </select>
+        
+    <insert id="insertStudent" parameterType="Student">
+        insert into teach_student
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="studentId != null  ">student_id,</if>
+			<if test="kgcNo != null  and kgcNo != ''  ">kgc_no,</if>
+			<if test="kgcUid != null  and kgcUid != ''  ">kgc_uid,</if>
+			<if test="kgcNickname != null  and kgcNickname != ''  ">kgc_nickname,</if>
+			<if test="status != null  ">status,</if>
+			<if test="startTime != null  ">start_time,</if>
+			<if test="postname != null  ">postname,</if>
+			<if test="studentName != null  and studentName != ''  ">student_name,</if>
+			<if test="studentSex != null  ">student_sex,</if>
+			<if test="ethnic != null  ">ethnic,</if>
+			<if test="nativePlace != null  and nativePlace != ''  ">native_place,</if>
+			<if test="idCardNo != null  and idCardNo != ''  ">id_card_no,</if>
+			<if test="birthday != null  ">birthday,</if>
+			<if test="education != null  ">education,</if>
+			<if test="politicsStatus != null  ">politics_status,</if>
+			<if test="phone != null  and phone != ''  ">phone,</if>
+			<if test="mail != null  and mail != ''  ">mail,</if>
+			<if test="qq != null  and qq != ''  ">qq,</if>
+			<if test="city != null  ">city,</if>
+			<if test="address != null  and address != ''  ">address,</if>
+			<if test="classNo != null  ">class_no,</if>
+			<if test="dormitory != null  and dormitory != ''  ">dormitory,</if>
+			<if test="studentFatherName != null  and studentFatherName != ''  ">student_father_name,</if>
+			<if test="studentFatherPhone != null  and studentFatherPhone != ''  ">student_father_phone,</if>
+			<if test="studentFatherUnit != null  and studentFatherUnit != ''  ">student_father_unit,</if>
+			<if test="studentMotherName != null  and studentMotherName != ''  ">student_mother_name,</if>
+			<if test="studentMotherPhone != null  and studentMotherPhone != ''  ">student_mother_phone,</if>
+			<if test="studentMotherUnit != null  and studentMotherUnit != ''  ">student_mother_unit,</if>
+			<if test="studentAnotherName != null  and studentAnotherName != ''  ">student_another_name,</if>
+			<if test="singleParent != null  ">single_parent,</if>
+			<if test="extend1 != null  and extend1 != ''  ">extend1,</if>
+			<if test="extend2 != null  and extend2 != ''  ">extend2,</if>
+			<if test="extend3 != null  and extend3 != ''  ">extend3,</if>
+			<if test="graduateInstitutions != null  and graduateInstitutions != ''  ">graduate_institutions,</if>
+			<if test="workExperience != null  and workExperience != ''  ">work_experience,</if>
+			<if test="base != null  ">base,</if>
+			<if test="englishLevel != null  and englishLevel != ''  ">english_level,</if>
+			<if test="degreeInNature != null  ">degree_in_nature,</if>
+			<if test="graduateDate != null  ">graduate_date,</if>
+			<if test="major != null  and major != ''  ">major,</if>
+            <if test="upTime != null  and upTime != ''  ">up_time,</if>
+            <if test="emergencyContact != null and emergencyContact != '' ">emergency_contact,</if>
+            <if test="emergencyContactPhone != null and emergencyContactPhone != '' ">emergency_contact_phone,</if>
+            <if test="jobCity != null ">job_city,</if>
+            <if test="textbookNo != null and textbookNo != '' ">textbook_no,</if>
+            <if test="trafficPermit != null and trafficPermit != '' ">traffic_permit,</if>
+            <if test="postalCode != null and postalCode != '' ">postal_code,</if>
+            <if test="studentNamePinyin != null and studentNamePinyin != '' ">student_name_pinyin,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="studentId != null  ">#{studentId},</if>
+			<if test="kgcNo != null  and kgcNo != ''  ">#{kgcNo},</if>
+			<if test="kgcUid != null  and kgcUid != ''  ">#{kgcUid},</if>
+			<if test="kgcNickname != null  and kgcNickname != ''  ">#{kgcNickname},</if>
+			<if test="status != null  ">#{status},</if>
+			<if test="startTime != null  ">#{startTime},</if>
+			<if test="postname != null  ">#{postname},</if>
+			<if test="studentName != null  and studentName != ''  ">#{studentName},</if>
+			<if test="studentSex != null  ">#{studentSex},</if>
+			<if test="ethnic != null  ">#{ethnic},</if>
+			<if test="nativePlace != null  and nativePlace != ''  ">#{nativePlace},</if>
+			<if test="idCardNo != null  and idCardNo != ''  ">#{idCardNo},</if>
+			<if test="birthday != null  ">#{birthday},</if>
+			<if test="education != null  ">#{education},</if>
+			<if test="politicsStatus != null  ">#{politicsStatus},</if>
+			<if test="phone != null  and phone != ''  ">#{phone},</if>
+			<if test="mail != null  and mail != ''  ">#{mail},</if>
+			<if test="qq != null  and qq != ''  ">#{qq},</if>
+			<if test="city != null  ">#{city},</if>
+			<if test="address != null  and address != ''  ">#{address},</if>
+			<if test="classNo != null  ">#{classNo},</if>
+			<if test="dormitory != null  and dormitory != ''  ">#{dormitory},</if>
+			<if test="studentFatherName != null  and studentFatherName != ''  ">#{studentFatherName},</if>
+			<if test="studentFatherPhone != null  and studentFatherPhone != ''  ">#{studentFatherPhone},</if>
+			<if test="studentFatherUnit != null  and studentFatherUnit != ''  ">#{studentFatherUnit},</if>
+			<if test="studentMotherName != null  and studentMotherName != ''  ">#{studentMotherName},</if>
+			<if test="studentMotherPhone != null  and studentMotherPhone != ''  ">#{studentMotherPhone},</if>
+			<if test="studentMotherUnit != null  and studentMotherUnit != ''  ">#{studentMotherUnit},</if>
+			<if test="studentAnotherName != null  and studentAnotherName != ''  ">#{studentAnotherName},</if>
+			<if test="singleParent != null  ">#{singleParent},</if>
+			<if test="extend1 != null  and extend1 != ''  ">#{extend1},</if>
+			<if test="extend2 != null  and extend2 != ''  ">#{extend2},</if>
+			<if test="extend3 != null  and extend3 != ''  ">#{extend3},</if>
+			<if test="graduateInstitutions != null  and graduateInstitutions != ''  ">#{graduateInstitutions},</if>
+			<if test="workExperience != null  and workExperience != ''  ">#{workExperience},</if>
+			<if test="base != null  ">#{base},</if>
+			<if test="englishLevel != null  and englishLevel != ''  ">#{englishLevel},</if>
+			<if test="degreeInNature != null  ">#{degreeInNature},</if>
+			<if test="graduateDate != null  ">#{graduateDate},</if>
+			<if test="major != null  and major != ''  ">#{major},</if>
+            <if test="upTime != null  and upTime != ''  ">#{upTime},</if>
+            <if test="emergencyContact != null and emergencyContact != '' ">#{emergencyContact},</if>
+            <if test="emergencyContactPhone != null and emergencyContactPhone != '' ">#{emergencyContactPhone},</if>
+            <if test="jobCity != null ">#{jobCity},</if>
+            <if test="textbookNo != null and textbookNo != '' ">#{textbookNo},</if>
+            <if test="trafficPermit != null and trafficPermit != '' ">#{trafficPermit},</if>
+            <if test="postalCode != null and postalCode != '' ">#{postalCode},</if>
+            <if test="studentNamePinyin != null and studentNamePinyin != '' ">#{studentNamePinyin},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateStudent" parameterType="Student">
+        update teach_student
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="kgcNo != null  and kgcNo != ''  ">kgc_no = #{kgcNo},</if>
+            <if test="kgcUid != null  and kgcUid != ''  ">kgc_uid = #{kgcUid},</if>
+            <if test="kgcNickname != null  and kgcNickname != ''  ">kgc_nickname = #{kgcNickname},</if>
+            <if test="status != null  ">status = #{status},</if>
+            <if test="startTime != null  ">start_time = #{startTime},</if>
+            <if test="postname != null  ">postname = #{postname},</if>
+            <if test="studentName != null  and studentName != ''  ">student_name = #{studentName},</if>
+            <if test="studentSex != null  ">student_sex = #{studentSex},</if>
+            <if test="ethnic != null  ">ethnic = #{ethnic},</if>
+            <if test="nativePlace != null  and nativePlace != ''  ">native_place = #{nativePlace},</if>
+            <if test="idCardNo != null  and idCardNo != ''  ">id_card_no = #{idCardNo},</if>
+            <if test="birthday != null  ">birthday = #{birthday},</if>
+            <if test="education != null  ">education = #{education},</if>
+            <if test="politicsStatus != null  ">politics_status = #{politicsStatus},</if>
+            <if test="phone != null  and phone != ''  ">phone = #{phone},</if>
+            <if test="mail != null  and mail != ''  ">mail = #{mail},</if>
+            <if test="qq != null  and qq != ''  ">qq = #{qq},</if>
+            <if test="city != null  ">city = #{city},</if>
+            <if test="address != null  and address != ''  ">address = #{address},</if>
+            <if test="classNo != null  and classNo != ''  ">class_no = #{classNo},</if>
+            <if test="dormitory != null  and dormitory != ''  ">dormitory = #{dormitory},</if>
+            <if test="studentFatherName != null  and studentFatherName != ''  ">student_father_name = #{studentFatherName},</if>
+            <if test="studentFatherPhone != null  and studentFatherPhone != ''  ">student_father_phone = #{studentFatherPhone},</if>
+            <if test="studentFatherUnit != null  and studentFatherUnit != ''  ">student_father_unit = #{studentFatherUnit},</if>
+            <if test="studentMotherName != null  and studentMotherName != ''  ">student_mother_name = #{studentMotherName},</if>
+            <if test="studentMotherPhone != null  and studentMotherPhone != ''  ">student_mother_phone = #{studentMotherPhone},</if>
+            <if test="studentMotherUnit != null  and studentMotherUnit != ''  ">student_mother_unit = #{studentMotherUnit},</if>
+            <if test="studentAnotherName != null  and studentAnotherName != ''  ">student_another_name = #{studentAnotherName},</if>
+            <if test="singleParent != null  ">single_parent = #{singleParent},</if>
+            <if test="extend1 != null  and extend1 != ''  ">extend1 = #{extend1},</if>
+            <if test="extend2 != null  and extend2 != ''  ">extend2 = #{extend2},</if>
+            <if test="extend3 != null  and extend3 != ''  ">extend3 = #{extend3},</if>
+            <if test="graduateInstitutions != null  and graduateInstitutions != ''  ">graduate_institutions = #{graduateInstitutions},</if>
+            <if test="workExperience != null  and workExperience != ''  ">work_experience = #{workExperience},</if>
+            <if test="base != null  ">base = #{base},</if>
+            <if test="englishLevel != null  and englishLevel != ''  ">english_level = #{englishLevel},</if>
+            <if test="degreeInNature != null  ">degree_in_nature = #{degreeInNature},</if>
+            <if test="graduateDate != null  ">graduate_date = #{graduateDate},</if>
+            <if test="major != null  and major != ''  ">major = #{major},</if>
+            <if test="upTime != null  and upTime != ''  ">up_time = #{upTime},</if>
+            <if test="emergencyContact != null and emergencyContact != '' ">emergency_contact = #{emergencyContact},</if>
+            <if test="emergencyContactPhone != null and emergencyContactPhone != '' ">emergency_contact_phone = #{emergencyContactPhone},</if>
+            <if test="jobCity != null ">job_city = #{jobCity},</if>
+            <if test="textbookNo != null and textbookNo != '' ">textbook_no = #{textbookNo},</if>
+            <if test="trafficPermit != null and trafficPermit != '' ">traffic_permit = #{trafficPermit},</if>
+            <if test="postalCode != null and postalCode != '' ">postal_code = #{postalCode},</if>
+            <if test="studentNamePinyin != null and studentNamePinyin != '' ">student_name_pinyin = #{studentNamePinyin},</if>
+        </trim>
+        where student_id = #{studentId}
+    </update>
+
+	<delete id="deleteStudentById" parameterType="Integer">
+        delete from teach_student where student_id = #{studentId}
+    </delete>
+	
+    <delete id="deleteStudentByIds" parameterType="String">
+        delete from teach_student where student_id in 
+        <foreach item="studentId" collection="array" open="(" separator="," close=")">
+            #{studentId}
+        </foreach>
+    </delete>
+
+    <select id="selectClassStudents" resultType="int">
+        SELECT COUNT(0) FROM teach_student WHERE class_no = #{id}
+    </select>
+
+    <select id="selecttongji" resultType="Map">
+        SELECT sum(CASE WHEN `status` IN ('1','3') THEN 1 ELSE 0 END) zaidu,
+          sum(CASE WHEN `status`=4 THEN 1 ELSE 0 END) tuixue,
+          sum(CASE WHEN `status`=5 THEN 1 ELSE 0 END) xiuxue,
+          sum(CASE WHEN `status`=6 THEN 1 ELSE 0 END) xianshang,
+          sum(CASE WHEN `status`=7 THEN 1 ELSE 0 END) tiqianjiuye,
+          sum(CASE WHEN `status`=8 THEN 1 ELSE 0 END) lixiao,
+          sum(CASE WHEN `status`=9 THEN 1 ELSE 0 END) jieke
+          FROM teach_student WHERE class_no = #{classId}
+    </select>
+    
+</mapper>

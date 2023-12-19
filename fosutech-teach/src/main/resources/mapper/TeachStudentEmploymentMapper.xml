@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachStudentEmploymentMapper">
+    
+    <resultMap type="TeachStudentEmployment" id="TeachStudentEmploymentResult">
+        <result property="id"    column="id"    />
+        <result property="studentId"    column="student_id"    />
+        <result property="edittime"    column="edittime"    />
+        <result property="employmentWay"    column="employment_way"    />
+        <result property="hiredate"    column="hiredate"    />
+        <result property="urbanEmployment"    column="urban_employment"    />
+        <result property="einheit"    column="einheit"    />
+        <result property="industry"    column="industry"    />
+        <result property="probationSalary"    column="probation_salary"    />
+        <result property="obtainmentSalary"    column="obtainment_salary"    />
+        <result property="obligate"    column="obligate"    />
+        <result property="teacherEmployment"    column="teacher_employment"    />
+        <result property="employmentNote"    column="employment_note"    />
+        <result property="employmentIsTrue"    column="employment_isTrue"    />
+        <result property="visitTeacher"    column="visit_teacher"    />
+        <result property="visitTime"    column="visit_time"    />
+       <!-- <association property="student"  column="student_id" javaType="Student" resultMap="StudentResult" />-->
+        <result property="studentName"    column="student_name"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="className"    column="class_name"    />
+        <result property="employment"    column="employment"    />
+        <result property="visit"    column="visit"    />
+    </resultMap>
+
+	
+	<sql id="selectTeachStudentEmploymentVo">
+        select id, student_id, edittime, employment_way, hiredate, urban_employment, einheit, industry, probation_salary, obtainment_salary,
+        obligate,teacher_employment,employment_note,employment_isTrue,visit_teacher,visit_time from teach_student_employment
+    </sql>
+	
+    <select id="selectTeachStudentEmploymentList" parameterType="TeachStudentEmployment" resultMap="TeachStudentEmploymentResult">
+        select se.*,stu.student_name,m.major_name,c.class_name from teach_student_employment se
+        left join teach_student stu on se.student_id = stu.student_id
+        left join teach_classes c on c.class_id = stu.class_no
+        left join teach_major m on m.major_id = c.major_id
+        <where>
+            einheit != '' and obtainment_salary != '' and hiredate != '' and urban_employment != ''
+            <if test="id != null "> and id = #{id}</if>
+             <if test="studentId != null "> and student_id = #{studentId}</if>
+            <if test="studentName != null and studentName != '' "> and student_name like concat('%',#{studentName},'%')</if>
+             <if test="edittime != null "> and edittime = #{edittime}</if>
+             <if test="majorId != null  and majorId != '' "> and m.major_id = #{majorId}</if>
+            <!-- <if test="hiredate != null "> and hiredate = #{hiredate}</if> -->
+           <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(hiredate,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(hiredate,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+            <if test="className != null and className != '' "> and c.class_name like concat('%',#{className},'%')</if>
+             <if test="urbanEmployment != null  and urbanEmployment != '' "> and urban_employment like concat('%',#{urbanEmployment},'%')</if>
+            <if test="teacherClass != null and teacherClass != ''"> and c.class_id in
+                <foreach item="teacherClass" collection="teacherClass" open="(" separator="," close=")">
+                    #{teacherClass}
+                </foreach>
+            </if>
+         </where>
+    </select>
+    
+    <select id="selectTeachStudentEmploymentById" parameterType="Integer" resultMap="TeachStudentEmploymentResult">
+        select se.*,stu.student_name from teach_student_employment se
+        left join teach_student stu on se.student_id = stu.student_id
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachStudentEmploymentsById" parameterType="Integer" resultMap="TeachStudentEmploymentResult">
+        SELECT
+            em.*,
+            stu.student_name,
+            u.user_name employment,
+            su.user_name visit
+        FROM
+            teach_student_employment em
+            LEFT JOIN sys_user u ON em.teacher_employment = u.user_id
+            LEFT JOIN sys_user su ON em.visit_teacher = su.user_id
+            LEFT JOIN teach_student stu ON em.student_id = stu.student_id
+        where id = #{id}
+    </select>
+
+    <select id="selectTeachStudentEmploymentByStudentId" parameterType="Integer" resultMap="TeachStudentEmploymentResult">
+        <include refid="selectTeachStudentEmploymentVo"/>
+        where student_id = #{studentId} and einheit != '' and obtainment_salary != '' and hiredate != '' and urban_employment != ''
+    </select>
+
+    <select id="selectEmployment" parameterType="TeachStudentEmployment" resultType="Map">
+        select em.*,u.user_name employment,su.user_name visit from teach_student_employment em
+				left join sys_user u on em.teacher_employment = u.user_id
+				left join sys_user su on em.visit_teacher = su.user_id
+				where em.student_id = #{studentId}
+    </select>
+
+    <select id="schoolIdUnique" parameterType="Integer" resultMap="TeachStudentEmploymentResult">
+        select student_id,einheit from teach_student_employment where student_id=#{studentId}
+    </select>
+        
+    <insert id="insertTeachStudentEmployment" parameterType="TeachStudentEmployment">
+        insert into teach_student_employment
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="studentId != null  ">student_id,</if>
+			<if test="edittime != null  ">edittime,</if>
+			<if test="employmentWay != null  and employmentWay != ''  ">employment_way,</if>
+			<if test="hiredate != null  ">hiredate,</if>
+			<if test="urbanEmployment != null  and urbanEmployment != ''  ">urban_employment,</if>
+			<if test="einheit != null  and einheit != ''  ">einheit,</if>
+			<if test="industry != null  and industry != ''  ">industry,</if>
+			<if test="probationSalary != null  ">probation_salary,</if>
+			<if test="obtainmentSalary != null  ">obtainment_salary,</if>
+			<if test="obligate != null  and obligate != ''  ">obligate,</if>
+            <if test="teacherEmployment != null and teacherEmployment !=''">teacher_employment,</if>
+            <if test="employmentNote != null and employmentNote !=''">employment_note,</if>
+            <if test="employmentIsTrue != null">employment_isTrue,</if>
+            <if test="visitTeacher != null and visitTeacher !=''">visit_teacher,</if>
+            <if test="visitTime != null and visitTime !=''">visit_time,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="studentId != null  ">#{studentId},</if>
+			<if test="edittime != null  ">#{edittime},</if>
+			<if test="employmentWay != null  and employmentWay != ''  ">#{employmentWay},</if>
+			<if test="hiredate != null  ">#{hiredate},</if>
+			<if test="urbanEmployment != null  and urbanEmployment != ''  ">#{urbanEmployment},</if>
+			<if test="einheit != null  and einheit != ''  ">#{einheit},</if>
+			<if test="industry != null  and industry != ''  ">#{industry},</if>
+			<if test="probationSalary != null  ">#{probationSalary},</if>
+			<if test="obtainmentSalary != null  ">#{obtainmentSalary},</if>
+			<if test="obligate != null  and obligate != ''  ">#{obligate},</if>
+            <if test="teacherEmployment != null  and teacherEmployment != ''  ">#{teacherEmployment},</if>
+            <if test="employmentNote != null  and employmentNote != ''  ">#{employmentNote},</if>
+            <if test="employmentIsTrue != null ">#{employmentIsTrue},</if>
+            <if test="visitTeacher != null  and visitTeacher != ''  ">#{visitTeacher},</if>
+            <if test="visitTime != null  and visitTime != ''  ">#{visitTime},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachStudentEmployment" parameterType="TeachStudentEmployment">
+        update teach_student_employment
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="studentId != null  ">student_id = #{studentId},</if>
+            <if test="edittime != null  ">edittime = #{edittime},</if>
+            <if test="employmentWay != null  and employmentWay != ''  ">employment_way = #{employmentWay},</if>
+            <if test="hiredate != null  ">hiredate = #{hiredate},</if>
+            <if test="urbanEmployment != null  and urbanEmployment != ''  ">urban_employment = #{urbanEmployment},</if>
+            <if test="einheit != null  and einheit != ''  ">einheit = #{einheit},</if>
+            <if test="industry != null  and industry != ''  ">industry = #{industry},</if>
+            <if test="probationSalary != null  ">probation_salary = #{probationSalary},</if>
+            <if test="obtainmentSalary != null  ">obtainment_salary = #{obtainmentSalary},</if>
+            <if test="obligate != null  and obligate != ''  ">obligate = #{obligate},</if>
+            <if test="teacherEmployment != null  and teacherEmployment != ''  ">teacher_employment = #{teacherEmployment},</if>
+            <if test="employmentNote != null  and employmentNote != ''  ">employment_note = #{employmentNote},</if>
+            <if test="employmentIsTrue != null">employment_isTrue = #{employmentIsTrue},</if>
+            <if test="visitTeacher != null  and visitTeacher != ''  ">visit_teacher = #{visitTeacher},</if>
+            <if test="visitTime != null  and visitTime != ''  ">visit_time = #{visitTime},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachStudentEmploymentById" parameterType="Integer">
+        delete from teach_student_employment where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachStudentEmploymentByIds" parameterType="String">
+        delete from teach_student_employment where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

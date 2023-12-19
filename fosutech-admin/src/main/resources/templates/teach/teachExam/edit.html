@@ -1,0 +1,228 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachExam-edit" th:object="${teachExam}">
+            <input id="examId" name="examId" th:field="*{examId}"  type="hidden">
+			<input id="classId" name="classId" type="hidden" th:field="*{classId}">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" readonly="true" id="className" th:field="*{className}"  >
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">考试阶段：</label>
+				<div class="col-sm-8">
+					<select name="stageId" id="stageId" class="form-control" disabled="disabled">
+						<option th:each="obj,eStat:${list}" th:value="${obj.id}"
+								th:text="${obj.stageName}" th:selected="${#strings.contains(teachExam.stageId,obj.id)}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考试时间：</label>
+				<div class="col-sm-8">
+					<input id="datetime" name="datetime" th:field="*{datetime}" class="form-control" type="text"  disabled="disabled">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">及格线：</label>
+				<div class="col-sm-8">
+					<input id="cutOffscores" name="cutOffscores" th:field="*{cutOffscores}" class="form-control" type="text">
+				</div>
+			</div>
+			<input id="invigilator" name="invigilator" type="hidden" th:field="*{invigilator}">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">主考老师：</label>
+				<div class="col-sm-8">
+					<input id="TeacherName" class="form-control" type="text" onclick="selectTeacherList()" readonly="true" th:field="*{teacherName}">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考试地点：</label>
+				<div class="col-sm-8">
+					<input id="address" name="address" th:field="*{address}" class="form-control" type="text">
+				</div>
+			</div>
+			<div id="BadstudenUser">
+				<h4 style="display: inline-block">非在读学生：</h4>
+			</div>
+			<hr/>
+			<h3>在读学生考试</h3>
+			<hr/>
+			<table class="table " id="Professional">
+				<tr id="biaoti">
+					<th style="display: none">学生id</th>
+					<th>学生</th>
+					<th>成绩</th>
+					<th>备注</th>
+				</tr>
+			</table>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachExam";
+		$("#form-teachExam-edit").validate({
+			rules:{
+                className:{
+                    required:true,
+                },
+                stageId:{
+                    required:true,
+                },
+                datetime:{
+                    required:true,
+                },
+                cutOffscores:{
+                    required:true,
+                },
+			}
+		});
+
+        //时间选择器
+        $(function(){
+            laydate.render({
+                elem: '#datetime',trigger: 'click'
+            });
+        });
+
+        function selectTeacherList() {
+            var url = ctx + "system/user/selectList";
+            var options = {
+                title: '选择老师',
+                width: "800",
+                url: url,
+                callBack: TeacherOpen
+            };
+            $.modal.openOptions(options);
+        }
+        function TeacherOpen(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            if(data != "undefined" && data != "" && data != null){
+                $("#TeacherName").val(body.find('.selected')[0].children[2].innerHTML);
+                $("#invigilator").val(body.find('.selected')[0].children[1].innerHTML);
+            }else{
+                layer.msg("请选择一个老师");
+            }
+            layer.close(index);
+        }
+
+        var myajax = $.ajax({
+            cache: true,
+            type: "POST",
+            url: ctx + "teach/teachStudentExam/list",
+            data: {"examId": $("#examId").val()},
+            success : function(data) {
+                var dataRow =data.rows;
+                console.log(dataRow)
+                for(var i=0;i<dataRow.length;i++){
+                    if(dataRow[i].score == null){
+                        dataRow[i].score = "";
+                    }
+                    if(dataRow[i].remark == null){
+                        dataRow[i].remark = "";
+                    }
+                    var stu="<tr>\n" +
+                        "\t\t\t\t\t<td style=\"display: none\"><input class=\"stuChildren\" type=\"hidden\" value='"+dataRow[i].studentId+"' /></td>\n" +
+                        "\t\t\t\t\t<td style=\"display: none\"><input class=\"stuIdList\" type=\"hidden\" value='"+dataRow[i].id+"' /></td>\n" +
+                        "\t\t\t\t\t<td><span style='width: 55%;display: inline-block'>"+dataRow[i].studentName+"</span></td>\n" +
+                        "\t\t\t\t\t<td>\n" +
+                        "\t\t\t\t\t\t<input class='score' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" placeholder=\"请输入考试成绩,如缺考则不填\" value='"+dataRow[i].score+"'>\n" +
+                        "\t\t\t\t\t</td>\n" +
+                        "\t\t\t\t\t<td>\n" +
+                        "\t\t\t\t\t\t<input class='remark' type=\"text\" style=\"width: 100%;height: 30px;border: none;\" placeholder=\"请输入备注\" value='"+dataRow[i].remark+"'>\n" +
+                        "\t\t\t\t\t</td>\n" +
+                        "\t\t\t\t</tr>";
+                    $("#Professional").append(stu);
+                }
+            }
+        })
+
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            //$.operate.save(prefix + "/edit", $('#form-teachExam-edit').serialize());
+                edit();
+	        }
+	    }
+        function edit() {
+            var examId = $("#examId").val();
+            var classId = $("#classId").val();
+            var invigilator = $("#invigilator").val();
+            var datetime = $("#datetime").val();
+            var cutOffscores = $("#cutOffscores").val();
+            var address = $("#address").val();
+            var children =[];
+            var id = document.getElementsByClassName("stuIdList");
+            var stuNunber = document.getElementsByClassName("stuChildren");
+            var score = document.getElementsByClassName("score");
+            var remark = document.getElementsByClassName("remark");
+            for(var i=0;i<stuNunber.length;i++){
+                var id1 = id[i].value;
+                var NameId = stuNunber[i].value;
+                var score1 = score[i].value;
+                var remark1 = remark[i].value;
+                if(score1 != null && score1 != "" && score1 != "undefined"){
+                    if(remark1 != null && remark1 != "" && remark1 != "undefined"){
+                        children.push({id:id1,studentId:NameId,score:score1,remark:remark1});
+                    }else{
+                        children.push({id:id1,studentId:NameId,score:score1});
+                    }
+                } else if(remark1 != null && remark1 != "" && remark1 != "undefined"){
+                    children.push({id:id1,studentId:NameId,remark:remark1});
+                }else {
+                    children.push({id:id1,studentId:NameId});
+                }
+            }
+            var aaaa = JSON.stringify(children)
+            var data = {
+                examId: examId,
+                classId: classId,
+                invigilator: invigilator,
+                datetime: datetime,
+                cutOffscores: cutOffscores,
+                address: address,
+                aaaa: aaaa
+            }
+
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/edit",
+                data : data,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            })
+        }
+
+        $.ajax({
+            cache: true,
+            type: "POST",
+            url: ctx + "teach/student/classOtherStudents",
+            data: {"classNo": $("input[name='classId']").val()},
+            error: function (request) {
+                $.modal.alertError("系统错误");
+            },
+            success: function (data) {
+                var dataRow = data.rows;
+                $("#BadstudenUser>span").remove();
+                for(var i=0;i<dataRow.length;i++){
+                    var datas="<span style='width: 80px;display: inline-block;text-align: center;height:30px;line-height:30px;margin-left: 15px;border-radius: 20px;font-size: 14px;color: #ffffff;background-color: #0d8ddb'>"+dataRow[i].studentName+"</span>";
+                    $("#BadstudenUser").append(datas)
+                }
+                if(dataRow.length==0){
+                    $("#BadstudenUser").append("<span>无</span>");
+                }
+            }
+        })
+	</script>
+</body>
+</html>

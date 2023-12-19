@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachFileCollection-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">课工场账号：</label>
+				<div class="col-sm-8">
+					<input id="kgcNo" name="kgcNo" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">课工场uid：</label>
+				<div class="col-sm-8">
+					<input id="kgcUid" name="kgcUid" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">课工场昵称：</label>
+				<div class="col-sm-8">
+					<input id="kgcNickname" name="kgcNickname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">状态：</label>
+				<div class="col-sm-8">
+					<input id="status" name="status" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">进班时间(报档时间)：</label>
+				<div class="col-sm-8">
+					<input id="startTime" name="startTime" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学生项目的地址：</label>
+				<div class="col-sm-8">
+					<input id="postname" name="postname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学生姓名：</label>
+				<div class="col-sm-8">
+					<input id="studentName" name="studentName" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学生性别：</label>
+				<div class="col-sm-8">
+					<input id="studentSex" name="studentSex" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">籍贯：</label>
+				<div class="col-sm-8">
+					<input id="nativePlace" name="nativePlace" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">身份证号：</label>
+				<div class="col-sm-8">
+					<input id="idCardNo" name="idCardNo" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学历：</label>
+				<div class="col-sm-8">
+					<input id="education" name="education" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">电话：</label>
+				<div class="col-sm-8">
+					<input id="phone" name="phone" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">邮箱：</label>
+				<div class="col-sm-8">
+					<input id="mail" name="mail" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">家庭地址：</label>
+				<div class="col-sm-8">
+					<input id="address" name="address" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级编号：</label>
+				<div class="col-sm-8">
+					<input id="classNo" name="classNo" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学生来源：</label>
+				<div class="col-sm-8">
+					<input id="extend1" name="extend1" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<input id="extend2" name="extend2" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">创建时间：</label>
+				<div class="col-sm-8">
+					<input id="extend3" name="extend3" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">毕业院校：</label>
+				<div class="col-sm-8">
+					<input id="graduateInstitutions" name="graduateInstitutions" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学前工作经历：</label>
+				<div class="col-sm-8">
+					<input id="workExperience" name="workExperience" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">是否有基础（0，无；1，有）：</label>
+				<div class="col-sm-8">
+					<input id="base" name="base" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">英语水平(编号)：</label>
+				<div class="col-sm-8">
+					<input id="englishLevel" name="englishLevel" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学历性质：</label>
+				<div class="col-sm-8">
+					<input id="degreeInNature" name="degreeInNature" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">毕业时间：</label>
+				<div class="col-sm-8">
+					<input id="graduateDate" name="graduateDate" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">专业：</label>
+				<div class="col-sm-8">
+					<input id="major" name="major" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">时间：</label>
+				<div class="col-sm-8">
+					<input id="upTime" name="upTime" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">与紧急联络人的关系：</label>
+				<div class="col-sm-8">
+					<input id="emergencyContact" name="emergencyContact" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">紧急联系人电话：</label>
+				<div class="col-sm-8">
+					<input id="emergencyContactPhone" name="emergencyContactPhone" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">就业意向城市（编号）：</label>
+				<div class="col-sm-8">
+					<input id="jobCity" name="jobCity" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">教材编号：</label>
+				<div class="col-sm-8">
+					<input id="textbookNo" name="textbookNo" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">通行证：</label>
+				<div class="col-sm-8">
+					<input id="trafficPermit" name="trafficPermit" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">邮政编码：</label>
+				<div class="col-sm-8">
+					<input id="postalCode" name="postalCode" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">学生姓名拼音：</label>
+				<div class="col-sm-8">
+					<input id="studentNamePinyin" name="studentNamePinyin" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="extend4" name="extend4" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">：</label>
+				<div class="col-sm-8">
+					<input id="extend5" name="extend5" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachFileCollection"
+		$("#form-teachFileCollection-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-teachFileCollection-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

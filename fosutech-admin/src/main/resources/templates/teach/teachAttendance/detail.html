@@ -1,0 +1,130 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-teachAttendance-edit" th:object="${teachAttendance}">
+        <input id="attendanceId" name="attendanceId" th:field="*{attendanceId}"  type="hidden">
+        <div class="form-group">
+            <input name="classId"  type="hidden" id="classId" th:field="*{classId}"/>
+            <label class="col-sm-3 control-label">班级：</label>
+            <div class="col-sm-8">
+                <input id="className" name="className" th:field="*{className}" class="form-control" type="text" readonly="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">上课老师：</label>
+            <div class="col-sm-8">
+                <select name="teacherId" id="teacherId" class="form-control" disabled="disabled">
+                    <option th:each="obj,eStat:${teacherList}" th:value="${obj.teacher_id}"
+                            th:text="${obj.teacher_name}" th:selected="${#strings.contains(teachAttendance.teacherId,obj.teacher_id)}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">考勤日期：</label>
+            <div class="col-sm-8">
+                <input id="attendanceDatetime" name="attendanceDatetime" th:field="*{attendanceDatetime}" class="form-control" type="text" readonly="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">考勤时段：</label>
+            <div class="col-sm-8">
+                <input id="attendancePeriod" name="attendancePeriod" th:field="*{attendancePeriod}" class="form-control" type="text" disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">教室：</label>
+            <div class="col-sm-8">
+                <input id="classroom" name="classroom" th:field="*{classroom}" class="form-control" type="text" readonly="true">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">课程编号：</label>
+            <div class="col-sm-8">
+                <input th:field="*{lesson}" id="lessonNo" type="hidden">
+                <select  class="form-control" name="lesson" id="lesson" disabled="disabled">
+                    <option value="1" class="keC">专业课</option>
+                    <option value="2" class="keC">实践课</option>
+                </select>
+            </div>
+        </div>
+        <div id="BadstudenUser">
+            <h4 style="display: inline-block">非在读学生：</h4>
+        </div>
+        <hr/>
+        <h4 style="padding: 0px;margin: 0px">在读学生出勤</h4>
+        <hr style="margin: 0px"/>
+        <div id="studenUser">
+
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script type="text/javascript">
+    var keCheng = document.getElementsByClassName("keC");
+    for (var i=0;i<keCheng.length;i++){
+        if(keCheng[i].value==$("#lessonNo").val()){
+            keCheng[i].selected=true;
+        }
+    }
+
+    var myajax = $.ajax({
+        cache: true,
+        type: "POST",
+        url: ctx + "teach/teachStudentAttendance/list",
+        data: {"attendanceId": $("#attendanceId").val()},
+        success : function(data) {
+            var dataRow =data.rows;
+            for(var i=0;i<dataRow.length;i++){
+                var stu="<div class=\"col-sm-3 text-center\" style=u\"margin-top: 20px\">\n" +
+                    "\t\t\t\t\t<input class=\"stuChildrenList\" type=\"hidden\"value='"+dataRow[i].attendance+"'  />\n" +
+                    "\t\t\t\t\t<span style='width: 55%;display: inline-block'>"+dataRow[i].studentName+"</span>&nbsp;&nbsp;&nbsp;\n" +
+                    "\t\t\t\t\t<select class='selectId' style=\"display: inline-block\" disabled=\"disabled\">\n" +
+                    "\t\t\t\t\t\t<option value='1'>出勤</option>\n" +
+                    "\t\t\t\t\t\t<option value='2'>请假</option>\n" +
+                    "\t\t\t\t\t\t<option value='3'>旷课</option>\n" +
+                    "\t\t\t\t\t\t<option value='4'>迟到</option>\n" +
+                    "\t\t\t\t\t\t<option value='5'>早退</option>\n" +
+                    "\t\t\t\t\t</select>\n" +
+                    "\t\t\t\t</div>"
+                $("#studenUser").append(stu);
+            }
+        }
+    })
+    $.when(myajax).done(function () {
+        //要执行的操作
+        var stuChildrenList = document.getElementsByClassName("stuChildrenList");
+        for(var i=0;i<$(".selectId").length;i++){
+            for(var j=0;j<$(".selectId").eq(i).children().length;j++){
+                if($(".selectId").eq(i).children().eq(j).val()==stuChildrenList[i].value){
+                    $(".selectId").eq(i).children().eq(j).attr("selected",true);
+                }
+            }
+        }
+    });
+
+    $.ajax({
+        cache: true,
+        type: "POST",
+        url: ctx + "teach/student/classOtherStudents",
+        data: {"classNo": $("input[name='classId']").val()},
+        error: function (request) {
+            $.modal.alertError("系统错误");
+        },
+        success: function (data) {
+            var dataRow = data.rows;
+            $("#BadstudenUser>span").remove();
+            for(var i=0;i<dataRow.length;i++){
+                var datas="<span style='width: 80px;display: inline-block;text-align: center;height:30px;line-height:30px;margin-left: 15px;border-radius: 20px;font-size: 14px;color: #ffffff;background-color: #0d8ddb'>"+dataRow[i].studentName+"</span>";
+                $("#BadstudenUser").append(datas)
+            }
+            if(dataRow.length==0){
+                $("#BadstudenUser").append("<span>无</span>");
+            }
+        }
+    })
+</script>
+</body>
+</html>

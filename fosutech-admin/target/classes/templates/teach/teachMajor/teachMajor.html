@@ -1,0 +1,110 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								专业名称：<input type="text" name="majorName"/>
+							</li>
+							<li>
+								专业类型：<select name="majorType" th:with="type=${@dict.getType('teach_major_type')}">
+									<option value="">所有</option>
+									<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}"></option>
+								</select>
+							</li>
+							<li>
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="teach:teachMajor:add">
+					<i class="fa fa-fw fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="teach:teachMajor:edit">
+					<i class="fa fa-fw fa-edit"></i> 修改
+				</a>
+				<!--<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="teach:teachMajor:remove">
+					<i class="fa fa-fw fa-remove"></i> 删除
+				</a>-->
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="teach:teachMajor:export">
+						<i class="fa fa-fw fa-download"></i> 导出
+				 </a>-->
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('teach:teachMajor:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('teach:teachMajor:remove')}]];
+        var prefix = ctx + "teach/teachMajor";
+		var typeDict = [[${@dict.getType('teach_major_type')}]];
+
+        $(function() {
+            //var datas = [[${@dict.getType('teach_major_type')}]];
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "专业",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'majorId', 
+					title : '专业id',
+					visible: false
+				},
+				{
+					field : 'majorName', 
+					title : '专业',
+					sortable: true
+				},
+				{
+					field : 'majorStage',
+					title : '阶段',
+					sortable: false
+				},
+				{
+					field : 'majorType',
+					title : '类别',
+					sortable: true,
+					formatter: function (value, row, index) {
+						var type = typeDict.find(t => t.dictValue == value);
+						return type ? type.dictLabel : "未知类型";
+					}
+				},
+		        {
+		            title: '操作',
+		            align: 'left',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.majorId + '\')"><i class="fa fa-fw fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.majorId + '\')"><i class="fa fa-fw fa-remove"></i>删除</a>');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

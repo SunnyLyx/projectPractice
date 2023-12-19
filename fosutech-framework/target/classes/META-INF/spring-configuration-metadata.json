@@ -1,0 +1,23 @@
+{
+  "groups": [
+    {
+      "name": "gen",
+      "type": "edu.fosu.framework.config.GenConfig",
+      "sourceType": "edu.fosu.framework.config.GenConfig"
+    },
+    {
+      "name": "spring.datasource.druid.master",
+      "type": "javax.sql.DataSource",
+      "sourceType": "edu.fosu.framework.config.DruidConfig",
+      "sourceMethod": "masterDataSource(edu.fosu.framework.config.properties.DruidProperties)"
+    },
+    {
+      "name": "spring.datasource.druid.slave",
+      "type": "javax.sql.DataSource",
+      "sourceType": "edu.fosu.framework.config.DruidConfig",
+      "sourceMethod": "slaveDataSource(edu.fosu.framework.config.properties.DruidProperties)"
+    }
+  ],
+  "properties": [],
+  "hints": []
+}

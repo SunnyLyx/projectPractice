@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachInspectionItemsMapper">
+    
+    <resultMap type="TeachInspectionItems" id="TeachInspectionItemsResult">
+        <result property="inspectionItemsId"    column="inspection_items_id"    />
+        <result property="assessId"    column="assess_id"    />
+        <result property="inspectionItemsNo"    column="inspection_items_no"    />
+        <result property="inspectionItemsWeight"    column="inspection_items_weight"    />
+    </resultMap>
+	
+	<sql id="selectTeachInspectionItemsVo">
+        select inspection_items_id, assess_id, inspection_items_no, inspection_items_weight from teach_inspection_items
+    </sql>
+	
+    <select id="selectTeachInspectionItemsList" parameterType="TeachInspectionItems" resultMap="TeachInspectionItemsResult">
+        <include refid="selectTeachInspectionItemsVo"/>
+        <where>  
+            <if test="inspectionItemsId != null "> and inspection_items_id = #{inspectionItemsId}</if>
+             <if test="assessId != null "> and assess_id = #{assessId}</if>
+             <if test="inspectionItemsNo != null "> and inspection_items_no = #{inspectionItemsNo}</if>
+             <if test="inspectionItemsWeight != null  and inspectionItemsWeight != '' "> and inspection_items_weight = #{inspectionItemsWeight}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachInspectionItemsById" parameterType="Integer" resultMap="TeachInspectionItemsResult">
+        <include refid="selectTeachInspectionItemsVo"/>
+        where inspection_items_id = #{inspectionItemsId}
+    </select>
+        
+    <insert id="insertTeachInspectionItems" parameterType="TeachInspectionItems">
+        insert into teach_inspection_items
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="inspectionItemsId != null  ">inspection_items_id,</if>
+			<if test="assessId != null  ">assess_id,</if>
+			<if test="inspectionItemsNo != null  ">inspection_items_no,</if>
+			<if test="inspectionItemsWeight != null  and inspectionItemsWeight != ''  ">inspection_items_weight,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="inspectionItemsId != null  ">#{inspectionItemsId},</if>
+			<if test="assessId != null  ">#{assessId},</if>
+			<if test="inspectionItemsNo != null  ">#{inspectionItemsNo},</if>
+			<if test="inspectionItemsWeight != null  and inspectionItemsWeight != ''  ">#{inspectionItemsWeight},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachInspectionItems" parameterType="TeachInspectionItems">
+        update teach_inspection_items
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="assessId != null  ">assess_id = #{assessId},</if>
+            <if test="inspectionItemsNo != null  ">inspection_items_no = #{inspectionItemsNo},</if>
+            <if test="inspectionItemsWeight != null  and inspectionItemsWeight != ''  ">inspection_items_weight = #{inspectionItemsWeight},</if>
+        </trim>
+        where inspection_items_id = #{inspectionItemsId}
+    </update>
+
+	<delete id="deleteTeachInspectionItemsById" parameterType="Integer">
+        delete from teach_inspection_items where inspection_items_id = #{inspectionItemsId}
+    </delete>
+	
+    <delete id="deleteTeachInspectionItemsByIds" parameterType="String">
+        delete from teach_inspection_items where inspection_items_id in 
+        <foreach item="inspectionItemsId" collection="array" open="(" separator="," close=")">
+            #{inspectionItemsId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteTeachInspectionItemsByAssessId" parameterType="Integer">
+        delete from teach_inspection_items where assess_id = #{assessId}
+    </delete>
+    
+</mapper>

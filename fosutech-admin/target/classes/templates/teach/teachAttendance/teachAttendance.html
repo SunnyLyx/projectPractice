@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								班级：<input type="text" name="className"/>
+							</li>
+
+							<li>
+								上课老师：<input type="text" name="teacherName"/>
+							</li>
+
+							<li>
+								考勤日期：<input type="text" name="attendanceDatetime" id="attendanceDatetime"/>
+							</li>
+
+							<li style="width:243px;">
+								教室：<input type="text" name="classroom"/>
+							</li>
+
+							<li>
+								课程：
+								<select  class="form-control" name="lesson" id="lesson" style="padding: 0px;display: inline-block">
+								<option value="0">全部</option>
+								<option value="1">专业课</option>
+								<option value="2">实践课</option>
+							</select>
+							</li>
+
+							<li style="width:290px">
+								专业：<!--<input type="text" name="majorId"/>-->
+								<select id="majorId" name="majorId" class="form-control" type="text" style="padding: 0px;display: inline-block">
+									<option value="0" id="aaa">全部</option>
+									<option th:each="obj,eStat:${major}" th:value="${obj.majorId}"
+											th:text="${obj.majorName}"></option>
+								</select>
+							</li>
+
+							<li style="width: 100%;text-align: center">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="teach:teachAttendance:add">
+					<i class="fa fa-fw fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="teach:teachAttendance:edit">
+					<i class="fa fa-fw fa-edit"></i> 修改
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="teach:teachAttendance:remove">
+					<i class="fa fa-fw fa-remove"></i> 删除
+				</a>
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="teach:teachAttendance:export">
+						<i class="fa fa-fw fa-download"></i> 导出
+				 </a>-->
+				<br/>
+				<span style="color: #cb4042">出勤率：(出勤+迟到)/班级基数；班级基数=班级“在读”状态学生</span>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var detailFlag = [[${@permission.hasPermi('teach:teachAttendance:detail')}]];
+        var editFlag = [[${@permission.hasPermi('teach:teachAttendance:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('teach:teachAttendance:remove')}]];
+        var prefix = ctx + "teach/teachAttendance";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                detailUrl: prefix + "/detail/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "班级考勤",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'attendanceId', 
+					title : '考勤ID',
+					visible: false
+				},
+                 {
+					 field : 'schoolName',
+					 title : '分部',
+					 sortable: false,
+                     formatter:paramsMatter
+
+                 },
+				{
+					field : 'majorName',
+					title : '专业',
+					sortable: false,
+                    formatter:paramsMatter
+
+                },
+				{
+					field : 'className',
+					title : '班级',
+					sortable: false
+				},
+				{
+					field : 'teacherName',
+					title : '上课老师',
+					sortable: false
+				},
+				{
+					field : 'attendanceDatetime', 
+					title : '考勤日期',
+					sortable: false,
+                    formatter:paramsMatter
+
+                },
+				{
+					field : 'attendancePeriod', 
+					title : '考勤时段',
+					sortable: false,
+                    formatter:paramsMatter
+
+                },
+				{
+					field : 'classroom', 
+					title : '教室',
+					sortable: false,
+                    formatter:paramsMatter
+
+                },
+				{
+					field : 'lesson', 
+					title : '课程',
+					sortable: false,
+					formatter:test,
+//                    formatter:paramsMatter,
+
+                },
+                    {
+                        field : 'attendancenum',
+                        title : '正常出勤人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'leavenum',
+                        title : '请假人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'truancynum',
+                        title : '旷课人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'latenum',
+                        title : '迟到人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'leaveearlynum',
+                        title : '早退人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'studentnum',
+                        title : '班级在读人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'classAttendance',
+                        title : '出勤率',
+                        sortable: false,
+                        formatter:test,
+                    },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: #0e9aef;" class="' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.attendanceId + '\')">编辑</a> ');
+                        actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: rgb(242,178,89)" class="' + detailFlag + '" href="#" onclick="$.operate.detail(\'' + row.attendanceId + '\')">详情</a> ');
+                        actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: red;" class="' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.attendanceId + '\')">删除</a>');
+                        return $.table.dropdownToggle(actions.join(''));
+		            }
+		        }]
+            };
+            function test(val) {
+                if (val == 1) {
+                    val = "专业课"
+                } else if (val == 2) {
+                    val = "实践课"
+                }
+				return val;
+            }
+            function paramsMatter(value,row,index) {
+                var span=document.createElement('span');
+                span.setAttribute('title',value);
+                span.innerHTML = value;
+                span.style.width="80px";
+                span.style.display="inline-block";
+                span.style.overflow="hidden";
+                span.style.textOverflow="ellipsis";
+                span.style.whiteSpace="nowrap";
+                return span.outerHTML;
+            }
+            $.table.init(options);
+        });
+
+        //时间选择器
+        $(function(){
+            laydate.render({
+                elem: '#attendanceDatetime',
+                range: '~',trigger: 'click'
+            });
+        });
+    </script>
+</body>
+</html>

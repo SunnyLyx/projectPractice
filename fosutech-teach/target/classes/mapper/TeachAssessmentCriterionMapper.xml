@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachAssessmentCriterionMapper">
+    
+    <resultMap type="TeachAssessmentCriterion" id="TeachAssessmentCriterionResult">
+        <result property="assessId"    column="assess_id"    />
+        <result property="schoolId"    column="school_id"    />
+        <result property="characterNo"    column="character_no"    />
+        <result property="assessProportion"    column="assess_proportion"    />
+        <association property="inspectionItems"  column="inspection_items_id" javaType="TeachInspectionItems" resultMap="TeachInspectionItemsResult" />
+        <association property="sysDept"  column="dept_id" javaType="SysDept" resultMap="SysDeptResult" />
+        <association property="sysRole"  column="role_id" javaType="SysRole" resultMap="SysRoleResult" />
+    </resultMap>
+
+    <resultMap type="TeachInspectionItems" id="TeachInspectionItemsResult">
+        <result property="inspectionItemsId"    column="inspection_items_id"    />
+        <result property="assessId"    column="assess_id"    />
+        <result property="inspectionItemsNo"    column="inspection_items_no"    />
+        <result property="inspectionItemsWeight"    column="inspection_items_weight"    />
+    </resultMap>
+
+    <resultMap type="SysDept" id="SysDeptResult">
+        <id     property="deptId"     column="dept_id"     />
+        <result property="parentId"   column="parent_id"   />
+        <result property="ancestors"  column="ancestors"   />
+        <result property="deptName"   column="dept_name"   />
+        <result property="orderNum"   column="order_num"   />
+        <result property="leader"     column="leader"      />
+        <result property="phone"      column="phone"       />
+        <result property="email"      column="email"       />
+        <result property="status"     column="status"      />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="parentName" column="parent_name" />
+        <result property="createBy"   column="create_by"   />
+        <result property="createTime" column="create_time" />
+        <result property="updateBy"   column="update_by"   />
+        <result property="updateTime" column="update_time" />
+    </resultMap>
+
+    <resultMap type="SysRole" id="SysRoleResult">
+        <id     property="roleId"       column="role_id"        />
+        <result property="roleName"     column="role_name"      />
+        <result property="roleKey"      column="role_key"       />
+        <result property="roleSort"     column="role_sort"      />
+        <result property="dataScope"    column="data_scope"     />
+        <result property="status"       column="status"         />
+        <result property="delFlag"      column="del_flag"       />
+        <result property="createBy"     column="create_by"      />
+        <result property="createTime"   column="create_time"    />
+        <result property="updateBy"     column="update_by"      />
+        <result property="updateTime"   column="update_time"    />
+        <result property="remark"       column="remark"         />
+    </resultMap>
+	
+	<sql id="selectTeachAssessmentCriterionVo">
+        select assess_id, school_id, character_no, assess_proportion from teach_assessment_criterion
+    </sql>
+	
+    <select id="selectTeachAssessmentCriterionList" parameterType="TeachAssessmentCriterion" resultMap="TeachAssessmentCriterionResult">
+        select ac.*,d.dept_name,r.role_name from teach_assessment_criterion ac
+        left join sys_dept d on d.dept_id = ac.school_id
+        left join sys_role r on r.role_id = ac.character_no
+        <where>
+            <if test="characterNo != null "> and ac.character_no = #{characterNo}</if>
+            <if test="schoolId != null "> and ac.school_id = #{schoolId}</if>
+            <if test="roleName != null and roleName != '' "> and r.role_name = #{roleName}</if>
+            <if test="assessProportion != null  and assessProportion != '' "> and assess_proportion = #{assessProportion}</if>
+        </where>
+    </select>
+    
+    <select id="selectTeachAssessmentCriterionById" parameterType="Integer" resultMap="TeachAssessmentCriterionResult">
+        select ac.*,d.dept_name,r.role_name from teach_assessment_criterion ac
+        left join sys_dept d on d.dept_id = ac.school_id
+        left join sys_role r on r.role_id = ac.character_no
+        where assess_id = #{assessId}
+    </select>
+
+    <select id="selectId" resultType="Integer">
+        select assess_id from teach_assessment_criterion
+        order by assess_id desc limit 1
+    </select>
+
+    <select id="selectCountNum" resultType="Integer">
+        select count(1) from teach_assessment_criterion
+    </select>
+
+    <insert id="insertTeachAssessmentCriterion" parameterType="TeachAssessmentCriterion">
+        insert into teach_assessment_criterion
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="assessId != null  ">assess_id,</if>
+			<if test="schoolId != null  ">school_id,</if>
+			<if test="characterNo != null  ">character_no,</if>
+			<if test="assessProportion != null  and assessProportion != ''  ">assess_proportion,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="assessId != null  ">#{assessId},</if>
+			<if test="schoolId != null  ">#{schoolId},</if>
+			<if test="characterNo != null  ">#{characterNo},</if>
+			<if test="assessProportion != null  and assessProportion != ''  ">#{assessProportion},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachAssessmentCriterion" parameterType="TeachAssessmentCriterion">
+        update teach_assessment_criterion
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="schoolId != null  ">school_id = #{schoolId},</if>
+            <if test="characterNo != null  ">character_no = #{characterNo},</if>
+            <if test="assessProportion != null  and assessProportion != ''  ">assess_proportion = #{assessProportion},</if>
+        </trim>
+        where assess_id = #{assessId}
+    </update>
+
+	<delete id="deleteTeachAssessmentCriterionById" parameterType="Integer">
+        delete from teach_assessment_criterion where assess_id = #{assessId}
+    </delete>
+	
+    <delete id="deleteTeachAssessmentCriterionByIds" parameterType="String">
+        delete from teach_assessment_criterion where assess_id in 
+        <foreach item="assessId" collection="array" open="(" separator="," close=")">
+            #{assessId}
+        </foreach>
+    </delete>
+    
+</mapper>

@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								班级：<input type="text" name="className"/>
+							</li>
+
+							<li>
+								作业时间：<input type="text" name="datetime" id="datetime"/>
+							</li>
+
+							<li>
+								阶段章节：<input type="text" name="jobStage"/>
+							</li>
+
+							<li style="width:290px">
+								专业：<!--<input type="text" name="majorId"/>-->
+								<select id="majorId" name="majorId" class="form-control" type="text" style="padding: 0px;display: inline-block">
+									<option value="0" id="aaa">全部</option>
+									<option th:each="obj,eStat:${major}" th:value="${obj.majorId}"
+											th:text="${obj.majorName}"></option>
+								</select>
+							</li>
+
+							<li style="width: 100%;text-align: center">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="teach:teachJob:add">
+					<i class="fa fa-fw fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="teach:teachJob:edit">
+					<i class="fa fa-fw fa-edit"></i> 修改
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="teach:teachJob:remove">
+					<i class="fa fa-fw fa-remove"></i> 删除
+				</a>
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="teach:teachJob:export">
+						<i class="fa fa-fw fa-download"></i> 导出
+				 </a>-->
+				<br/>
+				<span style="color: #cb4042">作业完成率：(优+良)/班级基数</span>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('teach:teachJob:edit')}]];
+        var detailFlag = [[${@permission.hasPermi('teach:teachJob:detail')}]];
+        var removeFlag = [[${@permission.hasPermi('teach:teachJob:remove')}]];
+        var prefix = ctx + "teach/teachJob";
+
+        $(function() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                detailUrl: prefix + "/detail/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                modalName: "班级作业",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'jobId', 
+					title : '作业编号',
+					visible: false
+				},
+                    {
+                        field : 'schoolName',
+                        title : '分部',
+                        sortable: false,
+                        formatter:paramsMatter
+                    },
+                    {
+                        field : 'majorName',
+                        title : '专业',
+                        sortable: false,
+                        formatter:paramsMatter
+                    },
+                    {
+                        field : 'className',
+                        title : '班级',
+                        sortable: false
+                    },
+				{
+					field : 'datetime', 
+					title : '作业时间',
+					sortable: false,
+                    formatter:paramsMatter
+				},
+				{
+					field : 'jobContent', 
+					title : '作业内容',
+					sortable: false,
+                    formatter:paramsMatter
+
+                },
+                    {
+                        field : 'workbestnum',
+                        title : '作业优人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'workgoodnum',
+                        title : '作业良人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'workpoornum',
+                        title : '作业差人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'worknosubmitnum',
+                        title : '未交人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'studentnum',
+                        title : '班级在读人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'classHomeworkAttendance',
+                        title : '作业合格率',
+                        sortable: false
+                    },
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: #0e9aef;" class=" ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.jobId + '\')">编辑</a> ');
+                        actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: rgb(242,178,89)" class="' + detailFlag + '" href="#" onclick="$.operate.detail(\'' + row.jobId + '\')">详情</a> ');
+		            	actions.push('<a style="color:#ffffff;display: inline-block;padding:0px 2px;background-color: red;" class=" ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.jobId + '\')">删除</a>');
+                        return $.table.dropdownToggle(actions.join(''));
+		            }
+		        }]
+            };
+            function paramsMatter(value,row,index) {
+                var span=document.createElement('span');
+                span.setAttribute('title',value);
+                span.innerHTML = value;
+                span.style.width="80px";
+                span.style.display="inline-block";
+                span.style.overflow="hidden";
+                span.style.textOverflow="ellipsis";
+                span.style.whiteSpace="nowrap";
+                return span.outerHTML;
+            }
+
+//            function formatTableUnit(value, row, index) {
+//                return {
+//                    css:{
+////                        "width":"80px",
+////						"display": "inline-block",
+////                        "white-space": 'nowrap',
+////                        "text-overflow": 'ellipsis',
+////                        "overflow": 'hidden'
+//                    }
+//                }
+//            }
+            $.table.init(options);
+        });
+
+        //时间选择器
+        $(function(){
+            laydate.render({
+                elem: '#datetime',
+                range: '~',trigger: 'click'
+            });
+        });
+    </script>
+</body>
+</html>

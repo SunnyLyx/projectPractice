@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachJobMapper">
+    
+    <resultMap type="TeachJob" id="TeachJobResult">
+        <result property="jobId"    column="job_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="datetime"    column="datetime"    />
+        <result property="jobContent"    column="job_content"    />
+        <result property="jobStage"    column="job_stage"    />
+        <result property="className"    column="class_name"    />
+        <result property="schoolName"    column="school_name"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="starttime"    column="starttime"    />
+        <result property="endtime"    column="endtime"    />
+        <result property="workbestnum"    column="workbestnum"    />
+        <result property="workgoodnum"    column="workgoodnum"    />
+        <result property="workpoornum"    column="workpoornum"    />
+        <result property="worknosubmitnum"    column="worknosubmitnum"    />
+        <result property="studentnum"    column="studentnum"    />
+        <result property="classHomeworkAttendance"    column="class_homework_attendance"    />
+    </resultMap>
+	
+	<sql id="selectTeachJobVo">
+        select job_id, class_id, datetime, job_content from teach_job
+    </sql>
+	
+    <select id="selectTeachJobList" parameterType="TeachJob" resultMap="TeachJobResult">
+        select a.workbestnum, a.workgoodnum, a.workpoornum, a.worknosubmitnum, a.studentnum, a.class_homework_attendance, a.job_content, a.job_id, a.datetime, a.job_content,
+        b.dept_name school_name, c.major_name, tc.class_name from teach_job a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        <where>  
+            <if test="jobId != null "> and job_id = #{jobId}</if>
+            <if test="className != null and className != '' "> and tc.class_name LIKE concat('%', #{className}, '%')</if>
+             <if test="datetime != null and datetime != '' "> and a.datetime between #{starttime} and #{endtime}</if>
+             <if test="jobStage != null  and jobStage != '' "> and a.job_stage LIKE concat('%', #{jobStage}, '%')</if>
+            <if test="majorId != null and majorId != '' and majorId != '0'"> and c.major_id = #{majorId}</if>
+            <if test="classes != null and classes != ''"> and a.class_id in
+                <foreach item="classes" collection="classes" open="(" separator="," close=")">
+                    #{classes}
+                </foreach>
+            </if>
+         </where>
+        order by a.datetime desc
+    </select>
+
+    <select id="selectTeachJobList1" parameterType="TeachJob" resultMap="TeachJobResult">
+        select a.workbestnum, a.workgoodnum, a.workpoornum, a.worknosubmitnum, a.studentnum, a.class_homework_attendance, a.job_content, a.job_id, a.datetime, a.job_content,
+        b.dept_name school_name, c.major_name, tc.class_name from teach_job a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        where a.class_id = #{classId} and a.datetime between #{starttime} and #{endtime}
+        order by a.datetime desc
+    </select>
+    
+    <select id="selectTeachJobById" parameterType="Integer" resultMap="TeachJobResult">
+        select a.job_id, a.class_id, a.datetime, a.job_content, a.job_stage, tc.class_name from teach_job a
+        join teach_classes tc on tc.class_id = a.class_id
+        where a.job_id = #{jobId}
+    </select>
+
+    <select id="selectSum" resultType="int">
+        SELECT COUNT(0) FROM teach_job
+    </select>
+
+    <select id="selectMaxId" resultType="int">
+        SELECT MAX(job_id) FROM teach_job
+    </select>
+
+    <insert id="insertTeachJob" parameterType="TeachJob">
+        insert into teach_job
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="jobId != null  ">job_id,</if>
+			<if test="classId != null  ">class_id,</if>
+			<if test="datetime != null  ">datetime,</if>
+			<if test="jobContent != null  and jobContent != ''  ">job_content,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="jobId != null  ">#{jobId},</if>
+			<if test="classId != null  ">#{classId},</if>
+			<if test="datetime != null  ">#{datetime},</if>
+			<if test="jobContent != null  and jobContent != ''  ">#{jobContent},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachJob" parameterType="TeachJob">
+        update teach_job
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  ">class_id = #{classId},</if>
+            <if test="datetime != null  ">datetime = #{datetime},</if>
+            <if test="jobContent != null  and jobContent != ''  ">job_content = #{jobContent},</if>
+        </trim>
+        where job_id = #{jobId}
+    </update>
+
+	<delete id="deleteTeachJobById" parameterType="Integer">
+        delete from teach_job where job_id = #{jobId}
+    </delete>
+	
+    <delete id="deleteTeachJobByIds" parameterType="String">
+        delete from teach_job where job_id in 
+        <foreach item="jobId" collection="array" open="(" separator="," close=")">
+            #{jobId}
+        </foreach>
+    </delete>
+
+    <select id="selectTeachJobListCount" resultType="int">
+        SELECT COUNT(0) FROM teach_job WHERE class_id = #{classId} and datetime between #{starttime} and #{endtime}
+    </select>
+    
+</mapper>

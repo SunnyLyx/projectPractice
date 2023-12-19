@@ -1,0 +1,472 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachStudentEmployment-add">
+			<input name="studentId"  type="hidden" id="studentId"/>
+			<input name="classId"  type="hidden" id="classId"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text"  onclick="selectList()"  readonly="true" id="className"   >
+				</div>
+			</div>
+			<!--<h3>就业信息</h3>-->
+			<!--<hr/>-->
+			<style>
+				.trs{
+					height: 0px !important;
+					padding:2px !important;
+					margin: 0px !important;
+					text-align: center;
+				}
+				th{
+					padding:0px!important;
+					margin: 0px!important;
+					font-size: 12px;
+					width:200px!important;
+					text-align: center;
+					border: 1px solid #cccccc !important;
+				}
+				td{
+					padding:0px!important;
+					margin: 0px !important;
+					font-size: 12px !important;
+					height: 0px!important;
+					/*width:200px!important;*/
+					overflow: auto;
+					text-align: center;
+
+				}
+				td>input{
+					padding: 0px !important;
+					font-size: 12px !important;
+					margin: 0px  !important;
+					overflow: auto;
+					text-align: center;
+				}
+				tr{
+					border: 1px solid #cccccc !important;
+				}
+				td{
+					border: 1px solid #cccccc !important;
+				}
+				.m{
+					margin: 0px;
+				}
+				.ibox-content{
+					padding: 15px 10px 20px 10px;
+				}
+				.fixed-table-container tbody td , .fixed-table-container, .bootstrap-table .table, .table>tbody>tr>th, .table>tfoot>tr>th,  .table>thead>tr>th{
+					border:0px;
+				}
+				.table>tbody>tr>td,  .table>tfoot>tr>td,.table>thead>tr>td,{
+					border-bottom:1px;
+				}
+			</style>
+			<div id="BadstudenUser">
+				<h4 style="display: inline-block">非在读学生：</h4>
+			</div>
+			<hr style="margin-top: 10px;    margin-bottom: 10px;"/>
+			<h4 style="padding: 0px;margin: 0px;margin-bottom: 10px">在读学生就业信息：</h4>
+			<table id="Professional">
+				<tr id="biaoti">
+					<th>学生姓名</th>
+					<th>就业城市</th>
+					<th>所属行业</th>
+					<th>就业单位</th>
+					<th>试用薪资</th>
+					<th>转正薪资</th>
+					<th>就业时间</th>
+					<th>就业方式</th>
+					<th>就业老师</th>
+					<th>就业备注</th>
+					<th>学生电话</th>
+					<th>学历</th>
+					<th>就业属实</th>
+					<th>回访时间</th>
+					<th>回访老师</th>
+				</tr>
+			</table>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachStudentEmployment";
+		$("#form-teachStudentEmployment-add").validate({
+		});
+
+        /*学生就业信息管理-新增-选择班级*/
+        function selectList() {
+            var url = ctx + "teach/teachClasses/selectList";
+            var options = {
+                title: '选择班级',
+                width: "800",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            var className = body.find('.selected')[0].children[2].innerHTML;
+            var classId = body.find('.selected')[0].children[1].innerHTML;
+            if(data != "undefined" && data != "" && data != null){
+                $("#className").val(className);
+                $("#classId").val(classId);
+                stuMsg(classId);
+                stuOtherMsg(classId);
+            }else{
+                layer.msg("请选择一个班级");
+            }
+            layer.close(index);
+        }
+
+        function stuMsg(classId){
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/student/listByClassNo",
+                data : {"classNo" : classId},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $("#biaoti").siblings().remove();
+                    var dataStu =data.rows;
+                    for(var i=0;i<dataStu.length;i++){
+                        if(dataStu[i].id == null){
+                            dataStu[i].id="";
+                        }
+                        if(dataStu[i].phone == null){
+                            dataStu[i].phone="";
+						}
+						if(dataStu[i].edu == null){
+                            dataStu[i].edu="";
+						}
+                        if(dataStu[i].urbanEmployment == null){
+                            dataStu[i].urbanEmployment="";
+                        }
+                        if(dataStu[i].industry == null){
+                            dataStu[i].industry="";
+                        }
+                        if(dataStu[i].einheit == null){
+                            dataStu[i].einheit="";
+                        }
+                        if(dataStu[i].probationSalary == null){
+                            dataStu[i].probationSalary="";
+                        }
+                        if(dataStu[i].obtainmentSalary == null){
+                            dataStu[i].obtainmentSalary="";
+                        }
+                        if(dataStu[i].hiredate == null){
+                            dataStu[i].hiredate="";
+                        }
+                        if(dataStu[i].teacherEmployment == null){
+                            dataStu[i].teacherEmployment="";
+                            dataStu[i].employment="";
+                        }
+                        if(dataStu[i].employmentNote == null){
+                            dataStu[i].employmentNote="";
+                        }
+                        if(dataStu[i].employmentWay == null){
+                            dataStu[i].employmentWay = "";
+						}
+                        if(dataStu[i].visitTime == null){
+                            dataStu[i].visitTime="";
+                        }
+                        if(dataStu[i].visitTeacher == null){
+                            dataStu[i].visitTeacher="";
+                            dataStu[i].visit="";
+                        }
+                        var stu="<tr class='trs'>\n" +
+                            "\t\t\t\t\t<input type=\"hidden\" class=\"id\" value='"+dataStu[i].id+"'>\n" +
+                            "\t\t\t\t\t<input type=\"hidden\" class=\"studentId\" value='"+dataStu[i].student_id+"'>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"studentName\" value='"+dataStu[i].student_name+"' readonly=\"readonly\" style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"urbanEmployment\" value='"+dataStu[i].urbanEmployment+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"industry\" value='"+dataStu[i].industry+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td style='width: 520px !important '>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"einheit\" value='"+dataStu[i].einheit+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"number\" class=\"probationSalary\" value='"+dataStu[i].probationSalary+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"number\" class=\"obtainmentSalary\" value='"+dataStu[i].obtainmentSalary+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" id='"+"hiredate"+i+"' class=\"hiredate\" value='"+dataStu[i].hiredate+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"employmentWay\" value='"+dataStu[i].employmentWay+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"hidden\" class=\"teacherEmploymentId\" value='"+dataStu[i].teacherEmployment+"'>\n" +
+                            "\t\t\t\t\t\t<input class=\"nunbers\" type=\"hidden\" value='"+i+"'>\n" +
+                            "\t\t\t\t\t\t<input class=\"form-control teacherEmployment\"  type=\"text\" value='"+dataStu[i].employment+"' onclick=\"selectTeacherList(this)\" readonly=\"true\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"employmentNote\" value='"+dataStu[i].employmentNote+"' style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"phone\" value='"+dataStu[i].phone+"' readonly=\"readonly\" style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"text\" class=\"education\"  value='"+dataStu[i].edu+"' readonly=\"readonly\" style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input name='"+"verified"+i+"' type=\"radio\" value='1'/>是\n" +
+                            "\t\t\t\t\t\t<input name='"+"verified"+i+"' type=\"radio\" checked='checked' value='0'/>否\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input id='"+"visitTime"+i+"' class=\"visitTime\" value='"+dataStu[i].visitTime+"' type=\"text\" style=\"height: 30px;width: 100%;border: none;\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t\t<td>\n" +
+                            "\t\t\t\t\t\t<input type=\"hidden\" class=\"visitTeacherId\" value='"+dataStu[i].visitTeacher+"'>\n" +
+                            "\t\t\t\t\t\t<input class=\"nunbers\" type=\"hidden\" value='"+i+"'>\n" +
+                            "\t\t\t\t\t\t<input class=\"form-control visitTeacher\" value='"+dataStu[i].visit+"' type=\"text\" onclick=\"selectTeacherList1(this)\" readonly=\"true\">\n" +
+                            "\t\t\t\t\t</td>\n" +
+                            "\t\t\t\t</tr>";
+                        $("#Professional").append(stu);
+                        if(dataStu[i].verified == null){
+                            var nameData = "verified"+i;
+                            $("input[value='"+nameData+"'][value=0]").attr('checked',true);
+                        }
+                        if(dataStu[i].verified == 1){
+                            var nameData = "verified"+i;
+                            $("input[value='"+nameData+"'][value=1]").attr('checked',true);
+                        }
+                        if(dataStu[i].verified == 0){
+                            var nameData = "verified"+i;
+                            $("input[name='"+nameData+"'][value=0]").attr('checked',true);
+                        }
+                        laydate.render({
+                            elem: '#hiredate'+i,
+                            trigger: 'click',
+                            format: 'yyyy-MM-dd',
+                            done: function(value, date, endDate){
+//                    console.log(value); //得到日期生成的值，如：2017-08-18
+//                    console.log(date); //得到日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
+//                    console.log(endDate); //得结束的日期时间对象，开启范围选择（range: true）才会返回。对象成员同上。
+                                var myDate = new Date()
+                                var Y=myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+                                var M=myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+                                var D=myDate.getDate();        //获取当前日(1-31)
+                                if(M<10){
+                                    M="0"+M
+                                }
+                                if(D<10){
+                                    D="0"+D
+                                }
+                                var curDay =Y+"-"+M+"-"+D;
+                                var Ncurdy = curDay.split("-");
+                                var Ndatatime = value.split("-");
+                                var PresentTime =Ncurdy[0]+Ncurdy[1]+Ncurdy[2];
+                                var UserTime =Ndatatime[0]+Ndatatime[1]+Ndatatime[2];
+                                console.log(parseInt(PresentTime))
+                                console.log(parseInt(UserTime))
+
+                                if(parseInt(PresentTime)<parseInt(UserTime)){
+                                    layer.alert("填选时间不能大于当前时间")
+                                }
+                            }
+                        });
+                        laydate.render({
+                            elem: '#visitTime'+i,
+                            trigger: 'click',
+                            format: 'yyyy-MM-dd',
+                            done: function(value, date, endDate){
+//                    console.log(value); //得到日期生成的值，如：2017-08-18
+//                    console.log(date); //得到日期时间对象：{year: 2017, month: 8, date: 18, hours: 0, minutes: 0, seconds: 0}
+//                    console.log(endDate); //得结束的日期时间对象，开启范围选择（range: true）才会返回。对象成员同上。
+								var times = $(this);
+                                var myDate = new Date()
+                                var Y=myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+                                var M=myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+                                var D=myDate.getDate();        //获取当前日(1-31)
+                                if(M<10){
+                                    M="0"+M
+                                }
+                                if(D<10){
+                                    D="0"+D
+                                }
+                                var curDay =Y+"-"+M+"-"+D;
+                                var Ncurdy = curDay.split("-");
+                                var Ndatatime = value.split("-");
+                                var PresentTime =Ncurdy[0]+Ncurdy[1]+Ncurdy[2];
+                                var UserTime =Ndatatime[0]+Ndatatime[1]+Ndatatime[2];
+                                console.log(parseInt(PresentTime))
+                                console.log(parseInt(UserTime))
+
+                                if(parseInt(PresentTime)<parseInt(UserTime)){
+                                    var data = times[0].elem.selector;
+                                    layer.alert("填选时间不能大于当前时间")
+
+                                }
+                            }
+
+                        });
+                    }
+                }
+            })
+        }
+
+        function stuOtherMsg(classId){
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: ctx + "teach/student/classOtherStudent",
+                data: {"classNo": classId},
+                error: function (request) {
+                    $.modal.alertError("系统错误");
+                },
+                success: function (data) {
+                    var dataRow = data.rows;
+                    $("#BadstudenUser>span").remove();
+                    for(var i=0;i<dataRow.length;i++){
+                        var datas="<span style='width: 65px;display: inline-block;text-align: center;height:25px;line-height:25px;margin-left: 15px;border-radius: 20px;font-size: 12px;color: #ffffff;background-color: #0d8ddb'>"+dataRow[i].studentName+"</span>";
+                        $("#BadstudenUser").append(datas)
+                    }
+                    if(dataRow.length==0){
+                        $("#BadstudenUser").append("<span>无</span>");
+                    }
+                }
+            })
+        }
+
+        function selectTeacherList(data) {
+            var url = ctx + "system/user/selectList";
+            var options = {
+                title: '选择老师',
+                width: "800",
+                url: url,
+                data:data,
+                callBack: TeacherOpen
+            };
+            $.modal.openOptions(options);
+        }
+        function TeacherOpen(index, layero){
+            //获取相对应的隐藏域的值
+            var indexs =this.data.previousSibling.previousSibling.value;
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            if(data != "undefined" && data != "" && data != null){
+                for(var i=0;i<$(".trs").length;i++){
+                    //如果和找到的相等就添加
+                    if(i==indexs){
+                        $(".trs").eq(i).children().eq(10).children().eq(2).val(data.children[2].innerHTML);
+                        $(".trs").eq(i).children().eq(10).children().eq(0).val(data.children[1].innerHTML);
+                        //console.log($(".trs").eq(i).children().eq(9).children().eq(0).val());
+                    }
+                }
+            }else{
+                layer.msg("请选择一个老师");
+            }
+            layer.close(index);
+        }
+
+        function selectTeacherList1(data) {
+            var url = ctx + "system/user/selectList1";
+            var options = {
+                title: '选择老师',
+                width: "800",
+                url: url,
+                data:data,
+                callBack: TeacherOpen1
+            };
+            $.modal.openOptions(options);
+        }
+        function TeacherOpen1(index, layero){
+            //获取相对应的隐藏域的值
+            var indexs =this.data.previousSibling.previousSibling.value;
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            if(data != "undefined" && data != "" && data != null){
+                for(var i=0;i<$(".trs").length;i++){
+                    //如果和找到的相等就添加
+                    if(i==indexs){
+                        $(".trs").eq(i).children().eq(16).children().eq(2).val(data.children[2].innerHTML);
+                        $(".trs").eq(i).children().eq(16).children().eq(0).val(data.children[1].innerHTML);
+                    }
+                }
+            }else{
+                layer.msg("请选择一个老师");
+            }
+            layer.close(index);
+        }
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+                add();
+	        }
+	    }
+
+	    function add() {
+            var children =[];
+            var idData = document.getElementsByClassName("id");
+            var urbanEmploymentData = document.getElementsByClassName("urbanEmployment");
+            var probationSalaryData = document.getElementsByClassName("probationSalary");
+            var obtainmentSalaryData = document.getElementsByClassName("obtainmentSalary");
+            //var hiredateData = document.getElementsByClassName("hiredate");
+            var employmentWayData = document.getElementsByClassName("employmentWay");
+            var employmentNoteData = document.getElementsByClassName("employmentNote");
+            //var visitTimeData = document.getElementsByClassName("visitTime");
+			 var industryData = document.getElementsByClassName("industry");
+			 var einheitData = document.getElementsByClassName("einheit");
+            for(var i=0;i<$(".trs").length;i++){
+                var id = idData[i].value;
+                console.log(id);
+                var nameData = "verified"+i;
+                var verify = $("input[name='"+nameData+"']:checked").val();
+                var studentId = $(".trs").eq(i).children().eq(1).val();
+                var urbanEmployment = urbanEmploymentData[i].value;
+                var probationSalary = probationSalaryData[i].value;
+                var obtainmentSalary = obtainmentSalaryData[i].value;
+                var employmentWay = employmentWayData[i].value;
+                var teacher1 = $(".trs").eq(i).children().eq(10).children().eq(0).val();
+                var employmentNote = employmentNoteData[i].value;
+                var hiredate = $(".trs").eq(i).children().eq(8).children().eq(0).val();
+                var visitTime = $(".trs").eq(i).children().eq(15).children().eq(0).val();
+                var teacher2 = $(".trs").eq(i).children().eq(16).children().eq(0).val();
+				var industry = industryData[i].value;
+				var einheit = einheitData[i].value;
+                children.push({id:id,
+					studentId:studentId,urbanEmployment:urbanEmployment,probationSalary:probationSalary,
+                    obtainmentSalary:obtainmentSalary,employmentWay:employmentWay,verify:verify,
+					teacher1:teacher1,employmentNote:employmentNote,hiredate:hiredate,visitTime:visitTime,
+					teacher2:teacher2,industry:industry,einheit:einheit
+                });
+            }
+            //console.log(children);
+
+            var children = JSON.stringify(children);
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : {
+                    "children": children
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+
+        }
+	</script>
+</body>
+</html>

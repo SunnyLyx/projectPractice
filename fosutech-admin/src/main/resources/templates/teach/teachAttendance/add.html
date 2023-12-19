@@ -1,0 +1,344 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachAttendance-add">
+			<input name="classId"  type="hidden" id="classId"/>
+			<input name="accessId"  type="hidden" id="accessId" th:value="${quanxian}"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text"  onclick="selectList()"  readonly="true" id="className"   >
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">上课老师：</label>
+				<div class="col-sm-8">
+					<select name="teacherId" id="teacherId" class="form-control"></select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">考勤日期：</label>
+				<div class="col-sm-8">
+					<input id="attendanceDatetime" name="attendanceDatetime" class="form-control" type="text" readonly="true">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考勤时段：</label>
+				<div class="col-sm-8">
+					<input id="attendancePeriod" name="attendancePeriod" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">教室：</label>
+				<div class="col-sm-8">
+					<input id="classroom" name="classroom" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">课程：</label>
+				<div class="col-sm-8">
+					<select  class="form-control" name="lesson" id="lesson">
+						<option value="1">专业课</option>
+						<option value="2">实践课</option>
+					</select>
+				</div>
+			</div>
+			<div id="BadstudenUser">
+				<h4 style="display: inline-block">非在读学生：</h4>
+			</div>
+			<hr/>
+            <h4 style="padding: 0px;margin: 0px">在读学生出勤:</h4>
+			<hr style="margin: 5px"/>
+			<div id="studenUser">
+				<!--<div class="col-sm-3 text-center stuChildren" style="margin-top: 20px">
+					<input type="hidden" value="" />
+					<span>迪丽热巴</span>&nbsp;&nbsp;&nbsp;
+					<select class="selectId" style="display: inline-block">
+						<option value="1">出勤</option>
+						<option value="2">请假</option>
+						<option value="3">旷课</option>
+						<option value="4">迟到</option>
+						<option value="5">早退</option>
+					</select>
+				</div>-->
+			</div>
+
+			<!--<h4 style="padding: 0px;margin: 0px">非在读学生</h4>-->
+			<!--<hr style="margin: 0px"/>-->
+
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachAttendance"
+		$("#form-teachAttendance-add").validate({
+			rules:{
+                attendanceDatetime:{
+					required:true,
+				},
+                className:{
+                    required:true,
+				},
+                teacherId:{
+                    required:true,
+				},
+                attendancePeriod:{
+                    required:true,
+				}
+			}
+		});
+
+		if($("#accessId").val()==0){
+            //时间选择器
+            $(function(){
+                laydate.render({
+                    elem: '#attendanceDatetime',
+                    trigger: 'click',
+                    format: 'yyyy-MM-dd',
+                    done: function(value, date, endDate){
+
+                        var myDate = new Date()
+                        var Y=myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+                        var M=myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+                        var D=myDate.getDate();        //获取当前日(1-31)
+                        myDate.setTime(myDate.getTime()-24*60*60*1000);
+                        if(M<10){
+                            M="0"+M
+                        }
+                        if(D<10){
+                            D="0"+D
+						}
+
+                        var curDay =Y+"-"+M+"-"+D;
+
+                        //当前时间
+                        var Ncurdy = curDay.split("-");
+                        //昨天时间
+                        var Ndatatime = value.split("-");
+                        var PresentTimes =Ncurdy[0]+Ncurdy[1]+Ncurdy[2];
+                        var UserTime =Ndatatime[0]+Ndatatime[1]+Ndatatime[2];
+
+                        if(parseInt(PresentTimes)>=parseInt(UserTime)){
+
+                        }else{
+                            layer.alert("选择时间不可以大于当前时间")
+                            $("#attendanceDatetime").val("")
+                        }
+                    }
+                });
+            });
+		}else{
+            //时间选择器
+            $(function(){
+                laydate.render({
+                    elem: '#attendanceDatetime',
+                    trigger: 'click',
+                    format: 'yyyy-MM-dd',
+                    done: function(value, date, endDate){
+
+                        var myDate = new Date()
+                        var Y=myDate.getFullYear();    //获取完整的年份(4位,1970-????)
+                        var M=myDate.getMonth()+1;       //获取当前月份(0-11,0代表1月)
+                        var D=myDate.getDate();        //获取当前日(1-31)
+                        myDate.setTime(myDate.getTime()-24*60*60*1000);
+                        if(M<10){
+                            M="0"+M
+                        }
+                        if(D<10){
+                            D="0"+D
+                        }
+                        var s1 = myDate.getFullYear()+"-" + M+ "-" + myDate.getDate();
+                        var curDay =Y+"-"+M+"-"+D;
+                        //当前时间
+                        var Ncurdy = curDay.split("-");
+                        //昨天时间
+                        var yesterday = s1.split("-");
+                        var Ndatatime = value.split("-");
+                        var PresentTimes =Ncurdy[0]+Ncurdy[1]+Ncurdy[2];
+                        var UserTime =Ndatatime[0]+Ndatatime[1]+Ndatatime[2];
+                        var yesterday1=yesterday[0]+yesterday[1]+yesterday[2];
+                        if(parseInt(PresentTimes)>=parseInt(UserTime)){
+                            if(parseInt(UserTime)<parseInt(yesterday1)){
+                                layer.alert("结束时间只能是昨天或者今天")
+                                $("#attendanceDatetime").val("")
+                            }
+                        }else{
+                            layer.alert("选择时间不可以大于当前时间")
+                            $("#attendanceDatetime").val("")
+                        }
+                    }
+                });
+            });
+		}
+
+
+        /*学生管理-新增-选择班级*/
+        function selectList() {
+            var classId = $.common.isEmpty($("#classId").val()) ? 1 : $("#classId").val();
+            var url = ctx + "teach/teachClasses/selectList";
+            var options = {
+                title: '选择班级',
+				url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            var className = body.find('.selected')[0].children[2].innerHTML;
+            var classId = body.find('.selected')[0].children[1].innerHTML;
+            if(data != "undefined" && data != "" && data != null){
+                $("#className").val(className);
+                $("#classId").val(classId);
+                stuMsg(classId);
+                stuOtherMsg(classId);
+                //判断是否为空
+                if (classId != undefined && classId != null) {
+                    checkInput();
+                }
+            }else{
+                layer.msg("请选择一个班级");
+            }
+            layer.close(index);
+        }
+
+        //当班级发生改变的时候  清空下拉框  重新赋值
+        function checkInput(){
+            // $('#classId').bind('input propertychange', function () {
+            var classId = $("#classId").val();
+            var codeurl = ctx + "teach/teachSatisfaction/classId";
+            //清空之后再赋值
+            $("#teacherId").children().remove();
+            //判断是否为空
+            if (classId != undefined && classId != null) {
+                $.post(codeurl, {classId: classId}, function (data) {
+                    console.log(data.rows)
+                    $.each(data.rows, function (i, d) {
+                        $("select[name='teacherId']").append("<option value='" + d.teacher_id + "'>" + d.teacher_name + "</option>");
+                    });
+                }, 'json');
+            }
+            // });
+        }
+
+        //时间选择器
+        $(function(){
+            laydate.render({
+                elem: '#attendancePeriod',
+                type: 'time',
+                range: true,trigger: 'click',
+                btns: ['clear','confirm']
+
+
+            });
+        });
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+                add();
+	        }
+	    }
+
+        function add() {
+            var classId = $("input[name='classId']").val();
+            var teacherId = $("select[name='teacherId']").val();
+            var attendanceDatetime = $("input[name='attendanceDatetime']").val();
+            var attendancePeriod = $("input[name='attendancePeriod']").val();
+            var classroom = $("input[name='classroom']").val();
+            var lesson = $("select[name='lesson']").val();
+			var children =[];
+			var stuNunber = document.getElementsByClassName("stuChildren");
+            var stuSelectId = document.getElementsByClassName("selectId");
+			for(var i=0;i<stuNunber.length;i++){
+                //console.log(stuNunber[i])
+                var NameId = stuNunber[i].value;
+                var index=stuSelectId[i].selectedIndex ;
+                var SelectId= stuSelectId[i].options[index].value;
+                children.push({studentId:NameId,stuSelectId:SelectId});
+			}
+			/*console.log(children)
+            console.log("------------")*/
+			var aaaa = JSON.stringify(children)
+            var data = {
+                classId: classId,
+                teacherId: teacherId,
+                attendanceDatetime: attendanceDatetime,
+                attendancePeriod: attendancePeriod,
+                classroom: classroom,
+                lesson: lesson,
+                aaaa: aaaa
+            }
+            console.log(data)
+
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : data,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+			})
+		}
+        function stuMsg(classId){
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/student/classStudents",
+                data : {"classNo" : classId},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $("#studenUser").children().remove();
+                    var dataStu =data.rows;
+                    for(var i=0;i<dataStu.length;i++){
+                        var stu="<div class=\"col-sm-3 text-center\" style=u\"margin-top: 20px\">\n" +
+                            "\t\t\t\t\t<input class=\"stuChildren\" type=\"hidden\"value='"+dataStu[i].studentId+"' />\n" +
+                            "\t\t\t\t\t<span style='width: 55%;display: inline-block'>"+dataStu[i].studentName+"</span>&nbsp;&nbsp;&nbsp;\n" +
+                            "\t\t\t\t\t<select class='selectId' style=\"display: inline-block\">\n" +
+                            "\t\t\t\t\t\t<option value='1'>出勤</option>\n" +
+                            "\t\t\t\t\t\t<option value='2'>请假</option>\n" +
+                            "\t\t\t\t\t\t<option value='3'>旷课</option>\n" +
+                            "\t\t\t\t\t\t<option value='4'>迟到</option>\n" +
+                            "\t\t\t\t\t\t<option value='5'>早退</option>\n" +
+                            "\t\t\t\t\t</select>\n" +
+                            "\t\t\t\t</div>"
+                        $("#studenUser").append(stu);
+                    }
+                }
+            })
+		}
+
+        function stuOtherMsg(classId){
+            $.ajax({
+                cache: true,
+                type: "POST",
+                url: ctx + "teach/student/classOtherStudents",
+                data: {"classNo": classId},
+                error: function (request) {
+                    $.modal.alertError("系统错误");
+                },
+                success: function (data) {
+					var dataRow = data.rows;
+                    $("#BadstudenUser>span").remove();
+                    for(var i=0;i<dataRow.length;i++){
+                        var datas="<span style='width: 80px;display: inline-block;text-align: center;height:30px;line-height:30px;margin-left: 15px;border-radius: 20px;font-size: 14px;color: #ffffff;background-color: #0d8ddb'>"+dataRow[i].studentName+"</span>";
+                        $("#BadstudenUser").append(datas)
+					}
+					if(dataRow.length==0){
+                        $("#BadstudenUser").append("<span>无</span>");
+					}
+                }
+            })
+		}
+	</script>
+</body>
+</html>

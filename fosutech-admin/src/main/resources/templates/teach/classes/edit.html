@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-classes-edit" th:object="${classes}">
+            <input id="classId" name="classId" th:field="*{classId}"  type="hidden">
+			<div class="form-group">
+				<label class="col-sm-3 control-label">班级名称：</label>
+				<div class="col-sm-8">
+					<input id="className" name="className" th:field="*{className}" class="form-control" type="text">
+				</div>
+			</div>
+			<input name="schoolId"  type="hidden"  th:field="*{schoolId}" id="treeId"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">所属分部：</label>
+				<div class="col-sm-8">
+					<!--<select id="schoolId" name="schoolId" class="form-control" type="text">
+						<option th:each="obj,eStat:${school}" th:value="${obj.schoolId}"
+								th:text="${obj.schoolName}" th:selected="${#strings.contains(classes.schoolId,obj.schoolId)}"></option>
+					</select>-->
+					<input class="form-control" type="text" onclick="selectDeptTree()" readonly="true" id="treeName" th:field="${dept.deptName}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">所属专业：</label>
+				<div class="col-sm-8">
+					<select id="majorId" name="majorId" class="form-control" type="text">
+						<option th:each="obj,eStat:${major}" th:value="${obj.majorId}"
+								th:text="${obj.majorName}" th:selected="${#strings.contains(classes.majorId,obj.majorId)}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">当前阶段：</label>
+				<div class="col-sm-8">
+					<input id="stageNew" name="stageNew" th:field="*{stageNew}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">阶段时间：</label>
+				<div class="col-sm-8">
+					<input id="stageStarttime" name="stageStarttime" th:field="*{stageStarttime}" class="form-control" type="text">-
+					<input id="stageEndtime" name="stageEndtime" th:field="*{stageEndtime}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班主任：</label>
+				<div class="col-sm-8">
+					<input id="headTeacher" name="headTeacher" th:field="*{headTeacher}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">教师1：</label>
+				<div class="col-sm-8">
+					<input id="teacherOne" name="teacherOne" th:field="*{teacherOne}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">教师2：</label>
+				<div class="col-sm-8">
+					<input id="teacherTwo" name="teacherTwo" th:field="*{teacherTwo}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">教师3：</label>
+				<div class="col-sm-8">
+					<input id="teacherThree" name="teacherThree" th:field="*{teacherThree}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">教师4：</label>
+				<div class="col-sm-8">
+					<input id="teacherFour" name="teacherFour" th:field="*{teacherFour}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">助教：</label>
+				<div class="col-sm-8">
+					<input id="teachingAssistant" name="teachingAssistant" th:field="*{teachingAssistant}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/classes";
+		$("#form-classes-edit").validate({
+			rules:{
+                schoolName:{
+					required:true,
+				},
+			}
+		});
+
+        function selectDeptTree() {
+            var treeId = $("#treeId").val();
+            var deptId = $.common.isEmpty(treeId) ? "100" : $("#treeId").val();
+            var url = ctx + "system/dept/selectDeptTree/" + deptId;
+            var options = {
+                title: '选择分部',
+                width: "380",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            $("#treeId").val(body.find('#treeId').val());
+            $("#treeName").val(body.find('#treeName').val());
+            layer.close(index);
+        }
+
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            edit();
+	        }
+	    }
+
+        function edit() {
+            var classId = $("input[name='classId']").val();
+            var className = $("input[name='className']").val();
+            var schoolId = $("input[name='schoolId']").val();
+            var majorId = $("select[name='majorId']").val();
+            var stageNew = $("input[name='stageNew']").val();
+            var stageStarttime = $("input[name='stageStarttime']").val();
+            var stageEndtime = $("input[name='stageEndtime']").val();
+            var headTeacher = $("select[name='headTeacher']").val();
+            var teacherOne = $("input[name='teacherOne']").val();
+            var teacherTwo = $("input[name='teacherTwo']").val();
+            var teacherThree = $("input[name='teacherThree']").val();
+            var teacherFour = $("select[name='teacherFour']").val();
+            var teachingAssistant = $("input[name='teachingAssistant']").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/edit",
+                data : {
+                    "classId":classId,
+                    "className": className,
+                    "schoolId": schoolId,
+                    "majorId": majorId,
+                    "stageNew": stageNew,
+                    "stageStarttime": stageStarttime,
+                    "stageEndtime": stageEndtime,
+                    "headTeacher": headTeacher,
+                    "teacherOne": teacherOne,
+                    "teacherTwo": teacherTwo,
+                    "teacherThree": teacherThree,
+                    "teacherFour": teacherFour,
+                    "teachingAssistant": teachingAssistant
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    console.log(data);
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+
+	</script>
+</body>
+</html>

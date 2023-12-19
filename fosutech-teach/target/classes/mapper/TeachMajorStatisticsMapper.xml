@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachMajorStatisticsMapper">
+    
+    <resultMap type="TeachMajorStatistics" id="TeachMajorStatisticsResult">
+        <result property="id"    column="id"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="createtime"    column="createtime"    />
+        <result property="month"    column="month"    />
+        <result property="attendence"    column="attendence"    />
+        <result property="subjectPercentageComplete"    column="subject_percentage_complete"    />
+        <result property="jobPercentageComplete"    column="job_percentage_complete"    />
+        <result property="examAcceptability"    column="exam_acceptability"    />
+    </resultMap>
+	
+	<sql id="selectTeachMajorStatisticsVo">
+        select id, major_id, createtime, month, attendence, subject_percentage_complete, job_percentage_complete, exam_acceptability from teach_major_statistics
+    </sql>
+	
+    <select id="selectTeachMajorStatisticsList" parameterType="TeachMajorStatistics" resultMap="TeachMajorStatisticsResult">
+        <include refid="selectTeachMajorStatisticsVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="majorId != null "> and major_id = #{majorId}</if>
+             <if test="createtime != null "> and createtime = #{createtime}</if>
+             <!--<if test="month != null "> and month = #{month}</if>-->
+            <if test="params.beginTime != null and params.beginTime != ''"><!-- 开始时间检索 -->
+                AND date_format(month,'%y%m%d') &gt;= date_format(#{params.beginTime},'%y%m%d')
+            </if>
+            <if test="params.endTime != null and params.endTime != ''"><!-- 结束时间检索 -->
+                AND date_format(month,'%y%m%d') &lt;= date_format(#{params.endTime},'%y%m%d')
+            </if>
+             <if test="attendence != null "> and attendence = #{attendence}</if>
+             <if test="subjectPercentageComplete != null "> and subject_percentage_complete = #{subjectPercentageComplete}</if>
+             <if test="jobPercentageComplete != null "> and job_percentage_complete = #{jobPercentageComplete}</if>
+             <if test="examAcceptability != null "> and exam_acceptability = #{examAcceptability}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachMajorStatisticsById" parameterType="Integer" resultMap="TeachMajorStatisticsResult">
+        <include refid="selectTeachMajorStatisticsVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertTeachMajorStatistics" parameterType="TeachMajorStatistics">
+        insert into teach_major_statistics
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="majorId != null  ">major_id,</if>
+			<if test="createtime != null  ">createtime,</if>
+			<if test="month != null  ">month,</if>
+			<if test="attendence != null  ">attendence,</if>
+			<if test="subjectPercentageComplete != null  ">subject_percentage_complete,</if>
+			<if test="jobPercentageComplete != null  ">job_percentage_complete,</if>
+			<if test="examAcceptability != null  ">exam_acceptability,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="majorId != null  ">#{majorId},</if>
+			<if test="createtime != null  ">#{createtime},</if>
+			<if test="month != null  ">#{month},</if>
+			<if test="attendence != null  ">#{attendence},</if>
+			<if test="subjectPercentageComplete != null  ">#{subjectPercentageComplete},</if>
+			<if test="jobPercentageComplete != null  ">#{jobPercentageComplete},</if>
+			<if test="examAcceptability != null  ">#{examAcceptability},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachMajorStatistics" parameterType="TeachMajorStatistics">
+        update teach_major_statistics
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="majorId != null  ">major_id = #{majorId},</if>
+            <if test="createtime != null  ">createtime = #{createtime},</if>
+            <if test="month != null  ">month = #{month},</if>
+            <if test="attendence != null  ">attendence = #{attendence},</if>
+            <if test="subjectPercentageComplete != null  ">subject_percentage_complete = #{subjectPercentageComplete},</if>
+            <if test="jobPercentageComplete != null  ">job_percentage_complete = #{jobPercentageComplete},</if>
+            <if test="examAcceptability != null  ">exam_acceptability = #{examAcceptability},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachMajorStatisticsById" parameterType="Integer">
+        delete from teach_major_statistics where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachMajorStatisticsByIds" parameterType="String">
+        delete from teach_major_statistics where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

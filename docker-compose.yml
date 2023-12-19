@@ -1,0 +1,15 @@
+version: "3"
+services:
+  mysql:
+    container_name: fosutech-mysql
+    command: --lower_case_table_names=1
+    image: docker.io/mysql:5.6
+    environment:
+      MYSQL_DATABASE: fosutech
+      MYSQL_ROOT_PASSWORD: 123456
+    # userns: keep-id
+    ports:
+      - 127.0.0.1:3306:3306
+    volumes:
+      - ./sql/fosutech.sql:/docker-entrypoint-initdb.d/data.sql
+      - ./_data/_mysql_data:/var/lib/mysql

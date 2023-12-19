@@ -1,0 +1,225 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
+<body class="gray-bg">
+	<div class="ui-layout-west">
+		<div class="main-content">
+			<div class="box box-main">
+				<div class="box-header">
+					<div class="box-title">
+						<i class="fa fa-fw icon-grid"></i> 分部
+					</div>
+					<div class="box-tools pull-right">
+						<!--<a type="button" class="btn btn-box-tool menuItem" href="#" onclick="dept()" title="管理分部"><i class="fa fa-fw fa-edit"></i></a>-->
+						<button type="button" class="btn btn-box-tool" id="btnExpand" title="展开" style="display:none;"><i class="fa fa-fw fa-chevron-up"></i></button>
+						<button type="button" class="btn btn-box-tool" id="btnCollapse" title="折叠"><i class="fa fa-fw fa-chevron-down"></i></button>
+						<button type="button" class="btn btn-box-tool" id="btnRefresh" title="刷新"><i class="fa fa-fw fa-refresh"></i></button>
+					</div>
+				</div>
+				<div class="ui-layout-content">
+					<div id="tree" class="ztree"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+     <div class="container-div ui-layout-center">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								专业：<select id="majorId" name="majorId" type="text" style="padding: 0px">
+								<option value="">全部</option>
+								<option th:each="obj,eStat:${major}" th:value="${obj.majorId}"
+										th:text="${obj.majorName}"></option>
+							</select>
+							</li>
+
+							<li>
+								班级：<input type="text" name="className"/>
+							</li>
+
+							<li style="width: 100%;text-align: center">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="teach:teachSupervisionSubject:add">
+					<i class="fa fa-fw fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="teach:teachSupervisionSubject:edit">
+					<i class="fa fa-fw fa-edit"></i> 修改
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="teach:teachSupervisionSubject:remove">
+					<i class="fa fa-fw fa-remove"></i> 删除
+				</a>
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="teach:teachSupervisionSubject:export">
+					<i class="fa fa-fw fa-download"></i> 导出
+			 	</a>-->
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+	<script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+	<script th:src="@{/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('teach:teachSupervisionSubject:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('teach:teachSupervisionSubject:remove')}]];
+        var prefix = ctx + "teach/teachSupervisionSubject";
+
+        $(function() {
+            var panehHidden = false;
+            if ($(this).width() < 769) {
+                panehHidden = true;
+            }
+            $('body').layout({ initClosed: panehHidden, west__size: 185 });
+            queryTeachSupervisionSubject();
+            queryDeptTree();
+        });
+
+        function queryTeachSupervisionSubject(){
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                modalName: "总部督查项目",
+                search: false,
+                showExport: true,
+                columns: [{
+                    checkbox: true
+                },
+                    {
+                        field : 'id',
+                        title : '编号',
+                        visible: false
+                    },
+                    {
+                        field : 'sysDept.deptName',
+                        title : '分部',
+                        sortable: false
+                    },
+                    {
+                        field : 'majors.majorName',
+                        title : '专业',
+                        sortable: false
+                    },
+                    {
+                        field : 'createtime',
+                        title : '日期',
+                        sortable: false
+                    },
+                    {
+                        field : 'subject.subjectName',
+                        title : '项目',
+                        sortable: false
+                    },
+                    {
+                        field : 'classes.className',
+                        title : '班级',
+                        sortable: false
+                    },
+                    {
+                        field : 'params.num',
+                        title : '班级人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'schoolAcceptability',
+                        title : '分部合格率',
+                        sortable: false
+                    },
+                    {
+                        field : 'headquartersAcceptability',
+                        title : '总部合格率',
+                        sortable: false
+                    },
+                    {
+                        field : 'randomNumber',
+                        title : '抽查个数',
+                        sortable: false
+                    },
+                    {
+                        field : 'randomAcceptability',
+                        title : '抽查合格率',
+                        sortable: false
+                    },
+                    {
+                        title: '操作',
+                        align: 'center',
+                        formatter: function(value, row, index) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-fw fa-edit"></i>编辑</a> ');
+                            actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-fw fa-remove"></i>删除</a>');
+                            return actions.join('');
+                        }
+                    }]
+            };
+            $.table.init(options);
+		}
+
+        function queryDeptTree()
+        {
+            var url = ctx + "system/dept/treeData";
+            var options = {
+                url: url,
+                expandLevel: 2,
+                onClick : zOnClick
+            };
+            $.tree.init(options);
+
+            function zOnClick(event, treeId, treeNode) {
+                $("#schoolId").val(treeNode.id);
+                $("#parentId").val(treeNode.pId);
+                $.ajax({
+                    type:"POST",
+                    url:prefix + '/listById',
+                    data:{schoolId:treeNode.id},
+                    success : function(data) {
+                        // alert("成功");
+                        // console.log(data);
+                        $("#bootstrap-table").bootstrapTable('load', data);
+                    }
+                })
+            }
+        }
+
+        $('#btnExpand').click(function() {
+            $._tree.expandAll(true);
+            $(this).hide();
+            $('#btnCollapse').show();
+        });
+
+        $('#btnCollapse').click(function() {
+            $._tree.expandAll(false);
+            $(this).hide();
+            $('#btnExpand').show();
+        });
+
+        $('#btnRefresh').click(function() {
+            queryDeptTree();
+        });
+
+        /* 总部督查-分部 */
+        function dept() {
+            var url = ctx + "system/dept";
+            createMenuItem(url, "分部");
+        }
+
+    </script>
+</body>
+</html>

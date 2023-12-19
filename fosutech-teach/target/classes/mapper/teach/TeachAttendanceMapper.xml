@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachAttendanceMapper">
+    
+    <resultMap type="TeachAttendance" id="TeachAttendanceResult">
+        <result property="attendanceId"    column="attendance_id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="teacherId"    column="teacher_id"    />
+        <result property="attendanceDatetime"    column="attendance_datetime"    />
+        <result property="attendancePeriod"    column="attendance_period"    />
+        <result property="classroom"    column="classroom"    />
+        <result property="lesson"    column="lesson"    />
+        <result property="className"    column="class_name"    />
+        <result property="teacherName"    column="teacher_name"    />
+        <result property="schoolName"    column="school_name"    />
+        <result property="majorId"    column="major_id"    />
+        <result property="majorName"    column="major_name"    />
+        <result property="attendancenum"    column="attendancenum"    />
+        <result property="leavenum"    column="leavenum"    />
+        <result property="truancynum"    column="truancynum"    />
+        <result property="latenum"    column="latenum"    />
+        <result property="leaveearlynum"    column="leaveearlynum"    />
+        <result property="studentnum"    column="studentnum"    />
+        <result property="classAttendance"    column="class_attendance"    />
+    </resultMap>
+	
+	<sql id="selectTeachAttendanceVo">
+        select attendance_id, class_id, teacher_id, attendance_datetime, attendance_period, classroom, lesson from teach_attendance
+    </sql>
+	
+    <select id="selectTeachAttendanceList" parameterType="TeachAttendance" resultMap="TeachAttendanceResult">
+        SELECT
+        a.attendancenum,a.leavenum,a.truancynum,a.latenum,a.leaveearlynum,a.studentnum,a.class_attendance,a.attendance_id,a.attendance_datetime,a.attendance_period,a.classroom,a.lesson,
+        b.dept_name school_name,c.major_name,tc.class_name,su.user_name teacher_name
+        FROM teach_attendance a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        JOIN sys_user su ON su.user_id = a.teacher_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        <where>  
+             <if test="className != null and className != '' "> and tc.class_name LIKE concat('%', #{className}, '%')</if>
+             <if test="teacherName != null and teacherName != ''"> and su.user_name LIKE concat('%', #{teacherName}, '%')</if>
+             <if test="attendanceDatetime != null and attendanceDatetime != '' "> and a.attendance_datetime between #{startDatetime} and #{endDatetime}</if>
+             <if test="classroom != null  and classroom != '' "> and a.classroom LIKE concat('%', #{classroom}, '%')</if>
+             <if test="lesson != null and lesson != ''and lesson != '0'"> and a.lesson = #{lesson}</if>
+            <if test="majorId != null and majorId != '' and majorId != '0'"> and c.major_id = #{majorId}</if>
+            <if test="classes != null and classes != ''"> and a.class_id in
+                <foreach item="classes" collection="classes" open="(" separator="," close=")">
+                    #{classes}
+                </foreach>
+            </if>
+         </where>
+        order by a.attendance_datetime desc
+    </select>
+
+    <select id="selectTeachAttendanceList1" parameterType="TeachAttendance" resultMap="TeachAttendanceResult">
+        SELECT
+        a.attendancenum,a.leavenum,a.truancynum,a.latenum,a.leaveearlynum,a.studentnum,a.class_attendance,a.attendance_id,a.attendance_datetime,a.attendance_period,a.classroom,a.lesson,
+        b.dept_name school_name,c.major_name,tc.class_name,su.user_name teacher_name
+        FROM teach_attendance a
+        JOIN teach_classes tc ON tc.class_id = a.class_id
+        JOIN sys_user su ON su.user_id = a.teacher_id
+        LEFT JOIN sys_dept b ON tc.school_id = b.dept_id
+        LEFT JOIN teach_major c ON tc.major_id = c.major_id
+        WHERE a.attendance_datetime between #{startDatetime} and #{endDatetime}
+        and a.class_id = #{classId}
+        order by a.attendance_datetime desc
+    </select>
+
+    <select id="selectTeachAttendanceListCount" resultType="int">
+        SELECT COUNT(0) FROM teach_attendance WHERE attendance_datetime between #{startDatetime} and #{endDatetime} and class_id = #{classId}
+    </select>
+    
+    <select id="selectTeachAttendanceById" parameterType="Integer" resultMap="TeachAttendanceResult">
+        select a.attendance_id, a.class_id, a.teacher_id, a.attendance_datetime, a.attendance_period, a.classroom, a.lesson, tc.class_name,
+        su.user_name as teacher_name from teach_attendance a
+        join teach_classes tc on tc.class_id = a.class_id
+        join sys_user su on su.user_id = a.teacher_id
+        where a.attendance_id = #{attendanceId}
+    </select>
+
+    <select id="selectMaxId" resultType="int">
+        SELECT MAX(attendance_id) FROM teach_attendance
+    </select>
+
+    <insert id="insertTeachAttendance" parameterType="TeachAttendance">
+        insert into teach_attendance
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="attendanceId != null  ">attendance_id,</if>
+			<if test="classId != null  ">class_id,</if>
+			<if test="teacherId != null  ">teacher_id,</if>
+			<if test="attendanceDatetime != null  ">attendance_datetime,</if>
+			<if test="attendancePeriod != null  and attendancePeriod != ''  ">attendance_period,</if>
+			<if test="classroom != null  and classroom != ''  ">classroom,</if>
+			<if test="lesson != null  ">lesson,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="attendanceId != null  ">#{attendanceId},</if>
+			<if test="classId != null  ">#{classId},</if>
+			<if test="teacherId != null  ">#{teacherId},</if>
+			<if test="attendanceDatetime != null  ">#{attendanceDatetime},</if>
+			<if test="attendancePeriod != null  and attendancePeriod != ''  ">#{attendancePeriod},</if>
+			<if test="classroom != null  and classroom != ''  ">#{classroom},</if>
+			<if test="lesson != null  ">#{lesson},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachAttendance" parameterType="TeachAttendance">
+        update teach_attendance
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  ">class_id = #{classId},</if>
+            <if test="teacherId != null  ">teacher_id = #{teacherId},</if>
+            <if test="attendanceDatetime != null  ">attendance_datetime = #{attendanceDatetime},</if>
+            <if test="attendancePeriod != null  and attendancePeriod != ''  ">attendance_period = #{attendancePeriod},</if>
+            <if test="classroom != null  and classroom != ''  ">classroom = #{classroom},</if>
+            <if test="lesson != null  ">lesson = #{lesson},</if>
+        </trim>
+        where attendance_id = #{attendanceId}
+    </update>
+
+	<delete id="deleteTeachAttendanceById" parameterType="Integer">
+        delete from teach_attendance where attendance_id = #{attendanceId}
+    </delete>
+	
+    <delete id="deleteTeachAttendanceByIds" parameterType="String">
+        delete from teach_attendance where attendance_id in 
+        <foreach item="attendanceId" collection="array" open="(" separator="," close=")">
+            #{attendanceId}
+        </foreach>
+    </delete>
+    
+</mapper>

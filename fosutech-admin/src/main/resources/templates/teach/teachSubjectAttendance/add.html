@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachSubjectAttendance-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级ID：</label>
+				<div class="col-sm-8">
+					<input id="classId" name="classId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目ID：</label>
+				<div class="col-sm-8">
+					<input id="subjectId" name="subjectId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目开始时间：</label>
+				<div class="col-sm-8">
+					<input id="attendanceStarttime" name="attendanceStarttime" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目结束时间：</label>
+				<div class="col-sm-8">
+					<input id="attendanceEndtime" name="attendanceEndtime" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">项目名称：</label>
+				<div class="col-sm-8">
+					<input id="subjectname" name="subjectname" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业优人数：</label>
+				<div class="col-sm-8">
+					<input id="bestnum" name="bestnum" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业良人数：</label>
+				<div class="col-sm-8">
+					<input id="goodnum" name="goodnum" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业差人数：</label>
+				<div class="col-sm-8">
+					<input id="poornum" name="poornum" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业未完成人数：</label>
+				<div class="col-sm-8">
+					<input id="unfinishednum" name="unfinishednum" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">班级总人数：</label>
+				<div class="col-sm-8">
+					<input id="studentnum" name="studentnum" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业优占比：</label>
+				<div class="col-sm-8">
+					<input id="bestAttendance" name="bestAttendance" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业良占比：</label>
+				<div class="col-sm-8">
+					<input id="goodAttendance" name="goodAttendance" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">作业差占比：</label>
+				<div class="col-sm-8">
+					<input id="poorAttendance" name="poorAttendance" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachSubjectAttendance"
+		$("#form-teachSubjectAttendance-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-teachSubjectAttendance-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

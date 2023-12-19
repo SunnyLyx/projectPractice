@@ -1,0 +1,235 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachSupervisionSubject-edit" th:object="${teachSupervisionSubject}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<input id="classId" name="classId" th:field="*{classId}"  type="hidden">
+
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">班级：</label>
+					<div class="col-sm-8">
+						<input id="className" name="className" onclick="selectList()" th:field="*{classes.className}" class="form-control" type="text" readonly="true">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">创建时间：</label>
+					<div class="col-sm-8">
+						<input id="createtime" name="createtime" disabled="disabled" th:field="*{createtime}" class="form-control" type="text">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目：</label>
+					<div class="col-sm-8">
+						<input id="subjectId" name="subjectId" th:field="*{subjectId}" class="form-control" type="hidden">
+						<select id="subject" name="subject" class="form-control" type="text"></select>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">分部合格率：</label>
+					<div class="col-sm-8">
+						<input id="schoolAcceptability" name="schoolAcceptability" th:field="*{schoolAcceptability}" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">总部合格率：</label>
+					<div class="col-sm-8">
+						<input id="headquartersAcceptability" name="headquartersAcceptability" th:field="*{headquartersAcceptability}" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">抽查个数：</label>
+					<div class="col-sm-8">
+						<input id="randomNumber" name="randomNumber" th:field="*{randomNumber}" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">抽查合格率：</label>
+					<div class="col-sm-8">
+						<input id="randomAcceptability" name="randomAcceptability" th:field="*{randomAcceptability}" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachSupervisionSubject";
+		$("#form-teachSupervisionSubject-edit").validate({
+			rules:{
+				xxxx:{
+					required:true
+				}
+			}
+		});
+
+        //默认项目下拉框
+        var classId = $("input[name='classId']").val();
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "teach/teachSubject/list",
+            data : {"classId" : classId},
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                if (data && data.rows.length > 0) {
+                    var subject = data.rows;
+                    addOptions1(subject);
+                }
+            }
+        });
+
+        /*月度考核-修改-选择班级*/
+        function selectList() {
+            var url = ctx + "teach/teachClasses/selectList";
+            var options = {
+                title: '选择班级',
+                width: "800",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            var classId = body.find('.selected')[0].children[1].innerHTML;
+            if(data != "undefined" && data != "" && data != null){
+                $("#className").val(body.find('.selected')[0].children[2].innerHTML);
+                $("#classId").val(classId);
+                subjectSelect(classId);
+                //判断是否为空
+                if (classId != undefined && classId != null) {
+                    checkInput();
+                }
+            }else{
+                layer.msg("请选择一个班级");
+            }
+            layer.close(index);
+        }
+
+        function subjectSelect(classId) {
+            //进入班级选择且classId有值时查询当前项目值存入下拉框
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachSubject/list",
+                data : {"classId" : classId},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    var subject = data.rows;
+                    addOptions(subject);
+                }
+            });
+        }
+
+        function checkInput() {
+            //根据选择的班级级联查询阶段存入项目下拉框
+            var classId = $("input[name='classId']").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachSubject/list",
+                data : {"classId" : classId},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    if (data && data.rows.length > 0) {
+                        var subject = data.rows;
+                        addOptions(subject);
+                    }
+                }
+            });
+        }
+
+        function addOptions1(subject) {
+            var pro = $('select[name="subject"]');
+            pro.children().remove();
+
+            var options = "";
+            $(subject).each(function() {
+                options += '<option class="subjects" value="' + this.subjectId + '" >' + this.subjectName + '</option>';
+            });
+
+            pro.append(options);
+
+            var subjects = document.getElementsByClassName("subjects");
+            for (var i=0;i<subjects.length;i++){
+                if(subjects[i].value==$("#subjectId").val()){
+                    subjects[i].selected=true;
+                }
+            }
+        }
+
+        function addOptions(subject) {
+            var pro = $('select[name="subject"]');
+            pro.children().remove();
+
+            var options = "";
+            $(subject).each(function() {
+                options += '<option value="' + this.subjectId + '" >' + this.subjectName + '</option>';
+            });
+
+            pro.append(options);
+        }
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	        }edit();
+	    }
+
+	    function edit(){
+            var id = $("#id").val();
+            var classId = $("input[name='classId']").val();
+            var options=$("#subject option:selected"); //获取选中的项
+            var subjectId = options.val();
+            var schoolAcceptability = $("#schoolAcceptability").val();
+            var headquartersAcceptability = $("#headquartersAcceptability").val();
+            var randomNumber = $("#randomNumber").val();
+            var randomAcceptability = $("#randomAcceptability").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/edit",
+                data : {
+                    "id":id,
+                    "classId": classId,
+                    "subjectId": subjectId,
+                    "schoolAcceptability": schoolAcceptability,
+                    "headquartersAcceptability": headquartersAcceptability,
+                    "randomNumber": randomNumber,
+                    "randomAcceptability": randomAcceptability
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+		}
+	</script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachTeacherStatisticsChildren-edit" th:object="${teachTeacherStatisticsChildren}">
+            <input id="id" name="id" th:field="*{id}"  type="hidden">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">月度统计表id：</label>
+				<div class="col-sm-8">
+					<input id="teacherStatisticsId" name="teacherStatisticsId" th:field="*{teacherStatisticsId}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考核项编号：</label>
+				<div class="col-sm-8">
+					<input id="inspectionItemsNo" name="inspectionItemsNo" th:field="*{inspectionItemsNo}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考核项完成率：</label>
+				<div class="col-sm-8">
+					<input id="percentageComplete" name="percentageComplete" th:field="*{percentageComplete}" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考核项得分：</label>
+				<div class="col-sm-8">
+					<input id="grade" name="grade" th:field="*{grade}" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+    </div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachTeacherStatisticsChildren";
+		$("#form-teachTeacherStatisticsChildren-edit").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/edit", $('#form-teachTeacherStatisticsChildren-edit').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

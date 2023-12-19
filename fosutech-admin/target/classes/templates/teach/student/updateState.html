@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" >
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-student-updateState">
+			<input name="classIds"  type="hidden" id="classIds" th:value="${student.classNo}"/>
+			<input name="classId"  type="hidden" id="classId" th:value="${student.classNo}"/>
+			<input name="studentId"  type="hidden"  th:value="${student.studentId}" />
+			<input name="state"  type="hidden" id="state" th:value="${student.status}"/>
+			<input name="sclass"  type="hidden" id="sclass" th:value="${student.classes.className}"/>
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">学生名称：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" readonly="true" name="studentName" th:value="${student.studentName}"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">学生状态：</label>
+				<div class="col-sm-8">
+					<!--<input class="form-control" type="password" name="password" id="password" th:value="${@config.getKey('sys.user.initPassword')}">-->
+					<select id="status" name="status" class="form-control m-b" th:with="type=${@dict.getType('teach_status')}">
+						<option th:each="dict : ${type}" th:text="${dict.dictLabel}" th:value="${dict.dictValue}" th:field="*{student.status}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group" id="one">
+				<label class="col-sm-3 control-label">新入班级：</label>
+				<div class="col-sm-8">
+					<input class="form-control"  type="text" name="classNo" onclick="selectList()" required="true" id="className" th:value="${student.classes.className}">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">日期：</label>
+				<div class="col-sm-8">
+					<input id="upTime" name="upTime" class="form-control" type="text"  th:value="${student.upTime}" placeholder="yyyy-MM-dd">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">备注：</label>
+				<div class="col-sm-8">
+					<textarea type="text" name="extend2" id="extend2" class="form-control" th:text="${student.extend2}"></textarea>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript">
+
+        $("#form-student-updateState").validate({
+            rules: {
+                extend2: {
+                    required: true
+                }
+            }
+        });
+
+        $("#one").hide();
+        //给div添加change事件
+        $("#status").change(function() {
+            if($(this).val() == 2 ) {
+                $("#one").show();
+            } else if($(this).val() == 3 ) {
+                $("#one").show();
+            }else {
+                $("#one").hide();
+			}
+        });
+
+        //时间选择器
+        laydate.render({
+            elem: '#upTime',trigger: 'click'
+        });
+
+        /*学生管理-更改学生状态-选择班级*/
+        function selectList() {
+            var url = ctx + "teach/teachClasses/selectList";
+            var options = {
+                title: '选择班级',
+                width: "800",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            if(data != "undefined" && data != "" && data != null){
+                $("#className").val(body.find('.selected')[0].children[2].innerHTML);
+                $("#classId").val(body.find('.selected')[0].children[1].innerHTML);
+                // console.log($("#classId").val());
+            }else{
+                layer.msg("请选择一个班级");
+            }
+            layer.close(index);
+        }
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+                checkState();
+	        }
+	    }
+
+        function checkState() {
+            var status = $("#status option:selected").val();
+            var studentId = $("input[name='studentId']").val();
+            var classId = $("#classIds").val();
+            var state = $("input[name='state']").val();
+            if(status == 7){
+                var shuju = "";
+                $.ajax({
+                    cache : true,
+                    type : "POST",
+                    url : ctx + "/teach/teachStudentEmployment/employment",
+                    data : {
+                        "studentId": studentId
+                    },
+                    async : false,
+                    error : function(request) {
+                        $.modal.alertError("系统错误");
+                    },
+                    success : function(data) {
+                        shuju = data;
+                    }
+                });
+                //console.log(shuju);
+                if(shuju == null || shuju.length == 0){
+                    layer.alert("请先添加就业信息");
+                    return;
+                }
+			}
+			if(status == 2){
+                if(state != 5){
+                    layer.alert("此学生不是休学状态，不能复学");
+					return;
+				}
+			}
+			if(status == 3 || status == 2){
+                classId = $("#classId").val();
+			}
+			if(state == 5){
+                if(status != 2 && status != 4){
+                    layer.alert("此学生只能选择退学或者复学");
+                    return;
+				}
+			}
+            //$.operate.save(ctx + "teach/student/updateState", $('#form-student-updateState').serialize());
+
+            var extend2 = $("#extend2").val();
+            var className = $("#className").val();
+            var sclass = $("#sclass").val();
+
+            var upTime = $("#upTime").val();
+
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/student/updateState",
+                data : {
+                    "studentId": studentId,
+                    "classNo": classId,
+                    "status": status,
+                    "extend2":extend2,
+                    "oldClass":sclass,
+                    "className":className,
+					"upTime":upTime
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    // console.log(data);
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+	</script>
+</body>
+
+</html>

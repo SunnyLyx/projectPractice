@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachInspectionItems-add">
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考核标准（父表）编号：</label>
+				<div class="col-sm-8">
+					<input id="assessId" name="assessId" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考核项编号：</label>
+				<div class="col-sm-8">
+					<input id="inspectionItemsNo" name="inspectionItemsNo" class="form-control" type="text">
+				</div>
+			</div>
+			<div class="form-group">	
+				<label class="col-sm-3 control-label">考核项权重：</label>
+				<div class="col-sm-8">
+					<input id="inspectionItemsWeight" name="inspectionItemsWeight" class="form-control" type="text">
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachInspectionItems"
+		$("#form-teachInspectionItems-add").validate({
+			rules:{
+				xxxx:{
+					required:true,
+				},
+			}
+		});
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            $.operate.save(prefix + "/add", $('#form-teachInspectionItems-add').serialize());
+	        }
+	    }
+	</script>
+</body>
+</html>

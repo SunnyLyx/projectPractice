@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+    
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse" th:object="${knowledgeMenu}">
+				<input id="menuId" name="menuId" type="hidden" th:field="*{menuId}"/>
+				<form id="formId">
+					<div class="select-list">
+						<ul>
+							<li>
+								菜单名称：<input type="text" name="menuName"/>
+							</li>
+
+							<li style="width: 100%;text-align: center">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+    <script th:inline="javascript">
+        var prefix = ctx + "knowledge/knowledgeMenu";
+        $(function() {
+            var options = {
+                url: prefix + "/list1",
+                modalName: "菜单",
+                search: false,
+		        showExport: false,
+                singleSelect: true,
+                columns: [{
+		            checkbox: true,
+                    formatter:function(value,row,index){
+		                var menuId = $("#menuId").val();
+                        if (menuId == row.menuId)
+                            return {
+                                checked : true//设置选中
+                            };
+                        return value;
+                    }
+		        },
+				{
+					field : 'menuId',
+					title : '菜单编号',
+					visible: true
+				},
+				{
+					field : 'menuName',
+					title : '菜单名称',
+					sortable: false
+				},
+				{
+					field : 'url',
+					title : '请求地址',
+					sortable: false
+				}]
+            };
+            $.table.init(options);
+        });
+    </script>
+</body>
+</html>

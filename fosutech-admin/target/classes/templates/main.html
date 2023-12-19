@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!--360浏览器优先以webkit内核解析-->
+    <title>fosuTech</title>
+    <link rel="shortcut icon" href="favicon.ico">
+    <link href="../static/css/bootstrap.min.css" th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link href="../static/css/font-awesome.min.css" th:href="@{/css/font-awesome.min.css}" rel="stylesheet"/>
+    <link href="../static/css/main/animate.min.css" th:href="@{/css/main/animate.min.css}" rel="stylesheet"/>
+    <link href="../static/css/main/style.min862f.css" th:href="@{/css/main/style.min862f.css}" rel="stylesheet"/>
+</head>
+
+<body class="gray-bg">
+    <div class="row  border-bottom white-bg dashboard-header">
+        <div class="col-sm-10">
+            <!--<h4>技术选型：</h4>-->
+            <!--<ol>-->
+                <!--<li>核心框架：Spring Boot</li>-->
+                <!--<li>安全框架：Apache Shiro</li>-->
+                <!--<li>模板引擎：Thymeleaf</li>-->
+                <!--<li>持久层框架：MyBatis</li>-->
+				<!--<li>定时任务:Quartz</li>-->
+                <!--<li>数据库连接池：Druid</li>-->
+                <!--<li>工具类：Fastjson</li>-->
+                <!--<li>关系型数据库：mysql</li>-->
+                <!--<li>缓存数据库：redis</li>-->
+                <!--<li>页面缓存：eheache</li>-->
+                <!--<li>短信服务：aliyun Sms</li>-->
+                <!--<li>文件服务器：aliyun oss</li>-->
+            <!--</ol>-->
+            <h4>考核设置项：</h4>
+            <ol>
+                <li>专业课出勤率：(出勤+迟到)/班级基数；班级基数=班级“在读”状态学生</li>
+                <li>实践课出勤率：(出勤+迟到)/班级基数；班级基数=班级“在读”状态学生</li>
+                <li>项目合格率：(优+良)/班级基数</li>
+                <li>作业完成率：(优+良)/班级基数</li>
+                <li>考试合格：(>=及格线)/班级基数</li>
+            </ol>
+            <h4>学生状态：</h4>
+            <ol>
+                <li>休学：耽误1周以上课程，原因教学负责老师审核通过，学员可以申请办理休学；停止账号学习，最多休学6个月，只能休学1次；</li>
+                <li>退学：不符合学习条件不能再进行学习；</li>
+                <li>复学：复学功能；指休学学员在休学期间可以提出复学申请，安排新的班级学习，从原班级转出，新班级在读</li>
+                <li>转线上：前三个阶段学习期间不能安排线下面授学习时间，完全转入线上学习，线上学员学校不负责就业工作</li>
+                <li>转班：转班功能；指原班级学员满足转班要求，安排新班级学习，从原班级转出，新班级在读；</li>
+                <li>提前就业：在读班级还未结课前完成就业，可以申请提前就业，则不将班级数据考核基数；</li>
+                <li>提前离校不负责就业：在读班级最后阶段结课前，学员因为个人原因不能在学校享受面授课程，明确要求学校不负责就业；</li>
+                <li>在读：班级正常在读学员</li>
+                <li>班级结课	：最后阶段课程结束，进入就业阶段学员</li>
+            </ol>
+            <h4>出勤状态：</h4>
+            <ol>
+                <li>出勤：上课时间均正常出勤</li>
+                <li>退学：不符合学习条件不能再进行学习；</li>
+                <li>早退：最后一节课下课前离开
+                </li>
+                <li>迟到：上课15分钟后到教室
+                </li>
+                <li>请假:<br/>
+                   <p>(1).事假：因家里发生重大事情而无法继续上课而提出请假，一般情况下不能请事假，请事假一定要家长亲笔签名或亲自电话告知班主任</p>
+                    <p>(2).病假：因身体不适而无法按时上课而提出的请假，请病假时需要提供医院的病历，发票等证明材料，或提供由家长亲笔签名的请假条，如事情紧急可由家长亲自电话告知请假，并于事后补齐请假手续</p>
+                    <p>(3).公假：因参加学校或其他地方重大活动而无法上课而提出的请假，必须班主任签名；</p>
+                    <span>所有请假教职经理审核通过才有效，否则视为旷课处理；</span>
+                </li>
+                <li>旷课：无故未上课15分钟以上</li>
+            </ol>
+            <h4>项目状态：</h4>
+            <ol>
+                <li>提交优：功能完全</li>
+                <li>提交良好	：完成大部分2/3功能，少量有bug</li>
+                <li>提交差：完成部分<=1/3功能</li>
+                <li>未完成：没有做</li>
+            </ol>
+            <h4>作业状态：</h4>
+            <ol>
+                <li>作业优：功能完全</li>
+                <li>作业良好：完成大部分2/3功能，少量有bug</li>
+                <li>作业差：完成部分<=1/3功能</li>
+                <li>未交：没有做</li>
+            </ol>
+            <h4>班级数据统计计算：</h4>
+            <ol>
+                <li>出勤率：(出勤+迟到)/班级基数；班级基数=班级“在读”状态学员；班级基数随时都是变化的；每天的出勤班级基数是以当天的基数计算；
+                </li>
+                <li>项目合格率：（提交良好+提交优）/班级基数*100%
+                </li>
+                <li>考试合格率：过及格分数线的人数/班级基数
+                </li>
+                <li>作业完成率：提交人数/班级基数
+                </li>
+            </ol>
+            <h4>专业数据计算：</h4>
+            <ol>
+                <li>出勤率：专业所有班级出勤率取平均值
+                </li>
+                <li>项目合格率：专业所有班级项目合格率取平均值
+
+                </li>
+                <li>考试合格率：专业所有班级考试合格率取平均值
+
+                </li>
+                <li>作业完成率：专业所有班级作业完成率取平均值
+                </li>
+                <li>满意度：专业所有班级满意度取平均值
+                </li>
+            </ol>
+            <h4>督查数据：</h4>
+            <ol>
+                <li>抽查合格率：抽查合格数/总抽查数*100%
+                </li>
+                <li>总部合格率：抽查数据替代分部数据计算合格率
+
+                </li>
+            </ol>
+            <h4>老师数据计算：</h4>
+            <ol>
+                <li>单个班级：为单个班级的数据值
+                </li>
+                <li>多个班级：多个班级时取班级平均值
+
+                </li>
+                <li>老师考核：（考核项权重1*考核计算标准+考核项权重2*考核计算标准）*考核占分比
+                </li>
+                <li>考核计算标准核算：取分部与总部数据的平均值核算应得考核计算标准</li>
+            </ol>
+            <h4>老师考勤数据计算：</h4>
+            <ol>
+                <li>班主任考勤率：对班级整体数据
+                </li>
+                <li>教师考勤率：对自己上课的考勤
+
+                </li>
+                <li>助教：对自己上课的考勤
+                </li>
+            </ol>
+        </div>
+    </div>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script th:src="@{/js/bootstrap.min.js}"></script>
+</body>
+</html>

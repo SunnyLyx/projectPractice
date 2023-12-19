@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="edu.fosu.teach.mapper.TeachClassHomeworkMapper">
+    
+    <resultMap type="TeachClassHomework" id="TeachClassHomeworkResult">
+        <result property="id"    column="id"    />
+        <result property="classId"    column="class_id"    />
+        <result property="homeworkDatetime"    column="homework_datetime"    />
+        <result property="jobContent"    column="job_content"    />
+        <result property="lesson"    column="lesson"    />
+        <result property="workbestnum"    column="workbestnum"    />
+        <result property="workgoodnum"    column="workgoodnum"    />
+        <result property="workpoornum"    column="workpoornum"    />
+        <result property="worknosubmitnum"    column="worknosubmitnum"    />
+        <result property="studentnum"    column="studentnum"    />
+        <result property="classHomeworkAttendance"    column="class_homework_attendance"    />
+    </resultMap>
+	
+	<sql id="selectTeachClassHomeworkVo">
+        select id, class_id, homework_datetime, job_content, lesson, workbestnum, workgoodnum, workpoornum, worknosubmitnum, studentnum, class_homework_attendance from teach_class_homework
+    </sql>
+	
+    <select id="selectTeachClassHomeworkList" parameterType="TeachClassHomework" resultMap="TeachClassHomeworkResult">
+        <include refid="selectTeachClassHomeworkVo"/>
+        <where>  
+            <if test="id != null "> and id = #{id}</if>
+             <if test="classId != null  and classId != '' "> and class_id = #{classId}</if>
+             <if test="homeworkDatetime != null "> and homework_datetime = #{homeworkDatetime}</if>
+             <if test="jobContent != null  and jobContent != '' "> and job_content = #{jobContent}</if>
+             <if test="lesson != null  and lesson != '' "> and lesson = #{lesson}</if>
+             <if test="workbestnum != null "> and workbestnum = #{workbestnum}</if>
+             <if test="workgoodnum != null "> and workgoodnum = #{workgoodnum}</if>
+             <if test="workpoornum != null "> and workpoornum = #{workpoornum}</if>
+             <if test="worknosubmitnum != null "> and worknosubmitnum = #{worknosubmitnum}</if>
+             <if test="studentnum != null "> and studentnum = #{studentnum}</if>
+             <if test="classHomeworkAttendance != null  and classHomeworkAttendance != '' "> and class_homework_attendance = #{classHomeworkAttendance}</if>
+         </where>
+    </select>
+    
+    <select id="selectTeachClassHomeworkById" parameterType="Integer" resultMap="TeachClassHomeworkResult">
+        <include refid="selectTeachClassHomeworkVo"/>
+        where id = #{id}
+    </select>
+    <select id="selectTeachClassHomeworkTask" parameterType="Integer" resultMap="TeachClassHomeworkResult">
+        SELECT class_id,datetime,job_content,sum(studentnum) as studentnum ,sum(workbestnum) as workbestnum ,sum(workgoodnum) as workgoodnum,sum(workpoornum) as workpoornum,sum(worknosubmitnum) as worknosubmitnum from
+        (
+
+        SELECT class_id,datetime,job_content,count(0) as studentnum,0 as workbestnum,0 as workgoodnum,0 as workpoornum,0 as worknosubmitnum
+        from teach_job  tj
+        join teach_student_job tsj
+        on tj.job_id = tsj.job_id
+        -- WHERE DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY tj.class_id,tj.datetime
+        UNION
+        SELECT class_id,datetime,job_content,0 as studentnum,count(job_result) as workbestnum,0 as workgoodnum,0 as workpoornum,0 as worknosubmitnum
+        from teach_job  tj
+        join teach_student_job tsj
+        on tj.job_id = tsj.job_id
+        WHERE
+         tsj.job_result='1'
+         -- AND DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY tj.class_id,tj.datetime
+        UNION
+        SELECT class_id,datetime,job_content,0 as studentnum,0 as workbestnum,count(job_result) as workgoodnum,0 as workpoornum,0 as worknosubmitnum
+        from teach_job  tj
+        join teach_student_job tsj
+        on tj.job_id = tsj.job_id
+        WHERE
+         tsj.job_result='2'
+         -- AND DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY tj.class_id,tj.datetime
+        UNION
+        SELECT class_id,datetime,job_content,0 as studentnum,0 as workbestnum,0 as workgoodnum,count(job_result) as workpoornum,0 as worknosubmitnum
+        from teach_job  tj
+        join teach_student_job tsj
+        on tj.job_id = tsj.job_id
+        WHERE
+         tsj.job_result='3'
+         -- AND DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY tj.class_id,tj.datetime
+
+        UNION
+        SELECT class_id,datetime,job_content,0 as studentnum,0 as workbestnum,0 as workgoodnum,0 as workpoornum,count(job_result) as worknosubmitnum
+        from teach_job  tj
+        join teach_student_job tsj
+        on tj.job_id = tsj.job_id
+        WHERE
+         tsj.job_result='4'
+         -- AND DATEDIFF(ta.attendance_datetime,NOW())=-1
+        GROUP BY tj.class_id,tj.datetime
+        ) a
+        GROUP BY a.class_id,a.datetime,a.job_content
+    </select>
+
+    <insert id="insertTeachClassHomework" parameterType="TeachClassHomework">
+        insert into teach_class_homework
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">id,</if>
+			<if test="classId != null  and classId != ''  ">class_id,</if>
+			<if test="homeworkDatetime != null  ">homework_datetime,</if>
+			<if test="jobContent != null  and jobContent != ''  ">job_content,</if>
+			<if test="lesson != null  and lesson != ''  ">lesson,</if>
+			<if test="workbestnum != null  ">workbestnum,</if>
+			<if test="workgoodnum != null  ">workgoodnum,</if>
+			<if test="workpoornum != null  ">workpoornum,</if>
+			<if test="worknosubmitnum != null  ">worknosubmitnum,</if>
+			<if test="studentnum != null  ">studentnum,</if>
+			<if test="classHomeworkAttendance != null  and classHomeworkAttendance != ''  ">class_homework_attendance,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="id != null  ">#{id},</if>
+			<if test="classId != null  and classId != ''  ">#{classId},</if>
+			<if test="homeworkDatetime != null  ">#{homeworkDatetime},</if>
+			<if test="jobContent != null  and jobContent != ''  ">#{jobContent},</if>
+			<if test="lesson != null  and lesson != ''  ">#{lesson},</if>
+			<if test="workbestnum != null  ">#{workbestnum},</if>
+			<if test="workgoodnum != null  ">#{workgoodnum},</if>
+			<if test="workpoornum != null  ">#{workpoornum},</if>
+			<if test="worknosubmitnum != null  ">#{worknosubmitnum},</if>
+			<if test="studentnum != null  ">#{studentnum},</if>
+			<if test="classHomeworkAttendance != null  and classHomeworkAttendance != ''  ">#{classHomeworkAttendance},</if>
+         </trim>
+    </insert>
+	 
+    <update id="updateTeachClassHomework" parameterType="TeachClassHomework">
+        update teach_class_homework
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="classId != null  and classId != ''  ">class_id = #{classId},</if>
+            <if test="homeworkDatetime != null  ">homework_datetime = #{homeworkDatetime},</if>
+            <if test="jobContent != null  and jobContent != ''  ">job_content = #{jobContent},</if>
+            <if test="lesson != null  and lesson != ''  ">lesson = #{lesson},</if>
+            <if test="workbestnum != null  ">workbestnum = #{workbestnum},</if>
+            <if test="workgoodnum != null  ">workgoodnum = #{workgoodnum},</if>
+            <if test="workpoornum != null  ">workpoornum = #{workpoornum},</if>
+            <if test="worknosubmitnum != null  ">worknosubmitnum = #{worknosubmitnum},</if>
+            <if test="studentnum != null  ">studentnum = #{studentnum},</if>
+            <if test="classHomeworkAttendance != null  and classHomeworkAttendance != ''  ">class_homework_attendance = #{classHomeworkAttendance},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+	<delete id="deleteTeachClassHomeworkById" parameterType="Integer">
+        delete from teach_class_homework where id = #{id}
+    </delete>
+	
+    <delete id="deleteTeachClassHomeworkByIds" parameterType="String">
+        delete from teach_class_homework where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    
+</mapper>

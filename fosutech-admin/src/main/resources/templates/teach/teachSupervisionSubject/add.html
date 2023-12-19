@@ -1,0 +1,215 @@
+<!DOCTYPE HTML>
+<html  lang="zh" xmlns:th="http://www.thymeleaf.org">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="white-bg">
+    <div class="wrapper wrapper-content animated fadeInRight ibox-content">
+        <form class="form-horizontal m" id="form-teachSupervisionSubject-add">
+			<input name="classId"  type="hidden" id="classId"/>
+
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">班级：</label>
+					<div class="col-sm-8">
+						<!--<input id="classId" name="classId" class="form-control" type="text">-->
+						<input class="form-control" type="text" onclick="selectList()" readonly="true" id="className">
+					</div>
+				</div>
+			</div>
+			<!--<div class="form-group">
+				<label class="col-sm-3 control-label">创建时间：</label>
+				<div class="col-sm-8">
+					<input id="createtime" name="createtime" class="form-control" type="text">
+				</div>
+			</div>-->
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">项目：</label>
+					<div class="col-sm-8">
+						<!--<input id="subjectId" name="subjectId" class="form-control" type="text">-->
+						<select id="subjectId" name="subjectId" class="form-control" type="text"></select>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">分部合格率：</label>
+					<div class="col-sm-8">
+						<input id="schoolAcceptability" name="schoolAcceptability" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">总部合格率：</label>
+					<div class="col-sm-8">
+						<input id="headquartersAcceptability" name="headquartersAcceptability" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">抽查个数：</label>
+					<div class="col-sm-8">
+						<input id="randomNumber" name="randomNumber" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="form-group">
+					<label class="col-sm-3 control-label">抽查合格率：</label>
+					<div class="col-sm-8">
+						<input id="randomAcceptability" name="randomAcceptability" class="form-control" type="number">
+					</div>
+				</div>
+			</div>
+		</form>
+	</div>
+    <div th:include="include::footer"></div>
+    <script type="text/javascript">
+		var prefix = ctx + "teach/teachSupervisionSubject";
+		$("#form-teachSupervisionSubject-add").validate({
+			rules:{
+				xxxx:{
+					required:true
+				}
+			}
+		});
+
+        //默认项目下拉框
+        /*var classId = $("input[name='classId']").val();
+        $.ajax({
+            cache : true,
+            type : "POST",
+            url : ctx + "teach/teachSubject/list",
+            data : {"classId" : classId},
+            error : function(request) {
+                $.modal.alertError("系统错误");
+            },
+            success : function(data) {
+                if (data && data.rows.length > 0) {
+                    var subject = data.rows;
+                    addOptions(subject);
+                }
+            }
+        });*/
+
+        /*总部督查-新增-选择班级*/
+        function selectList() {
+            var url = ctx + "teach/teachClasses/selectList";
+            var options = {
+                title: '选择班级',
+                width: "800",
+                url: url,
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        }
+
+        function doSubmit(index, layero){
+            var body = layer.getChildFrame('body', index);
+            var data = body.find('.selected')[0];
+            var classId = body.find('.selected')[0].children[1].innerHTML;
+            if(data != "undefined" && data != "" && data != null){
+                $("#className").val(body.find('.selected')[0].children[2].innerHTML);
+                $("#classId").val(classId);
+                subjectSelect(classId);
+                //判断是否为空
+                if (classId != undefined && classId != null) {
+                    checkInput();
+                }
+            }else{
+                layer.msg("请选择一个班级");
+            }
+            layer.close(index);
+        }
+
+        function subjectSelect(classId) {
+            //进入班级选择且classId有值时查询当前项目值存入下拉框
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachSubject/list",
+                data : {"classId" : classId},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    var subject = data.rows;
+                    addOptions(subject);
+                }
+            });
+        }
+
+        function checkInput() {
+            //根据选择的班级级联查询阶段存入项目下拉框
+            var classId = $("input[name='classId']").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachSubject/list",
+                data : {"classId" : classId},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    if (data && data.rows.length > 0) {
+                        var subject = data.rows;
+                        addOptions(subject);
+                    }
+                }
+            });
+        }
+
+        function addOptions(subject) {
+            var pro = $('select[name="subjectId"]');
+            pro.children().remove();
+
+            var options = "";
+            $(subject).each(function() {
+                options += '<option value="' + this.subjectId + '" >' + this.subjectName + '</option>';
+            });
+
+            pro.append(options);
+        }
+		
+		function submitHandler() {
+	        if ($.validate.form()) {
+	            //$.operate.save(prefix + "/add", $('#form-teachSupervisionSubject-add').serialize());
+                add();
+	        }
+	    }
+
+	    function add() {
+            var classId = $("input[name='classId']").val();
+            var options=$("#subjectId option:selected"); //获取选中的项
+            var subjectId = options.val();
+            var schoolAcceptability = $("#schoolAcceptability").val();
+            var headquartersAcceptability = $("#headquartersAcceptability").val();
+            var randomNumber = $("#randomNumber").val();
+            var randomAcceptability = $("#randomAcceptability").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : prefix + "/add",
+                data : {
+                    "classId": classId,
+                    "subjectId": subjectId,
+                    "schoolAcceptability": schoolAcceptability,
+                    "headquartersAcceptability": headquartersAcceptability,
+                    "randomNumber": randomNumber,
+                    "randomAcceptability": randomAcceptability
+                },
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    $.operate.successCallback(data);
+                }
+            });
+        }
+
+	</script>
+</body>
+</html>

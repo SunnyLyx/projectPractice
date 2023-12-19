@@ -1,0 +1,290 @@
+<!DOCTYPE HTML>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<link th:href="@{/ajax/libs/jquery-layout/jquery.layout-latest.css}" rel="stylesheet"/>
+<link th:href="@{/ajax/libs/jquery-ztree/3.5/css/metro/zTreeStyle.css}" rel="stylesheet"/>
+<body class="gray-bg">
+
+     <div class="container-div">
+		<div class="row">
+			<div class="col-sm-12 search-collapse">
+				<form id="formId">
+					<input type="hidden" id="schoolId" name="schoolId">
+					<input type="hidden" id="parentId" name="parentId">
+					<div class="select-list">
+						<ul>
+							<li>
+								班级名称：<input type="text" name="className"/>
+							</li>
+
+							<!--<li>
+								所属分部：<input type="text" name="schoolId"/>
+							</li>-->
+
+							<li style="width:290px">
+								所属专业：<!--<input type="text" name="majorId"/>-->
+								<select id="majorId" name="majorId" class="form-control" type="text" style="padding: 0px;display: inline-block">
+									<option value="0" id="aaa">全部</option>
+									<option th:each="obj,eStat:${major}" th:value="${obj.majorId}"
+											th:text="${obj.majorName}"></option>
+								</select>
+							</li>
+
+							<!--<li  style="width:290px">
+								当前阶段：&lt;!&ndash;<input type="text" name="stageNew"/>&ndash;&gt;
+								<select id="stageNew" name="stageNew" class="form-control" type="text" style="padding: 0px;display: inline-block" ></select>
+							</li>-->
+
+							<!--<li>
+								阶段开始时间：<input type="text" name="stageStarttime"/>
+							</li>
+
+							<li>
+								阶段结束时间：<input type="text" name="stageEndtime"/>
+							</li>
+
+							<li>
+								创建时间：<input type="text" name="createtime"/>
+							</li>-->
+
+							<li style="width: 100%;text-align: center">
+								<a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-fw fa-search"></i>&nbsp;搜索</a>
+								<a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-fw fa-refresh"></i>&nbsp;重置</a>
+							</li>
+						</ul>
+					</div>
+				</form>
+			</div>
+			
+	        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+				<a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="teach:teachClasses:add">
+					<i class="fa fa-fw fa-plus"></i> 添加
+				</a>
+				<a class="btn btn-primary btn-edit disabled" onclick="$.operate.edit()" shiro:hasPermission="teach:teachClasses:edit">
+					<i class="fa fa-fw fa-edit"></i> 修改
+				</a>
+				<a class="btn btn-danger btn-del btn-del disabled" onclick="$.operate.removeAll()" shiro:hasPermission="teach:teachClasses:remove">
+					<i class="fa fa-fw fa-remove"></i> 删除
+				</a>
+				<!--<a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="teach:teachClasses:export">
+						<i class="fa fa-fw fa-download"></i> 导出
+				 </a>-->
+			</div>
+			<div class="col-sm-12 select-table table-striped">
+				<table id="bootstrap-table" data-mobile-responsive="true"></table>
+			</div>
+		</div>
+	</div>
+    <div th:include="include :: footer"></div>
+	<script th:src="@{/ajax/libs/jquery-layout/jquery.layout-latest.js}"></script>
+	<script th:src="@{/ajax/libs/jquery-ztree/3.5/js/jquery.ztree.all-3.5.js}"></script>
+    <script th:inline="javascript">
+        var detailFlag = [[${@permission.hasPermi('teach:teachClasses:detail')}]];
+        var editFlag = [[${@permission.hasPermi('teach:teachClasses:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('teach:teachClasses:remove')}]];
+        var changeFlag = [[${@permission.hasPermi('teach:teachClasses:change')}]];
+        var prefix = ctx + "teach/teachClasses";
+
+        $(function() {
+            /*var panehHidden = false;
+            if ($(this).width() < 769) {
+                panehHidden = true;
+            }
+            $('body').layout({ initClosed: panehHidden, west__size: 185 });*/
+            queryClassList();
+            queryDeptTree();
+        });
+
+        function queryClassList() {
+            var options = {
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                detailUrl: prefix + "/detail/{id}",
+                removeUrl: prefix + "/remove",
+				exportUrl: prefix + "/export",
+                changeUrl: prefix + "/change",
+                modalName: "班级",
+				search: false,
+		        showExport: true,
+                columns: [{
+		            checkbox: true
+		        },
+				{
+					field : 'classId', 
+					title : '班级ID',
+					visible: false
+				},
+				{
+					field : 'className', 
+					title : '班级名称',
+					sortable: false
+				},
+				{
+					field : 'schoolName',
+					title : '所属分部',
+					sortable: false
+				},
+				{
+					field : 'majorName',
+					title : '所属专业',
+					sortable: false
+				},
+                    {
+                        field : 'zaidu',
+                        title : '在读人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'tuixue',
+                        title : '退学人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'xiuxue',
+                        title : '休学人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'xianshang',
+                        title : '转线上人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'tiqianjiuye',
+                        title : '提前就业人数',
+                        sortable: false
+                    },
+                    {
+                        field : 'lixiao',
+                        title : '提前离校人数',
+                        sortable: false
+                    },
+				{
+					field : 'createtime', 
+					title : '班级创建时间',
+					sortable: false
+				},
+		        {
+		            title: '操作',
+		            align: 'center',
+		            formatter: function(value, row, index) {
+		            	var actions = [];
+		            	actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="#" onclick="$.operate.edit(\'' + row.classId + '\')"><i class="fa fa-fw fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-warning btn-xs ' + detailFlag + '" href="#" onclick="$.operate.detail(\'' + row.classId + '\')"><i class="fa fa-fw fa-search"></i>详情</a> ');
+                        actions.push('<a class="btn btn-info btn-xs ' + changeFlag + '" href="#" onclick="$.operate.change(\'' + row.classId + '\')"><i class="fa fa-fw fa-hourglass-end"></i>结课</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="#" onclick="$.operate.remove(\'' + row.classId + '\')"><i class="fa fa-fw fa-remove"></i>删除</a>');
+						return actions.join('');
+		            }
+		        }]
+            };
+            $.table.init(options);
+        }
+
+        function queryDeptTree()
+        {
+            var url = ctx + "system/dept/treeData";
+            var options = {
+                url: url,
+                expandLevel: 2,
+                onClick : zOnClick
+            };
+            $.tree.init(options);
+
+            function zOnClick(event, treeId, treeNode) {
+                $("#schoolId").val(treeNode.id);
+                $("#parentId").val(treeNode.pId);
+                /*$.ajax({
+                    type:"POST",
+                    url:prefix + '/listBySchoolId',
+                    data:{schoolId:treeNode.id},
+                    success : function(data) {
+                        $("#bootstrap-table").bootstrapTable('load', data);
+                    }
+                })*/
+                $.table.search();
+            }
+        }
+
+        //根据选择的专业级联查询阶段存入当前阶段下拉框
+        $("#majorId").bind("input propertychange",function () {
+            var aaa = $("#aaa").val();
+			//console.log(aaa)
+			if(aaa == 0){
+                var pro = $('#stageNew');
+                pro.children().remove();
+			}
+            var majorId1 = $("select[name='majorId']").val();
+            $.ajax({
+                cache : true,
+                type : "POST",
+                url : ctx + "teach/teachMajorStage/list",
+                data : {"majorId" : majorId1},
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                success : function(data) {
+                    if (data && data.rows.length > 0) {
+                        project = data.rows;
+                        addOptions(project);
+                    }
+                }
+            })
+        });
+
+        function addOptions(project) {
+
+            var pro = $('#stageNew');
+            pro.children().remove();
+
+            var options = "";
+            $(project).each(function() {
+                options += '<option value="' + this.id + '" >' + this.stageName + '</option>';
+            });
+
+            pro.append(options);
+        }
+
+        $('#btnExpand').click(function() {
+            $._tree.expandAll(true);
+            $(this).hide();
+            $('#btnCollapse').show();
+        });
+
+        $('#btnCollapse').click(function() {
+            $._tree.expandAll(false);
+            $(this).hide();
+            $('#btnExpand').show();
+        });
+
+        $('#btnRefresh').click(function() {
+            queryDeptTree();
+        });
+
+
+        /* 用户状态显示 */
+        function statusTools(row) {
+            if (row.linkStatus == 1) {
+                return '<i class=\"fa fa-toggle-off text-info fa-2x\" onclick="enable(\'' + row.classId + '\')"></i> ';
+            } else {
+                return '<i class=\"fa fa-toggle-on text-info fa-2x\" onclick="disable(\'' + row.classId + '\')"></i> ';
+            }
+        }
+
+        /* 用户管理-停用 */
+        function disable(classId) {
+            $.modal.confirm("确认要停用连接吗？", function() {
+                $.operate.post(prefix + "/changeStatus", { "classId": classId, "linkStatus": 1 });
+            })
+        }
+
+        /* 用户管理启用 */
+        function enable(classId) {
+            $.modal.confirm("确认要启用连接吗？", function() {
+                $.operate.post(prefix + "/changeStatus", { "classId": classId, "linkStatus": 0 });
+            })
+        }
+    </script>
+</body>
+</html>
